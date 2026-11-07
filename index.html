@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Suzy Coiffure</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Suzy Coiffure, salon de coiffure à Neuchâtel depuis plus de 25 ans. Brushing, balayage, coupes tendance, soins et ongles. Rue des Chavannes 13.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400;1,6..96,500&family=Jost:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Préloader -->
+<div class="loader" id="loader" aria-hidden="true">
+  <div class="loader-inner">
+    <svg class="loader-mono" viewBox="0 0 200 200">
+      <circle cx="100" cy="100" r="92" class="lm-ring"/>
+      <text x="100" y="134" text-anchor="middle" class="lm-s">S</text>
+    </svg>
+    <div class="loader-name">Suzy Coiffure</div>
+    <div class="loader-count"><span id="loaderCount">0</span></div>
+  </div>
+</div>
+
+<div class="cursor" id="cursor" aria-hidden="true"><span class="cursor-label" id="cursorLabel"></span></div>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- Navigation -->
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#top" class="logo" aria-label="Suzy Coiffure">
+      <span class="logo-s">Suzy</span><span class="logo-c">Coiffure</span>
+    </a>
+    <nav class="nav-links" aria-label="Navigation principale">
+      <a href="#experience" data-i18n="nav.experience"></a>
+      <a href="#services" data-i18n="nav.services"></a>
+      <a href="#galerie" data-i18n="nav.gallery"></a>
+      <a href="#equipe" data-i18n="nav.team"></a>
+      <a href="#contact" data-i18n="nav.contact"></a>
+    </nav>
+    <div class="nav-right">
+      <div class="lang" role="group" aria-label="Langue">
+        <button type="button" data-lang="fr" class="is-active">FR</button>
+        <button type="button" data-lang="en">EN</button>
+        <button type="button" data-lang="de">DE</button>
+      </div>
+      <a href="#contact" class="btn btn-gold btn-sm magnetic" data-i18n="nav.book"></a>
+      <button type="button" class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#experience" data-i18n="nav.experience"></a>
+    <a href="#services" data-i18n="nav.services"></a>
+    <a href="#galerie" data-i18n="nav.gallery"></a>
+    <a href="#equipe" data-i18n="nav.team"></a>
+    <a href="#contact" data-i18n="nav.contact"></a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero-media" id="heroMedia">
+      <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
+      <div class="hero-veil" aria-hidden="true"></div>
+    </div>
+
+    <div class="hero-top wrap">
+      <p class="eyebrow hero-eyebrow" data-i18n="hero.eyebrow"></p>
+      <div class="hero-rating">
+        <span class="stars" aria-hidden="true">★★★★★</span>
+        <strong>4,9</strong>
+        <span data-i18n="hero.reviews"></span>
+      </div>
+    </div>
+
+    <div class="hero-main wrap">
+      <div class="hero-aside">
+        <p class="hero-line" data-i18n-html="hero.line"></p>
+        <div class="hero-actions">
+          <a href="#contact" class="btn btn-gold magnetic"><span data-i18n="hero.cta"></span></a>
+          <a href="#experience" class="btn btn-ghost magnetic"><span data-i18n="hero.discover"></span></a>
+        </div>
+      </div>
+      <h1 class="hero-title" aria-label="Suzy Coiffure">
+        <span class="ht-1" data-split>Suzy</span>
+        <span class="ht-2" data-split>Coiffure</span>
+      </h1>
+    </div>
+
+    <div class="hero-bar wrap">
+      <div class="slides-nav" id="slidesNav" role="tablist" aria-label="Réalisations"></div>
+      <div class="slide-name" aria-live="polite"><span class="slide-num" id="slideNum">01</span><span class="slide-label" id="slideLabel"></span></div>
+      <div class="hero-scroll" aria-hidden="true"><span data-i18n="hero.scroll"></span><i></i></div>
+    </div>
+  </section>
+
+  <!-- Bandeau -->
+  <div class="ribbon" aria-hidden="true">
+    <div class="ribbon-track">
+      <span>Brushing</span><b>✦</b><span>Balayage</span><b>✦</b><span>Airtouch</span><b>✦</b><span>Butterfly cut</span><b>✦</b><span>Wolf cut</span><b>✦</b><span>Gloss</span><b>✦</b><span>Kératine</span><b>✦</b><span>Ongles</span><b>✦</b><span>Café gourmand</span><b>✦</b>
+      <span>Brushing</span><b>✦</b><span>Balayage</span><b>✦</b><span>Airtouch</span><b>✦</b><span>Butterfly cut</span><b>✦</b><span>Wolf cut</span><b>✦</b><span>Gloss</span><b>✦</b><span>Kératine</span><b>✦</b><span>Ongles</span><b>✦</b><span>Café gourmand</span><b>✦</b>
+    </div>
+  </div>
+
+  <!-- EXPÉRIENCE -->
+  <section class="section exp" id="experience">
+    <div class="wrap exp-grid">
+      <div class="exp-media">
+        <figure class="exp-img exp-img-a parallax" data-speed="-0.08">
+          <img src="assets/img/cafe.jpg" alt="Cafés crème servis au salon" loading="lazy">
+        </figure>
+        <figure class="exp-img exp-img-b parallax" data-speed="0.1">
+          <img src="assets/img/dessert.jpg" alt="Petits desserts aux fraises" loading="lazy">
+        </figure>
+        <p class="exp-caption" data-i18n="exp.caption"></p>
+      </div>
+      <div class="exp-text">
+        <p class="eyebrow" data-i18n="exp.eyebrow"></p>
+        <h2 class="h2 reveal-lines" data-i18n-html="exp.title"></h2>
+        <p class="lead reveal-up" data-i18n="exp.text"></p>
+        <ul class="rituals">
+          <li class="reveal-up"><span class="r-ico" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M6 13h16v6a7 7 0 0 1-7 7h-2a7 7 0 0 1-7-7z"/><path d="M22 15h2a3 3 0 0 1 0 6h-2"/><path d="M11 4c-1 2 1 3 0 6M15 4c-1 2 1 3 0 6"/></svg></span><div><h3 data-i18n="exp.r1.t"></h3><p data-i18n="exp.r1.d"></p></div></li>
+          <li class="reveal-up"><span class="r-ico" aria-hidden="true"><svg viewBox="0 0 32 32"><circle cx="9" cy="23" r="4"/><circle cx="23" cy="23" r="4"/><path d="M12 20 25 4M20 20 7 4"/></svg></span><div><h3 data-i18n="exp.r2.t"></h3><p data-i18n="exp.r2.d"></p></div></li>
+          <li class="reveal-up"><span class="r-ico" aria-hidden="true"><svg viewBox="0 0 32 32"><path d="M16 3l3.6 7.6 8.4 1-6.2 5.8 1.6 8.3L16 21.6l-7.4 4.1 1.6-8.3L4 11.6l8.4-1z"/></svg></span><div><h3 data-i18n="exp.r3.t"></h3><p data-i18n="exp.r3.d"></p></div></li>
+        </ul>
+      </div>
+    </div>
+    <div class="wrap stats">
+      <div class="stat"><span class="stat-n"><span class="count" data-to="25">25</span>+</span><span class="stat-l" data-i18n="exp.s1"></span></div>
+      <div class="stat"><span class="stat-n"><span class="count" data-to="4.9" data-dec="1">4,9</span><small>★</small></span><span class="stat-l" data-i18n="exp.s2"></span></div>
+      <div class="stat"><span class="stat-n"><span class="count" data-to="515">515</span></span><span class="stat-l" data-i18n="exp.s3"></span></div>
+    </div>
+  </section>
+
+  <!-- PRESTATIONS -->
+  <section class="section services" id="services">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow" data-i18n="srv.eyebrow"></p>
+        <h2 class="h2 reveal-lines" data-i18n-html="srv.title"></h2>
+      </div>
+      <div class="srv-tabs" id="srvTabs" role="tablist"></div>
+      <div class="srv-body">
+        <figure class="srv-visual" aria-hidden="true">
+          <img id="srvImg" src="assets/img/brushing.jpg" alt="">
+          <span class="srv-visual-label" id="srvLabel"></span>
+        </figure>
+        <ul class="srv-list" id="srvList" role="tabpanel"></ul>
+      </div>
+      <p class="srv-note" data-i18n="srv.note"></p>
+    </div>
+  </section>
+
+  <!-- GALERIE -->
+  <section class="gallery" id="galerie">
+    <div class="gal-pin">
+      <div class="wrap gal-head">
+        <div>
+          <p class="eyebrow" data-i18n="gal.eyebrow"></p>
+          <h2 class="h2" data-i18n-html="gal.title"></h2>
+        </div>
+        <span class="gal-hint" data-i18n="gal.hint"></span>
+      </div>
+      <div class="gal-track" id="galTrack">
+        <figure class="gal-item" data-cursor="Voir"><img src="assets/img/waves.jpg" alt="Ondulations glamour" loading="lazy"><figcaption><span>01</span>Ondulations glamour</figcaption></figure>
+        <figure class="gal-item tall" data-cursor="Voir"><img src="assets/img/gloss.jpg" alt="Couleur et gloss" loading="lazy"><figcaption><span>02</span>Couleur &amp; gloss</figcaption></figure>
+        <figure class="gal-item" data-cursor="Voir"><img src="assets/img/bob.jpg" alt="Carré flou" loading="lazy"><figcaption><span>03</span>Carré flou</figcaption></figure>
+        <figure class="gal-item tall" data-cursor="Voir"><img src="assets/img/chignon.jpg" alt="Chignon de mariée" loading="lazy"><figcaption><span>04</span>Chignon de mariée</figcaption></figure>
+        <figure class="gal-item" data-cursor="Voir"><img src="assets/img/curly.jpg" alt="Coupe cheveux bouclés" loading="lazy"><figcaption><span>05</span>Boucles naturelles</figcaption></figure>
+        <figure class="gal-item tall" data-cursor="Voir"><img src="assets/img/brushing.jpg" alt="Brushing wavy" loading="lazy"><figcaption><span>06</span>Brushing wavy</figcaption></figure>
+        <figure class="gal-item" data-cursor="Voir"><img src="assets/img/color.jpg" alt="Couleur fantaisie" loading="lazy"><figcaption><span>07</span>Couleur fantaisie</figcaption></figure>
+        <figure class="gal-item tall" data-cursor="Voir"><img src="assets/img/nails2.jpg" alt="Nail art" loading="lazy"><figcaption><span>08</span>Nail art</figcaption></figure>
+        <figure class="gal-item" data-cursor="Voir"><img src="assets/img/salon.jpg" alt="Le salon" loading="lazy"><figcaption><span>09</span>Le salon</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- AVANT / APRÈS -->
+  <section class="section ba" id="avant-apres">
+    <div class="wrap ba-grid">
+      <div class="ba-text">
+        <p class="eyebrow" data-i18n="ba.eyebrow"></p>
+        <h2 class="h2 reveal-lines" data-i18n-html="ba.title"></h2>
+        <p class="lead reveal-up" data-i18n="ba.text"></p>
+      </div>
+      <div class="ba-frame" id="baFrame" style="--pos:50%">
+        <img class="ba-after" src="assets/img/waves.jpg" alt="Après : ondulations brillantes">
+        <div class="ba-before-wrap"><img class="ba-before" src="assets/img/waves.jpg" alt="Avant"></div>
+        <span class="ba-tag ba-tag-l" data-i18n="ba.before"></span>
+        <span class="ba-tag ba-tag-r" data-i18n="ba.after"></span>
+        <div class="ba-handle" aria-hidden="true"><span>⟷</span></div>
+        <label class="sr-only" for="baRange">Avant / Après</label>
+        <input type="range" id="baRange" min="0" max="100" value="50">
+      </div>
+    </div>
+  </section>
+
+  <!-- ÉQUIPE -->
+  <section class="section team" id="equipe">
+    <div class="wrap">
+      <div class="sec-head center">
+        <p class="eyebrow" data-i18n="team.eyebrow"></p>
+        <h2 class="h2 reveal-lines" data-i18n-html="team.title"></h2>
+      </div>
+      <div class="team-grid">
+        <article class="member tilt">
+          <div class="member-img"><img src="assets/img/suzy.jpg" alt="Suzy, fondatrice" loading="lazy"></div>
+          <div class="member-body">
+            <p class="member-role" data-i18n="team.suzy.role"></p>
+            <h3 class="member-name">Suzy</h3>
+            <p data-i18n="team.suzy.bio"></p>
+          </div>
+        </article>
+        <article class="member tilt">
+          <div class="member-img"><img src="assets/img/valentina.jpg" alt="Valentina, coiffeuse" loading="lazy"><span class="member-flag">Italia</span></div>
+          <div class="member-body">
+            <p class="member-role" data-i18n="team.val.role"></p>
+            <h3 class="member-name">Valentina</h3>
+            <p data-i18n="team.val.bio"></p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bande typographique -->
+  <section class="bigtype" aria-hidden="true">
+    <div class="bigtype-row bt-1"><span>Brushing</span><i>✦</i><span class="o">Balayage</span><i>✦</i><span>Airtouch</span><i>✦</i><span class="o">Gloss</span><i>✦</i><span>Brushing</span><i>✦</i><span class="o">Balayage</span></div>
+    <div class="bigtype-row bt-2"><span class="o">comme à la maison</span><i>✦</i><span>Neuchâtel</span><i>✦</i><span class="o">comme à la maison</span><i>✦</i><span>Neuchâtel</span></div>
+  </section>
+
+  <!-- AVIS -->
+  <section class="section reviews" id="avis">
+    <div class="wrap sec-head center">
+      <p class="eyebrow" data-i18n="rev.eyebrow"></p>
+      <h2 class="h2 reveal-lines" data-i18n-html="rev.title"></h2>
+      <p class="rev-sub" data-i18n="rev.sub"></p>
+    </div>
+    <div class="marquee">
+      <div class="marquee-track" id="revTrack"></div>
+    </div>
+  </section>
+
+  <!-- ANNIVERSAIRE -->
+  <section class="section bday-sec">
+    <div class="wrap">
+      <div class="bday" id="bday">
+        <div class="bday-shine" aria-hidden="true"></div>
+        <div class="bday-text">
+          <p class="eyebrow" data-i18n="bday.eyebrow"></p>
+          <h2 class="h2" data-i18n-html="bday.title"></h2>
+          <p data-i18n="bday.text"></p>
+        </div>
+        <div class="bday-amount">
+          <span class="bday-minus">–20</span>
+          <span class="bday-chf">CHF <em data-i18n="bday.off"></em></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INFOS & CONTACT -->
+  <section class="section info" id="contact">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow" data-i18n="info.eyebrow"></p>
+        <h2 class="h2 reveal-lines" data-i18n-html="info.title"></h2>
+      </div>
+      <div class="info-grid">
+        <div class="info-card hours-card">
+          <div class="info-card-head">
+            <h3 data-i18n="info.hours"></h3>
+            <span class="status" id="openStatus"></span>
+          </div>
+          <ul class="hours" id="hoursList"></ul>
+        </div>
+
+        <div class="info-card place-card">
+          <a class="map" href="https://www.google.com/maps/search/?api=1&query=Suzy+Coiffure+Rue+des+Chavannes+13+2000+Neuch%C3%A2tel" target="_blank" rel="noopener">
+            <svg class="map-art" viewBox="0 0 400 260" aria-hidden="true">
+              <path class="lake" d="M0 200 C80 185 160 215 240 198 S360 180 400 192 V260 H0Z"/>
+              <path class="street" d="M20 40 L380 120"/>
+              <path class="street" d="M90 10 L150 250"/>
+              <path class="street" d="M260 0 L230 180"/>
+              <path class="street thin" d="M0 140 L300 60"/>
+              <path class="street thin" d="M330 20 L360 180"/>
+              <path class="chavannes" d="M120 70 C170 90 210 96 250 110"/>
+              <g class="pin" transform="translate(196 92)"><circle r="26" class="pin-pulse"/><circle r="9"/></g>
+            </svg>
+            <span class="map-label">Rue des Chavannes</span>
+            <span class="map-cta"><span data-i18n="info.map"></span> ↗</span>
+          </a>
+          <div class="place-rows">
+            <div><h3 data-i18n="info.address"></h3><p>Rue des Chavannes 13<br>2000 Neuchâtel</p><p class="muted" data-i18n="info.pedestrian"></p></div>
+            <div><h3 data-i18n="info.phone"></h3><p class="phone">076 321 32 39</p></div>
+          </div>
+        </div>
+
+        <div class="info-card book-card">
+          <h3 class="book-title" data-i18n="info.book"></h3>
+          <p data-i18n="info.bookText"></p>
+          <div class="book-actions">
+            <a href="tel:+41763213239" class="btn btn-gold magnetic"><span data-i18n="info.call"></span> · 076 321 32 39</a>
+            <a href="https://wa.me/41763213239" target="_blank" rel="noopener" class="btn btn-ghost-dark magnetic">WhatsApp</a>
+            <button type="button" class="link-btn" id="copyPhone" data-i18n="info.copy"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <div class="footer-logo"><span class="logo-s">Suzy</span><span class="logo-c">Coiffure</span></div>
+    <p data-i18n="foot.tag"></p>
+    <p class="muted">© <span id="year"></span> Suzy Coiffure · Rue des Chavannes 13, 2000 Neuchâtel · <span data-i18n="foot.rights"></span></p>
+    <p class="muted small" data-i18n="foot.demo"></p>
+  </div>
+</footer>
+
+<div class="lightbox" id="lightbox" hidden>
+  <button type="button" class="lb-close" id="lbClose" aria-label="Fermer">×</button>
+  <img id="lbImg" alt="">
+  <p id="lbCap"></p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="i18n.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

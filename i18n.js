@@ -1,0 +1,315 @@
+// Textes du site — FR (principal), EN, DE
+window.I18N = {
+  fr: {
+    "nav.experience": "L'expérience",
+    "nav.services": "Prestations",
+    "nav.gallery": "Réalisations",
+    "nav.team": "L'équipe",
+    "nav.contact": "Contact",
+    "nav.book": "Réserver",
+
+    "hero.eyebrow": "Salon de coiffure · Neuchâtel · depuis plus de 25 ans",
+    "hero.line": "L'art de la coiffure,<br><em>comme à la maison.</em>",
+    "hero.reviews": "515 avis Google",
+    "hero.cta": "Prendre rendez-vous",
+    "hero.discover": "Découvrir le salon",
+    "hero.scroll": "Faites défiler",
+
+    "exp.eyebrow": "L'expérience Suzy",
+    "exp.title": "Ici, on vous reçoit <em>comme une amie.</em>",
+    "exp.text": "Au cœur de la zone piétonne de Neuchâtel, Suzy Coiffure est un salon intime où l'on prend le temps. On vous écoute, on vous conseille, et l'on vous offre souvent un café gourmand pendant que la couleur pose.",
+    "exp.r1.t": "Café gourmand offert",
+    "exp.r1.d": "Un espresso et de petites douceurs, servis pendant votre soin.",
+    "exp.r2.t": "Conseil sur mesure",
+    "exp.r2.d": "Coupe et couleur choisies selon votre visage, votre style, votre quotidien.",
+    "exp.r3.t": "25 ans de savoir-faire",
+    "exp.r3.d": "Une maison fidèle à ses clientes depuis plus d'un quart de siècle.",
+    "exp.s1": "ans au cœur de Neuchâtel",
+    "exp.s2": "note Google",
+    "exp.s3": "avis de clientes",
+    "exp.caption": "Le café gourmand de la maison",
+
+    "srv.eyebrow": "Carte des prestations",
+    "srv.title": "Prestations <em>&amp; tarifs</em>",
+    "srv.note": "Prix en CHF. « dès » : le tarif final dépend de la longueur et de l'épaisseur des cheveux.",
+    "srv.from": "dès",
+
+    "gal.eyebrow": "Nos réalisations",
+    "gal.title": "Des cheveux <em>qui vous ressemblent.</em>",
+    "gal.hint": "Faites défiler →",
+
+    "ba.eyebrow": "Avant · Après",
+    "ba.title": "La différence <em>d'un brushing Suzy.</em>",
+    "ba.text": "Ondulations souples, brillance miroir, volume qui tient toute la journée. Glissez pour comparer.",
+    "ba.before": "Avant",
+    "ba.after": "Après",
+
+    "team.eyebrow": "L'équipe",
+    "team.title": "Des mains <em>expertes et bienveillantes.</em>",
+    "team.suzy.role": "Fondatrice",
+    "team.suzy.bio": "Depuis plus de 25 ans, Suzy accueille ses clientes comme à la maison. Son regard sûr et ses conseils sincères ont fait la réputation du salon.",
+    "team.val.role": "Coiffeuse · Studio Coiffure Valentina",
+    "team.val.bio": "Formée dans de belles maisons italiennes, Valentina apporte l'élégance de l'Italie : coupes tendance, balayages lumineux et brushings parfaits.",
+
+    "rev.eyebrow": "Ce que disent nos clientes",
+    "rev.title": "4,9 sur 5, <em>515 fois.</em>",
+    "rev.sub": "Les mots qui reviennent le plus souvent dans nos avis Google.",
+    "rev.1": "Un accueil chaleureux, on se sent tout de suite chez soi.",
+    "rev.2": "Parmi les plus beaux brushings de Neuchâtel : des ondulations et une brillance incroyables.",
+    "rev.3": "De vrais conseils pour choisir la coupe et la couleur qui vont à mon visage.",
+    "rev.4": "Un travail très professionnel, précis et soigné.",
+    "rev.5": "Un excellent rapport qualité-prix.",
+    "rev.6": "Le petit café gourmand, une attention qui fait toute la différence.",
+
+    "bday.eyebrow": "Votre anniversaire",
+    "bday.title": "Le jour de votre anniversaire, <em>on vous gâte.</em>",
+    "bday.text": "20 CHF offerts sur votre prestation, le jour de votre anniversaire. Il suffit de le mentionner à la réservation.",
+    "bday.off": "offerts",
+
+    "info.eyebrow": "Nous rendre visite",
+    "info.title": "Rue des Chavannes 13, <em>au cœur de la vieille ville.</em>",
+    "info.hours": "Horaires",
+    "info.address": "Adresse",
+    "info.phone": "Téléphone",
+    "info.closed": "Fermé",
+    "info.openNow": "Ouvert maintenant",
+    "info.closedNow": "Fermé actuellement",
+    "info.map": "Ouvrir dans Google Maps",
+    "info.pedestrian": "Zone piétonne · parkings du centre à quelques minutes",
+    "info.book": "Réservez votre moment",
+    "info.bookText": "Appelez-nous ou écrivez-nous sur WhatsApp, nous trouvons ensemble le créneau idéal.",
+    "info.call": "Appeler",
+    "info.copy": "Copier le numéro",
+    "info.copied": "Numéro copié",
+
+    "days": ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
+    "foot.tag": "Salon de coiffure & ongles · Neuchâtel",
+    "foot.rights": "Tous droits réservés.",
+    "foot.demo": "Maquette de présentation · photos d'illustration"
+  },
+
+  en: {
+    "nav.experience": "Experience",
+    "nav.services": "Services",
+    "nav.gallery": "Our work",
+    "nav.team": "Team",
+    "nav.contact": "Contact",
+    "nav.book": "Book",
+
+    "hero.eyebrow": "Hair salon · Neuchâtel · for over 25 years",
+    "hero.line": "The art of hairdressing,<br><em>just like at home.</em>",
+    "hero.reviews": "515 Google reviews",
+    "hero.cta": "Book an appointment",
+    "hero.discover": "Discover the salon",
+    "hero.scroll": "Scroll",
+
+    "exp.eyebrow": "The Suzy experience",
+    "exp.title": "Here, we welcome you <em>like a friend.</em>",
+    "exp.text": "In the heart of Neuchâtel's pedestrian zone, Suzy Coiffure is an intimate salon where we take our time. We listen, we advise, and we often treat you to a café gourmand while your colour sets.",
+    "exp.r1.t": "Complimentary café gourmand",
+    "exp.r1.d": "An espresso with little sweets, served during your treatment.",
+    "exp.r2.t": "Tailored advice",
+    "exp.r2.d": "Cut and colour chosen for your face, your style and your everyday life.",
+    "exp.r3.t": "25 years of expertise",
+    "exp.r3.d": "A house loyal to its clients for more than a quarter of a century.",
+    "exp.s1": "years in the heart of Neuchâtel",
+    "exp.s2": "Google rating",
+    "exp.s3": "client reviews",
+    "exp.caption": "Our house café gourmand",
+
+    "srv.eyebrow": "Service menu",
+    "srv.title": "Services <em>&amp; prices</em>",
+    "srv.note": "Prices in CHF. “from”: the final price depends on hair length and thickness.",
+    "srv.from": "from",
+
+    "gal.eyebrow": "Our work",
+    "gal.title": "Hair that <em>looks like you.</em>",
+    "gal.hint": "Scroll →",
+
+    "ba.eyebrow": "Before · After",
+    "ba.title": "The difference <em>of a Suzy blow-dry.</em>",
+    "ba.text": "Soft waves, mirror shine, volume that lasts all day. Slide to compare.",
+    "ba.before": "Before",
+    "ba.after": "After",
+
+    "team.eyebrow": "The team",
+    "team.title": "Expert hands, <em>warm hearts.</em>",
+    "team.suzy.role": "Founder",
+    "team.suzy.bio": "For more than 25 years, Suzy has welcomed her clients as if they were at home. Her sure eye and honest advice built the salon's reputation.",
+    "team.val.role": "Hairstylist · Studio Coiffure Valentina",
+    "team.val.bio": "Trained in fine Italian salons, Valentina brings Italian elegance: on-trend cuts, luminous balayage and flawless blow-dries.",
+
+    "rev.eyebrow": "What our clients say",
+    "rev.title": "4.9 out of 5, <em>515 times.</em>",
+    "rev.sub": "The words that come up most often in our Google reviews.",
+    "rev.1": "A warm welcome, you instantly feel at home.",
+    "rev.2": "Some of the best blow-dries in Neuchâtel: incredible waves and shine.",
+    "rev.3": "Real advice to find the cut and colour that suit my face.",
+    "rev.4": "Very professional, precise and careful work.",
+    "rev.5": "Excellent value for money.",
+    "rev.6": "The little café gourmand, a touch that makes all the difference.",
+
+    "bday.eyebrow": "Your birthday",
+    "bday.title": "On your birthday, <em>we spoil you.</em>",
+    "bday.text": "CHF 20 off your service on your birthday. Just mention it when you book.",
+    "bday.off": "off",
+
+    "info.eyebrow": "Visit us",
+    "info.title": "Rue des Chavannes 13, <em>in the heart of the old town.</em>",
+    "info.hours": "Opening hours",
+    "info.address": "Address",
+    "info.phone": "Phone",
+    "info.closed": "Closed",
+    "info.openNow": "Open now",
+    "info.closedNow": "Closed now",
+    "info.map": "Open in Google Maps",
+    "info.pedestrian": "Pedestrian zone · city-centre car parks a few minutes away",
+    "info.book": "Book your moment",
+    "info.bookText": "Call us or message us on WhatsApp and we'll find the perfect slot together.",
+    "info.call": "Call",
+    "info.copy": "Copy number",
+    "info.copied": "Number copied",
+
+    "days": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+    "foot.tag": "Hair & nail salon · Neuchâtel",
+    "foot.rights": "All rights reserved.",
+    "foot.demo": "Presentation mock-up · illustrative photos"
+  },
+
+  de: {
+    "nav.experience": "Erlebnis",
+    "nav.services": "Leistungen",
+    "nav.gallery": "Arbeiten",
+    "nav.team": "Team",
+    "nav.contact": "Kontakt",
+    "nav.book": "Buchen",
+
+    "hero.eyebrow": "Coiffeursalon · Neuenburg · seit über 25 Jahren",
+    "hero.line": "Die Kunst des Frisierens,<br><em>wie zu Hause.</em>",
+    "hero.reviews": "515 Google-Bewertungen",
+    "hero.cta": "Termin vereinbaren",
+    "hero.discover": "Salon entdecken",
+    "hero.scroll": "Scrollen",
+
+    "exp.eyebrow": "Das Suzy-Erlebnis",
+    "exp.title": "Hier empfangen wir Sie <em>wie eine Freundin.</em>",
+    "exp.text": "Mitten in der Fussgängerzone von Neuenburg ist Suzy Coiffure ein intimer Salon, in dem man sich Zeit nimmt. Wir hören zu, beraten Sie und servieren oft einen Café gourmand, während die Farbe einwirkt.",
+    "exp.r1.t": "Café gourmand offeriert",
+    "exp.r1.d": "Ein Espresso mit kleinen Süssigkeiten während Ihrer Behandlung.",
+    "exp.r2.t": "Persönliche Beratung",
+    "exp.r2.d": "Schnitt und Farbe passend zu Gesicht, Stil und Alltag.",
+    "exp.r3.t": "25 Jahre Erfahrung",
+    "exp.r3.d": "Ein Haus, das seinen Kundinnen seit über einem Vierteljahrhundert treu ist.",
+    "exp.s1": "Jahre im Herzen von Neuenburg",
+    "exp.s2": "Google-Bewertung",
+    "exp.s3": "Kundenbewertungen",
+    "exp.caption": "Unser hauseigener Café gourmand",
+
+    "srv.eyebrow": "Leistungskarte",
+    "srv.title": "Leistungen <em>&amp; Preise</em>",
+    "srv.note": "Preise in CHF. «ab»: Der Endpreis hängt von Haarlänge und -dichte ab.",
+    "srv.from": "ab",
+
+    "gal.eyebrow": "Unsere Arbeiten",
+    "gal.title": "Haare, <em>die zu Ihnen passen.</em>",
+    "gal.hint": "Scrollen →",
+
+    "ba.eyebrow": "Vorher · Nachher",
+    "ba.title": "Der Unterschied <em>eines Suzy-Brushings.</em>",
+    "ba.text": "Weiche Wellen, Spiegelglanz, Volumen, das den ganzen Tag hält. Zum Vergleichen schieben.",
+    "ba.before": "Vorher",
+    "ba.after": "Nachher",
+
+    "team.eyebrow": "Das Team",
+    "team.title": "Erfahrene Hände, <em>herzliche Menschen.</em>",
+    "team.suzy.role": "Gründerin",
+    "team.suzy.bio": "Seit über 25 Jahren empfängt Suzy ihre Kundinnen wie zu Hause. Ihr sicheres Auge und ihre ehrliche Beratung haben den Ruf des Salons begründet.",
+    "team.val.role": "Coiffeuse · Studio Coiffure Valentina",
+    "team.val.bio": "Ausgebildet in renommierten italienischen Salons, bringt Valentina italienische Eleganz: Trendschnitte, leuchtende Balayages und perfekte Brushings.",
+
+    "rev.eyebrow": "Was unsere Kundinnen sagen",
+    "rev.title": "4,9 von 5, <em>515 Mal.</em>",
+    "rev.sub": "Die Worte, die in unseren Google-Bewertungen am häufigsten vorkommen.",
+    "rev.1": "Ein herzlicher Empfang, man fühlt sich sofort zu Hause.",
+    "rev.2": "Eines der schönsten Brushings in Neuenburg: unglaubliche Wellen und Glanz.",
+    "rev.3": "Echte Beratung für Schnitt und Farbe, die zu meinem Gesicht passen.",
+    "rev.4": "Sehr professionelle, präzise und sorgfältige Arbeit.",
+    "rev.5": "Ausgezeichnetes Preis-Leistungs-Verhältnis.",
+    "rev.6": "Der kleine Café gourmand, eine Geste, die den Unterschied macht.",
+
+    "bday.eyebrow": "Ihr Geburtstag",
+    "bday.title": "An Ihrem Geburtstag <em>verwöhnen wir Sie.</em>",
+    "bday.text": "CHF 20 Rabatt auf Ihre Leistung an Ihrem Geburtstag. Erwähnen Sie es einfach bei der Buchung.",
+    "bday.off": "Rabatt",
+
+    "info.eyebrow": "Besuchen Sie uns",
+    "info.title": "Rue des Chavannes 13, <em>mitten in der Altstadt.</em>",
+    "info.hours": "Öffnungszeiten",
+    "info.address": "Adresse",
+    "info.phone": "Telefon",
+    "info.closed": "Geschlossen",
+    "info.openNow": "Jetzt geöffnet",
+    "info.closedNow": "Zurzeit geschlossen",
+    "info.map": "In Google Maps öffnen",
+    "info.pedestrian": "Fussgängerzone · Parkhäuser im Zentrum wenige Minuten entfernt",
+    "info.book": "Reservieren Sie Ihren Moment",
+    "info.bookText": "Rufen Sie uns an oder schreiben Sie uns auf WhatsApp – gemeinsam finden wir den idealen Termin.",
+    "info.call": "Anrufen",
+    "info.copy": "Nummer kopieren",
+    "info.copied": "Nummer kopiert",
+
+    "days": ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"],
+    "foot.tag": "Coiffeur- & Nagelsalon · Neuenburg",
+    "foot.rights": "Alle Rechte vorbehalten.",
+    "foot.demo": "Präsentations-Entwurf · Illustrationsfotos"
+  }
+};
+
+// Carte des prestations: [fr, en, de, prix, "dès"?]
+window.SERVICES = [
+  { id: "coupes", label: { fr: "Coupes & brushing", en: "Cuts & blow-dry", de: "Schnitt & Brushing" }, img: "assets/img/brushing.jpg",
+    items: [
+      [["Shampooing & brushing", "Wash & blow-dry", "Waschen & Föhnen"], 42, true],
+      [["Shampooing, coupe & brushing", "Wash, cut & blow-dry", "Waschen, Schneiden & Föhnen"], 75, true],
+      [["Coupe cheveux bouclés", "Curly hair cut", "Schnitt für lockiges Haar"], 65],
+      [["Changement de look (diagnostic + coupe)", "New look (consultation + cut)", "Typveränderung (Beratung + Schnitt)"], 85],
+      [["Frange", "Fringe", "Pony"], 9.5]
+    ] },
+  { id: "tendance", label: { fr: "Coupes tendance", en: "Trend cuts", de: "Trendschnitte" }, img: "assets/img/waves.jpg",
+    items: [
+      [["Butterfly cut", "Butterfly cut", "Butterfly Cut"], 89],
+      [["Wolf cut / Shag", "Wolf cut / Shag", "Wolf Cut / Shag"], 89],
+      [["Carré (Bob)", "Bob", "Bob"], 50]
+    ] },
+  { id: "couleur", label: { fr: "Couleur", en: "Colour", de: "Farbe" }, img: "assets/img/gloss.jpg",
+    items: [
+      [["Coloration sans ammoniaque + brushing", "Ammonia-free colour + blow-dry", "Ammoniakfreie Farbe + Brushing"], 101, true],
+      [["Coloration + coupe + brushing", "Colour + cut + blow-dry", "Farbe + Schnitt + Brushing"], 120, true],
+      [["Balayage / Airtouch + gloss + brushing", "Balayage / Airtouch + gloss + blow-dry", "Balayage / Airtouch + Glossing + Brushing"], 180, true],
+      [["Gloss (patine)", "Gloss (toner)", "Glossing (Tönung)"], 79, true],
+      [["Contouring", "Contouring", "Contouring"], 59]
+    ] },
+  { id: "soins", label: { fr: "Soins", en: "Treatments", de: "Pflege" }, img: "assets/img/wash.jpg",
+    items: [
+      [["Kératine, botox capillaire, détox, réparation", "Keratin, hair botox, detox, repair", "Keratin, Haar-Botox, Detox, Reparatur"], "15–29"],
+      [["Lissage (smoothing)", "Smoothing", "Glättung (Smoothing)"], 89],
+      [["Massage crânien & soin", "Head massage & treatment", "Kopfmassage & Pflege"], 20],
+      [["Coloration des sourcils", "Brow tint", "Augenbrauen färben"], 19]
+    ] },
+  { id: "hommes", label: { fr: "Hommes & enfants", en: "Men & children", de: "Herren & Kinder" }, img: "assets/img/men.jpg",
+    items: [
+      [["Coupe homme", "Men's cut", "Herrenschnitt"], 33, true],
+      [["Coupe fille", "Girls' cut", "Mädchenschnitt"], 30, true]
+    ] },
+  { id: "ongles", label: { fr: "Ongles", en: "Nails", de: "Nägel" }, img: "assets/img/nails.jpg",
+    items: [
+      [["Vernis semi-permanent", "Gel polish", "Shellac"], 50],
+      [["Gel", "Gel", "Gel"], 69, true],
+      [["Manucure", "Manicure", "Maniküre"], 25],
+      [["French / nail art", "French / nail art", "French / Nail-Art"], 15],
+      [["Pédicure SPA", "SPA pedicure", "SPA-Pediküre"], 45, true]
+    ] }
+];
+
+// Horaires: index 0 = dimanche
+window.HOURS = [null, ["14:00", "18:00"], null, ["10:00", "18:00"], ["10:00", "18:00"], ["10:00", "18:00"], ["09:30", "15:00"]];
