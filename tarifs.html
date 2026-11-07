@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tarifs · Suzy Coiffure</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Tous les prix de Suzy Coiffure, Neuchâtel : coupes, brushing, couleur, balayage, soins, hommes, enfants, ongles.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400;1,6..96,500&family=Jost:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="subpage">
+
+<div class="cursor" id="cursor" aria-hidden="true"><span class="cursor-label" id="cursorLabel"></span></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="logo" aria-label="Suzy Coiffure">
+      <span class="logo-s">Suzy</span><span class="logo-c">Coiffure</span>
+    </a>
+    <nav class="nav-links" aria-label="Navigation principale">
+      <a href="index.html" data-i18n="nav.home"></a>
+      <a href="realisations.html" data-i18n="nav.works"></a>
+      <a href="tarifs.html" data-i18n="nav.prices" aria-current="page"></a>
+      <a href="index.html#equipe" data-i18n="nav.team"></a>
+      <a href="index.html#contact" data-i18n="nav.contact"></a>
+    </nav>
+    <div class="nav-right">
+      <div class="lang" role="group" aria-label="Langue">
+        <button type="button" data-lang="fr" class="is-active">FR</button>
+        <button type="button" data-lang="en">EN</button>
+        <button type="button" data-lang="de">DE</button>
+      </div>
+      <a href="reservation.html" class="btn btn-gold btn-sm magnetic" data-i18n="nav.book"></a>
+      <button type="button" class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span></button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+      <a href="index.html" data-i18n="nav.home"></a>
+      <a href="realisations.html" data-i18n="nav.works"></a>
+      <a href="tarifs.html" data-i18n="nav.prices" aria-current="page"></a>
+      <a href="index.html#equipe" data-i18n="nav.team"></a>
+      <a href="index.html#contact" data-i18n="nav.contact"></a>
+  </div>
+</header>
+
+<main>
+  <section class="page-hero">
+    <div class="page-hero-bg" style="background-image:url(assets/img/work/hero-cuivre.jpg)"></div>
+    <div class="page-hero-veil" aria-hidden="true"></div>
+    <div class="wrap page-hero-inner">
+      <a class="crumb reveal-up" href="index.html">← <span data-i18n="page.back"></span></a>
+      <p class="eyebrow reveal-up" data-i18n="prices.eyebrow"></p>
+      <h1 class="h1 reveal-lines" data-i18n-html="prices.title"></h1>
+      <p class="page-intro reveal-up" data-i18n="prices.intro"></p>
+    </div>
+  </section>
+
+  <section class="section prices">
+    <div class="wrap">
+      <p class="offers reveal-up" data-i18n="prices.offers"></p>
+      <nav class="srv-tabs price-nav" id="priceNav" aria-label="Catégories"></nav>
+      <div id="priceList"></div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <div class="footer-logo"><span class="logo-s">Suzy</span><span class="logo-c">Coiffure</span></div>
+    <p data-i18n="foot.tag"></p>
+    <p><a class="insta" href="https://www.instagram.com/salon_suzycoiffure/" target="_blank" rel="noopener">Instagram · @salon_suzycoiffure</a></p>
+    <p class="muted">© <span id="year"></span> Suzy Coiffure · Rue des Chavannes 13, 2000 Neuchâtel · 076 321 32 39</p>
+    <p class="muted small" data-i18n="foot.demo"></p>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="i18n.js"></script>
+<script src="pages.js"></script>
+</body>
+</html>

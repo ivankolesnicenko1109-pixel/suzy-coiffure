@@ -380,3 +380,126 @@ window.BA_PAIRS = [
   { before: "assets/img/work/avant-16.jpg", after: "assets/img/work/apres-16.jpg", label: { fr: "Cuivré lissé", en: "Smooth copper", de: "Glattes Kupfer" } },
   { before: "assets/img/work/avant-25.jpg", after: "assets/img/work/apres-25.jpg", label: { fr: "Lissage long", en: "Long smoothing", de: "Lange Glättung" } }
 ];
+
+// Textes des pages intérieures (réservation, réalisations, tarifs)
+(() => {
+  const add = {
+    fr: {
+      "nav.home": "Accueil",
+      "nav.works": "Réalisations",
+      "nav.prices": "Tarifs",
+      "page.back": "Retour à l'accueil",
+
+      "book.eyebrow": "Réservation en ligne",
+      "book.title": "Votre moment <em>chez Suzy.</em>",
+      "book.intro": "Choisissez votre prestation, votre coiffeuse et un créneau libre. Le salon vous confirme le rendez-vous.",
+      "book.s1": "Prestation", "book.s2": "Coiffeuse", "book.s3": "Date", "book.s4": "Heure", "book.s5": "Vos coordonnées",
+      "book.any": "Sans préférence", "book.anyHint": "la première disponible",
+      "book.suzyHint": "fondatrice", "book.valHint": "brushing, wave, ongles",
+      "book.free": "Libre", "book.taken": "Complet", "book.mine": "Votre rendez-vous", "book.past": "Passé",
+      "book.closed": "Fermé ce jour-là", "book.noSlot": "Aucun créneau libre ce jour-là. Essayez un autre jour ou une autre coiffeuse.",
+      "book.legend": "Créneaux de 30 minutes",
+      "book.name": "Prénom et nom", "book.phone": "Téléphone", "book.email": "E-mail (facultatif)", "book.note": "Un mot pour le salon (facultatif)",
+      "book.notePh": "Longueur des cheveux, envie de changement, allergie…",
+      "book.summary": "Récapitulatif", "book.pick": "à choisir", "book.price": "Prix indicatif",
+      "book.confirm": "Demander ce rendez-vous", "book.need": "Choisissez une prestation, une date et une heure.",
+      "book.errName": "Indiquez votre prénom et votre nom.", "book.errPhone": "Indiquez un numéro de téléphone pour que le salon puisse vous rappeler.",
+      "book.doneTitle": "Merci, c'est noté !",
+      "book.doneText": "Votre demande de rendez-vous est enregistrée. Le salon vous appelle pour la confirmer.",
+      "book.demo": "Maquette : dans cette démonstration, la demande reste dans votre navigateur. Dans la version finale, elle est envoyée au salon.",
+      "book.again": "Prendre un autre rendez-vous",
+      "book.or": "Vous préférez appeler ?",
+      "book.with": "avec",
+
+      "works.eyebrow": "Nos réalisations",
+      "works.title": "Le travail du salon, <em>photo par photo.</em>",
+      "works.intro": "Coupes, couleurs, brushings et coiffures réalisés chez Suzy Coiffure, tirés de notre Instagram.",
+      "works.all": "Tout", "works.blond": "Blond & balayage", "works.waves": "Ondulations & boucles", "works.copper": "Cuivré & roux",
+      "works.bob": "Carrés", "works.updo": "Coiffures & tresses", "works.ba": "Avant / après",
+      "works.count": "photos", "works.cta": "Envie du même résultat ?", "works.ctaBtn": "Réserver",
+      "works.baTitle": "Avant / après", "works.more": "Plus de photos sur Instagram",
+
+      "prices.eyebrow": "Carte des prestations",
+      "prices.title": "Tarifs <em>du salon.</em>",
+      "prices.intro": "Tous nos prix en CHF. « dès » : le prix final dépend de la longueur et de l'épaisseur des cheveux. Paiement en espèces ou Twint.",
+      "prices.book": "Réserver",
+      "prices.offers": "Anniversaire : −30 % sur coupe ou brushing · Fidélité : −10 % sur la 4e prestation · Café gourmand offert"
+    },
+    en: {
+      "nav.home": "Home", "nav.works": "Our work", "nav.prices": "Prices", "page.back": "Back to home",
+      "book.eyebrow": "Online booking", "book.title": "Your moment <em>at Suzy's.</em>",
+      "book.intro": "Pick your service, your stylist and a free slot. The salon confirms your appointment.",
+      "book.s1": "Service", "book.s2": "Stylist", "book.s3": "Date", "book.s4": "Time", "book.s5": "Your details",
+      "book.any": "No preference", "book.anyHint": "first available",
+      "book.suzyHint": "founder", "book.valHint": "blow-dry, wave, nails",
+      "book.free": "Free", "book.taken": "Booked", "book.mine": "Your appointment", "book.past": "Past",
+      "book.closed": "Closed that day", "book.noSlot": "No free slot that day. Try another day or another stylist.",
+      "book.legend": "30-minute slots",
+      "book.name": "First and last name", "book.phone": "Phone", "book.email": "E-mail (optional)", "book.note": "A note for the salon (optional)",
+      "book.notePh": "Hair length, ideas for a change, allergies…",
+      "book.summary": "Summary", "book.pick": "to choose", "book.price": "Indicative price",
+      "book.confirm": "Request this appointment", "book.need": "Choose a service, a date and a time.",
+      "book.errName": "Enter your first and last name.", "book.errPhone": "Enter a phone number so the salon can call you back.",
+      "book.doneTitle": "Thank you, it's noted!",
+      "book.doneText": "Your appointment request is saved. The salon will call you to confirm it.",
+      "book.demo": "Mock-up: in this demo the request stays in your browser. In the final version it is sent to the salon.",
+      "book.again": "Book another appointment", "book.or": "Prefer to call?", "book.with": "with",
+      "works.eyebrow": "Our work", "works.title": "The salon's work, <em>photo by photo.</em>",
+      "works.intro": "Cuts, colours, blow-dries and styles done at Suzy Coiffure, from our Instagram.",
+      "works.all": "All", "works.blond": "Blonde & balayage", "works.waves": "Waves & curls", "works.copper": "Copper & red",
+      "works.bob": "Bobs", "works.updo": "Updos & braids", "works.ba": "Before / after",
+      "works.count": "photos", "works.cta": "Want the same result?", "works.ctaBtn": "Book",
+      "works.baTitle": "Before / after", "works.more": "More photos on Instagram",
+      "prices.eyebrow": "Service menu", "prices.title": "Salon <em>prices.</em>",
+      "prices.intro": "All prices in CHF. “from”: the final price depends on hair length and thickness. Cash or Twint.",
+      "prices.book": "Book",
+      "prices.offers": "Birthday: 30% off cut or blow-dry · Loyalty: 10% off the 4th service · Complimentary café gourmand"
+    },
+    de: {
+      "nav.home": "Startseite", "nav.works": "Arbeiten", "nav.prices": "Preise", "page.back": "Zurück zur Startseite",
+      "book.eyebrow": "Online-Termin", "book.title": "Ihr Moment <em>bei Suzy.</em>",
+      "book.intro": "Wählen Sie Leistung, Coiffeuse und einen freien Termin. Der Salon bestätigt Ihren Termin.",
+      "book.s1": "Leistung", "book.s2": "Coiffeuse", "book.s3": "Datum", "book.s4": "Uhrzeit", "book.s5": "Ihre Angaben",
+      "book.any": "Egal", "book.anyHint": "die erste freie",
+      "book.suzyHint": "Gründerin", "book.valHint": "Brushing, Wave, Nägel",
+      "book.free": "Frei", "book.taken": "Belegt", "book.mine": "Ihr Termin", "book.past": "Vorbei",
+      "book.closed": "An diesem Tag geschlossen", "book.noSlot": "An diesem Tag ist nichts frei. Versuchen Sie einen anderen Tag oder eine andere Coiffeuse.",
+      "book.legend": "30-Minuten-Termine",
+      "book.name": "Vor- und Nachname", "book.phone": "Telefon", "book.email": "E-Mail (optional)", "book.note": "Nachricht an den Salon (optional)",
+      "book.notePh": "Haarlänge, Wunsch nach Veränderung, Allergien…",
+      "book.summary": "Übersicht", "book.pick": "wählen", "book.price": "Richtpreis",
+      "book.confirm": "Termin anfragen", "book.need": "Wählen Sie Leistung, Datum und Uhrzeit.",
+      "book.errName": "Geben Sie Ihren Vor- und Nachnamen ein.", "book.errPhone": "Geben Sie eine Telefonnummer ein, damit der Salon Sie zurückrufen kann.",
+      "book.doneTitle": "Danke, notiert!",
+      "book.doneText": "Ihre Terminanfrage ist gespeichert. Der Salon ruft Sie zur Bestätigung an.",
+      "book.demo": "Entwurf: In dieser Demo bleibt die Anfrage in Ihrem Browser. In der finalen Version geht sie an den Salon.",
+      "book.again": "Weiteren Termin buchen", "book.or": "Lieber anrufen?", "book.with": "mit",
+      "works.eyebrow": "Unsere Arbeiten", "works.title": "Die Arbeit des Salons, <em>Foto für Foto.</em>",
+      "works.intro": "Schnitte, Farben, Brushings und Frisuren von Suzy Coiffure, aus unserem Instagram.",
+      "works.all": "Alle", "works.blond": "Blond & Balayage", "works.waves": "Wellen & Locken", "works.copper": "Kupfer & Rot",
+      "works.bob": "Bobs", "works.updo": "Frisuren & Zöpfe", "works.ba": "Vorher / Nachher",
+      "works.count": "Fotos", "works.cta": "Lust auf dasselbe Ergebnis?", "works.ctaBtn": "Buchen",
+      "works.baTitle": "Vorher / Nachher", "works.more": "Mehr Fotos auf Instagram",
+      "prices.eyebrow": "Leistungskarte", "prices.title": "Preise <em>des Salons.</em>",
+      "prices.intro": "Alle Preise in CHF. «ab»: Der Endpreis hängt von Haarlänge und -dichte ab. Bar oder mit Twint.",
+      "prices.book": "Buchen",
+      "prices.offers": "Geburtstag: 30 % auf Schnitt oder Brushing · Treue: 10 % auf die 4. Leistung · Café gourmand offeriert"
+    }
+  };
+  Object.assign(add.fr, { "more.prices": "Tous les tarifs", "more.works": "Toutes nos réalisations", "more.online": "Réserver en ligne" });
+  Object.assign(add.en, { "more.prices": "All prices", "more.works": "All our work", "more.online": "Book online" });
+  Object.assign(add.de, { "more.prices": "Alle Preise", "more.works": "Alle Arbeiten", "more.online": "Online buchen" });
+  Object.keys(add).forEach((l) => Object.assign(window.I18N[l], add[l]));
+})();
+
+// Réalisations : photos du compte Instagram du salon, classées par style
+window.PORTFOLIO = [
+  ["01", "blond"], ["02", "waves"], ["05", "copper"], ["06-reel", "waves"], ["11", "bob blond"], ["12", "bob copper"],
+  ["13", "blond waves"], ["14", "blond"], ["15", "blond"], ["16", "copper"], ["19", "blond"], ["20", "copper"],
+  ["21", "waves"], ["22-reel", "bob"], ["24-reel", "blond"], ["25", "blond"], ["26-reel", "copper"], ["27", "waves blond"],
+  ["28", "blond waves"], ["29", "blond waves"], ["30", "waves"], ["34", "blond"], ["35", "waves blond"], ["36", "waves"],
+  ["37-reel", "waves"], ["38-reel", "blond"], ["39-reel", "copper"], ["40", "waves blond"], ["41", "copper waves"], ["42", "waves"],
+  ["43-reel", "updo blond"], ["44", "bob blond"], ["47", "waves"], ["48", "waves"], ["49", "updo"], ["50", "blond waves"],
+  ["51", "copper waves"], ["53", "waves copper"], ["54", "updo"], ["59", "waves"], ["60-reel", "blond waves"], ["61", "blond waves"],
+  ["63", "updo"], ["69", "updo blond"], ["70", "blond waves"], ["79", "blond"], ["80", "blond"], ["85", "blond"], ["89", "bob copper"]
+];

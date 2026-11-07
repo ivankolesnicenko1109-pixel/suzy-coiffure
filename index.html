@@ -36,8 +36,8 @@
     </a>
     <nav class="nav-links" aria-label="Navigation principale">
       <a href="#experience" data-i18n="nav.experience"></a>
-      <a href="#services" data-i18n="nav.services"></a>
-      <a href="#galerie" data-i18n="nav.gallery"></a>
+      <a href="tarifs.html" data-i18n="nav.prices"></a>
+      <a href="realisations.html" data-i18n="nav.works"></a>
       <a href="#equipe" data-i18n="nav.team"></a>
       <a href="#contact" data-i18n="nav.contact"></a>
     </nav>
@@ -47,14 +47,14 @@
         <button type="button" data-lang="en">EN</button>
         <button type="button" data-lang="de">DE</button>
       </div>
-      <a href="#contact" class="btn btn-gold btn-sm magnetic" data-i18n="nav.book"></a>
+      <a href="reservation.html" class="btn btn-gold btn-sm magnetic" data-i18n="nav.book"></a>
       <button type="button" class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span></button>
     </div>
   </div>
   <div class="mobile-menu" id="mobileMenu">
     <a href="#experience" data-i18n="nav.experience"></a>
-    <a href="#services" data-i18n="nav.services"></a>
-    <a href="#galerie" data-i18n="nav.gallery"></a>
+    <a href="tarifs.html" data-i18n="nav.prices"></a>
+    <a href="realisations.html" data-i18n="nav.works"></a>
     <a href="#equipe" data-i18n="nav.team"></a>
     <a href="#contact" data-i18n="nav.contact"></a>
   </div>
@@ -82,7 +82,7 @@
       <div class="hero-aside">
         <p class="hero-line" data-i18n-html="hero.line"></p>
         <div class="hero-actions">
-          <a href="#contact" class="btn btn-gold magnetic"><span data-i18n="hero.cta"></span></a>
+          <a href="reservation.html" class="btn btn-gold magnetic"><span data-i18n="hero.cta"></span></a>
           <a href="#experience" class="btn btn-ghost magnetic"><span data-i18n="hero.discover"></span></a>
         </div>
       </div>
@@ -152,7 +152,13 @@
         </figure>
         <ul class="srv-list" id="srvList" role="tabpanel"></ul>
       </div>
-      <p class="srv-note" data-i18n="srv.note"></p>
+      <div class="more-row">
+        <p class="srv-note" data-i18n="srv.note"></p>
+        <div class="more-actions">
+          <a class="btn btn-ghost magnetic" href="tarifs.html"><span data-i18n="more.prices"></span></a>
+          <a class="btn btn-gold magnetic" href="reservation.html"><span data-i18n="nav.book"></span></a>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -164,7 +170,7 @@
           <p class="eyebrow" data-i18n="gal.eyebrow"></p>
           <h2 class="h2" data-i18n-html="gal.title"></h2>
         </div>
-        <span class="gal-hint" data-i18n="gal.hint"></span>
+        <a class="gal-more" href="realisations.html"><span data-i18n="more.works"></span> →</a>
       </div>
       <div class="gal-track" id="galTrack">
         <figure class="gal-item" data-cursor="Voir"><img src="assets/img/work/ig-01.jpg" alt="Blond dégradé" loading="lazy"><figcaption><span>01</span>Blond dégradé</figcaption></figure>
@@ -310,7 +316,8 @@
           <h3 class="book-title" data-i18n="info.book"></h3>
           <p data-i18n="info.bookText"></p>
           <div class="book-actions">
-            <a href="tel:+41763213239" class="btn btn-gold magnetic"><span data-i18n="info.call"></span> · 076 321 32 39</a>
+            <a href="reservation.html" class="btn btn-gold magnetic"><span data-i18n="more.online"></span></a>
+            <a href="tel:+41763213239" class="btn btn-ghost-dark magnetic"><span data-i18n="info.call"></span> · 076 321 32 39</a>
             <a href="https://wa.me/41763213239" target="_blank" rel="noopener" class="btn btn-ghost-dark magnetic">WhatsApp</a>
             <button type="button" class="link-btn" id="copyPhone" data-i18n="info.copy"></button>
           </div>
