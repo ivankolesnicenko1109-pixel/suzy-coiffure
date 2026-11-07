@@ -115,58 +115,19 @@
     const root = $("#booking");
     if (!root) return;
 
-    // Horaires par coiffeuse : le lundi, Valentina 9h30–12h et 15h–18h30, Suzy 15h–18h30
-    const toMin = (s) => { const [a, b] = s.split(":").map(Number); return a * 60 + b; };
-    const fmtMin = (m) => String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
-    const iso = (d) => d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
-    function staffHours(dow, who) {
-      if (!HOURS[dow]) return [];
-      if (dow === 1) return who === "valentina" ? [["09:30", "12:00"], ["15:00", "18:30"]] : [["15:00", "18:30"]];
-      return [HOURS[dow]];
-    }
-    // occupation simulée, toujours la même pour un jour donné
-    const hash = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0) / 4294967295; };
-    const BOOKINGS_KEY = "suzy-bookings";
-    const myBookings = () => { try { return JSON.parse(store.get(BOOKINGS_KEY) || "[]"); } catch (e) { return []; } };
-
+    // Les créneaux libres en temps réel sont sur Salonkee : ici on prépare le choix
+    const SALONKEE = "https://salonkee.ch/salon/suzy-coiffure?lang=";
     const params = new URLSearchParams(location.search);
     const startCat = SERVICES.find((c) => c.id === params.get("cat")) ? params.get("cat") : SERVICES[0].id;
     const state = {
       cat: startCat,
       svc: params.has("s") && params.get("cat") ? { cat: startCat, i: +params.get("s") } : null,
-      who: "any",
-      date: null,
-      time: null,
-      stylist: null,
-      done: null
+      who: "any"
     };
     if (state.svc && !SERVICES.find((c) => c.id === state.svc.cat).items[state.svc.i]) state.svc = null;
-
     const svcItem = () => state.svc && SERVICES.find((c) => c.id === state.svc.cat).items[state.svc.i];
     const stylistName = (w) => w === "suzy" ? "Suzy" : w === "valentina" ? "Valentina" : t("book.any");
 
-    function slotStatus(date, who, time, m) {
-      const now = new Date();
-      if (date === iso(now) && m <= now.getHours() * 60 + now.getMinutes()) return "past";
-      if (myBookings().some((b) => b.date === date && b.time === time && b.stylist === who)) return "mine";
-      return hash(date + "|" + who + "|" + time) < 0.46 ? "taken" : "free";
-    }
-    function slotsFor(date) {
-      const d = new Date(date + "T12:00:00"), dow = d.getDay();
-      const who = state.who === "any" ? ["suzy", "valentina"] : [state.who];
-      const map = new Map();
-      who.forEach((s) => staffHours(dow, s).forEach(([a, b]) => {
-        for (let m = toMin(a); m + 30 <= toMin(b); m += 30) {
-          const time = fmtMin(m), st = slotStatus(date, s, time, m);
-          const prev = map.get(time);
-          const rank = { free: 3, mine: 2, taken: 1, past: 0 };
-          if (!prev || rank[st] > rank[prev.st]) map.set(time, { time, m, st, stylist: s });
-        }
-      }));
-      return [...map.values()].sort((x, y) => x.m - y.m);
-    }
-
-    /* --- rendu --- */
     function renderServices() {
       $("#bkTabs").innerHTML = SERVICES.map((c) => `<button type="button" class="srv-tab" data-cat="${c.id}" aria-selected="${c.id === state.cat}">${c.label[lang]}</button>`).join("");
       const cat = SERVICES.find((c) => c.id === state.cat);
@@ -178,7 +139,6 @@
       $$("#bkServices .bk-svc").forEach((b) => b.addEventListener("click", () => {
         state.svc = { cat: state.cat, i: +b.dataset.i };
         renderServices(); renderSummary();
-        if (!state.date) $("#bkStep3").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
       }));
     }
     function renderStylists() {
@@ -193,98 +153,48 @@
           <span class="bk-who-name">${name}</span><span class="bk-who-hint">${hint}</span>
         </button>`).join("");
       $$("#bkStylists .bk-who").forEach((b) => b.addEventListener("click", () => {
-        state.who = b.dataset.who; state.time = null; state.stylist = null;
-        renderStylists(); renderDays(); renderSlots(); renderSummary();
+        state.who = b.dataset.who;
+        renderStylists(); renderWeek(); renderSummary();
       }));
     }
-    function renderDays() {
-      const fmtW = new Intl.DateTimeFormat(LOCALE[lang], { weekday: "short" });
-      const fmtM = new Intl.DateTimeFormat(LOCALE[lang], { month: "short" });
-      const today = new Date();
-      let html = "";
-      for (let k = 0; k < 21; k++) {
-        const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + k, 12);
-        const id = iso(d), closed = !HOURS[d.getDay()];
-        const freeCount = closed ? 0 : (() => { const s0 = state.date; const r = slotsFor(id).filter((s) => s.st === "free").length; state.date = s0; return r; })();
-        const full = !closed && freeCount === 0;
-        html += `<button type="button" class="bk-day" data-date="${id}" aria-pressed="${state.date === id}" ${closed ? "disabled" : ""}>
-          <span class="bk-day-w">${fmtW.format(d).replace(".", "")}</span><span class="bk-day-n">${d.getDate()}</span><span class="bk-day-m">${fmtM.format(d).replace(".", "")}</span>
-          <span class="bk-day-dot ${closed ? "is-closed" : full ? "is-full" : ""}">${closed ? t("info.closed") : full ? t("book.taken") : freeCount + " " + t("book.free").toLowerCase()}</span>
-        </button>`;
-      }
-      $("#bkDays").innerHTML = html;
-      $$("#bkDays .bk-day").forEach((b) => b.addEventListener("click", () => {
-        state.date = b.dataset.date; state.time = null; state.stylist = null;
-        renderDays(); renderSlots(); renderSummary();
-        $("#bkStep4").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "nearest" });
-      }));
-    }
-    function renderSlots() {
-      const box = $("#bkSlots");
-      if (!state.date) { box.innerHTML = `<p class="bk-empty">${t("book.need")}</p>`; return; }
-      const slots = slotsFor(state.date);
-      if (!slots.length) { box.innerHTML = `<p class="bk-empty">${t("book.closed")}</p>`; return; }
-      const label = { free: t("book.free"), taken: t("book.taken"), mine: t("book.mine"), past: t("book.past") };
-      box.innerHTML = `<div class="bk-slot-grid">${slots.map((s) => {
-        const sel = state.time === s.time;
-        return `<button type="button" class="bk-slot is-${s.st}" data-time="${s.time}" data-stylist="${s.stylist}" aria-pressed="${sel}" ${s.st !== "free" ? "disabled" : ""}>
-          <span class="bk-slot-t">${s.time}</span><span class="bk-slot-s">${label[s.st]}</span></button>`;
-      }).join("")}</div>` + (slots.some((s) => s.st === "free") ? "" : `<p class="bk-empty">${t("book.noSlot")}</p>`);
-      $$(".bk-slot", box).forEach((b) => b.addEventListener("click", () => {
-        state.time = b.dataset.time; state.stylist = b.dataset.stylist;
-        renderSlots(); renderSummary();
-      }));
+
+    // Semaine type : horaires du salon ; le lundi, présence de chaque coiffeuse (source : page Salonkee)
+    const AXIS = [9, 19];
+    const toH = (s) => { const [a, b] = s.split(":").map(Number); return a + b / 60; };
+    const MONDAY = { suzy: [["15:00", "18:30"]], valentina: [["09:30", "12:00"], ["15:00", "18:30"]] };
+    function renderWeek() {
+      const days = t("days");
+      const pos = (a, b) => `left:${(toH(a) - AXIS[0]) / (AXIS[1] - AXIS[0]) * 100}%;width:${(toH(b) - toH(a)) / (AXIS[1] - AXIS[0]) * 100}%`;
+      const bar = (cls, a, b, label) => `<span class="wk-bar ${cls}" style="${pos(a, b)}"><span>${label || a + " – " + b}</span></span>`;
+      const today = new Date().getDay();
+      let html = `<div class="wk-axis">${[9, 11, 13, 15, 17, 19].map((h) => `<span style="left:${(h - AXIS[0]) / (AXIS[1] - AXIS[0]) * 100}%">${h}h</span>`).join("")}</div>`;
+      [1, 2, 3, 4, 5, 6, 0].forEach((d) => {
+        const h = HOURS[d];
+        let lanes = "";
+        if (!h) lanes = `<div class="wk-lane"><span class="wk-closed">${t("info.closed")}</span></div>`;
+        else if (d === 1) {
+          ["suzy", "valentina"].filter((w) => state.who === "any" || state.who === w).forEach((w) => {
+            lanes += `<div class="wk-lane" data-who="${w}">${MONDAY[w].map(([a, b]) => bar(w === "suzy" ? "is-suzy" : "is-val", a, b)).join("")}</div>`;
+          });
+        } else lanes = `<div class="wk-lane">${bar("is-salon", h[0], h[1])}</div>`;
+        html += `<div class="wk-row ${d === today ? "is-today" : ""} ${h ? "" : "is-closed"}"><span class="wk-day">${days[d]}</span><div class="wk-lanes">${lanes}</div></div>`;
+      });
+      $("#bkWeek").innerHTML = html;
     }
     function renderSummary() {
       const it = svcItem();
-      const fmtD = new Intl.DateTimeFormat(LOCALE[lang], { weekday: "long", day: "numeric", month: "long" });
       const row = (k, v, ok) => `<div class="bk-sum-row"><span>${k}</span><b class="${ok ? "" : "is-empty"}">${v}</b></div>`;
       $("#bkSummary").innerHTML =
         row(t("book.s1"), it ? it[0] : t("book.pick"), !!it) +
-        row(t("book.s2"), state.stylist ? stylistName(state.stylist) : stylistName(state.who), true) +
-        row(t("book.s3"), state.date ? fmtD.format(new Date(state.date + "T12:00:00")) : t("book.pick"), !!state.date) +
-        row(t("book.s4"), state.time || t("book.pick"), !!state.time) +
+        row(t("book.s2"), stylistName(state.who), true) +
         `<div class="bk-sum-total"><span>${t("book.price")}</span><b>${it ? priceText(it[1], it[2]) : "—"}</b></div>`;
-      const ready = !!(it && state.date && state.time);
-      $("#bkSubmit").disabled = !ready;
-      $("#bkHint").textContent = ready ? "" : t("book.need");
+      const how2 = it ? t("book.how2svc").replace("{svc}", `<strong>${it[0]}</strong>`) : t("book.how2");
+      const how = state.who === "any" ? how2 : how2 + " " + t("book.how2who").replace("{who}", `<strong>${stylistName(state.who)}</strong>`);
+      $("#bkHow2").innerHTML = `<span>${how}</span>`;
+      $$("#bkGo, #bkGo2").forEach((a) => { a.href = SALONKEE + lang; });
     }
-    function renderDone() {
-      const d = state.done;
-      const panel = $("#bkDone");
-      panel.hidden = !d;
-      $("#bkFlow").hidden = !!d;
-      $("#bkSubmit").hidden = !!d;
-      $("#bkHint").hidden = !!d;
-      if (!d) return;
-      const fmtD = new Intl.DateTimeFormat(LOCALE[lang], { weekday: "long", day: "numeric", month: "long" });
-      $("#bkDoneText").innerHTML = `${t("book.doneText")}<br><strong>${d.svc}</strong><br>${fmtD.format(new Date(d.date + "T12:00:00"))} · ${d.time} · ${t("book.with")} ${stylistName(d.stylist)}`;
-    }
-    function renderAll() { renderServices(); renderStylists(); renderDays(); renderSlots(); renderSummary(); renderDone(); }
+    function renderAll() { renderServices(); renderStylists(); renderWeek(); renderSummary(); }
     renderers.push(renderAll);
-
-    /* --- envoi --- */
-    $("#bkForm").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const name = $("#bkName").value.trim(), phone = $("#bkPhone").value.trim();
-      const err = $("#bkError");
-      if (!svcItem() || !state.date || !state.time) { err.textContent = t("book.need"); return; }
-      if (name.length < 2) { err.textContent = t("book.errName"); $("#bkName").focus(); return; }
-      if (phone.replace(/\D/g, "").length < 9) { err.textContent = t("book.errPhone"); $("#bkPhone").focus(); return; }
-      err.textContent = "";
-      const booking = { date: state.date, time: state.time, stylist: state.stylist, svc: svcItem()[0], name };
-      const all = myBookings(); all.push(booking);
-      store.set(BOOKINGS_KEY, JSON.stringify(all));
-      state.done = booking;
-      renderDone();
-      $("#booking").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
-      if (hasGsap && !reduced) gsap.from("#bkDone > *", { y: 30, opacity: 0, duration: 1, stagger: .1, ease: "expo.out" });
-    });
-    $("#bkAgain").addEventListener("click", () => {
-      state.done = null; state.time = null; state.stylist = null;
-      $("#bkForm").reset();
-      renderAll();
-    });
   }
 
   /* =========================================================
