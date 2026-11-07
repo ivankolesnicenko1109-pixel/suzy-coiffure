@@ -30,6 +30,7 @@
     renderServices();
     renderReviews();
     renderHours();
+    renderPairs();
     $$(".count").forEach((el) => { if (el.dataset.done) el.textContent = formatCount(+el.dataset.to, +el.dataset.dec || 0); });
     if (heroGL) heroGL.relabel();
     store.set("suzy-lang", lang);
@@ -63,6 +64,9 @@
   /* ---------- Prestations ---------- */
   let activeCat = SERVICES[0].id;
   const fmtPrice = (p) => typeof p === "number" ? (Number.isInteger(p) ? String(p) : p.toFixed(2)) : p;
+  const priceHtml = (price, from) => price === null
+    ? `<b class="srv-free">${t("srv.free")}</b>`
+    : `${from ? `<small>${t("srv.from")}</small>` : ""}<b>${fmtPrice(price)}</b> CHF`;
 
   function renderServices() {
     const tabs = $("#srvTabs");
@@ -82,9 +86,9 @@
     const list = $("#srvList");
     list.innerHTML = cat.items.map(([names, price, from]) => `
       <li class="srv-item">
-        <span class="srv-name">${names[LANG_INDEX[lang]]}</span>
+        <span class="srv-name">${Array.isArray(names) ? names[LANG_INDEX[lang]] : names}</span>
         <span class="srv-dots" aria-hidden="true"></span>
-        <span class="srv-price">${from ? `<small>${t("srv.from")}</small>` : ""}<b>${fmtPrice(price)}</b> CHF</span>
+        <span class="srv-price">${priceHtml(price, from)}</span>
       </li>`).join("");
     const img = $("#srvImg");
     if (!img.src.endsWith(cat.img)) img.src = cat.img;
@@ -98,10 +102,23 @@
 
   /* ---------- Avis ---------- */
   function renderReviews() {
-    const keys = ["rev.1", "rev.2", "rev.3", "rev.4", "rev.5", "rev.6"];
-    const card = (k) => `<article class="rev-card"><p>${t(k)}</p><div class="rev-meta"><span class="stars">★★★★★</span><span>Google</span></div></article>`;
-    const html = keys.map(card).join("");
+    const card = ([text, who]) => `<article class="rev-card"><p>${text}</p><div class="rev-meta"><span class="stars">★★★★★</span><span>${who} · Salonkee</span></div></article>`;
+    const html = REVIEWS.map(card).join("");
     $("#revTrack").innerHTML = html + html.replace(/<article /g, '<article aria-hidden="true" ');
+  }
+
+  /* ---------- Avant / après : choix de la transformation ---------- */
+  let activePair = 0;
+  function renderPairs() {
+    const box = $("#baPairs");
+    box.innerHTML = BA_PAIRS.map((p, i) => `<button type="button" class="ba-pair" aria-pressed="${i === activePair}"><img src="${p.after}" alt="" loading="lazy"><span>${p.label[lang]}</span></button>`).join("");
+    $$(".ba-pair", box).forEach((b, i) => b.addEventListener("click", () => {
+      activePair = i;
+      $(".ba-before").src = BA_PAIRS[i].before;
+      $(".ba-after").src = BA_PAIRS[i].after;
+      $(".ba-after").alt = BA_PAIRS[i].label[lang];
+      renderPairs();
+    }));
   }
 
   /* ---------- Horaires ---------- */
@@ -276,10 +293,10 @@
      transitions « or liquide » + distorsion fluide à la souris
      ========================================================= */
   const SLIDES = [
-    { img: "assets/img/hero/h1.jpg", name: { fr: "Ondulations naturelles", en: "Natural waves", de: "Natürliche Wellen" } },
-    { img: "assets/img/hero/h3.jpg", name: { fr: "Brushing glamour", en: "Glamour blow-dry", de: "Glamour-Brushing" } },
-    { img: "assets/img/hero/h4.jpg", name: { fr: "Couleur pastel", en: "Pastel colour", de: "Pastellfarbe" } },
-    { img: "assets/img/hero/h2.jpg", name: { fr: "Boucles dorées", en: "Golden curls", de: "Goldene Locken" } }
+    { img: "assets/img/work/hero-blond.jpg", name: { fr: "Ondulations blondes", en: "Blonde waves", de: "Blonde Wellen" } },
+    { img: "assets/img/work/hero-cuivre.jpg", name: { fr: "Cuivré lumineux", en: "Luminous copper", de: "Leuchtendes Kupfer" } },
+    { img: "assets/img/work/hero-boucles.jpg", name: { fr: "Boucles définies", en: "Defined curls", de: "Definierte Locken" } },
+    { img: "assets/img/work/hero-wave.jpg", name: { fr: "Brushing wave", en: "Wave blow-dry", de: "Wave-Brushing" } }
   ];
   heroGL = initHeroGL();
 

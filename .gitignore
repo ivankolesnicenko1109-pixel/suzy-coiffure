@@ -1,2 +1,8 @@
 .claude/
 .DS_Store
+
+# Sources brutes (Instagram, Salonkee) : seules les photos utilisées sont copiées dans assets/img/work
+assets/instagram/
+assets/salon/
+# Essai d animation des logos, mis de côté
+logos.html

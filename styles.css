@@ -289,7 +289,7 @@ em { font-style: italic; }
 .ba-frame { position: relative; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 6px; user-select: none; max-width: 100%; box-shadow: 0 40px 80px -40px rgba(42,29,24,.55); }
 .ba-frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .ba-before-wrap { position: absolute; inset: 0; clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
-.ba-before { filter: saturate(.35) brightness(.86) contrast(.82) blur(1.6px) sepia(.15); transform: scale(1.03); }
+
 .ba-handle { position: absolute; top: 0; bottom: 0; left: var(--pos); width: 1px; background: var(--porcelain); pointer-events: none; }
 .ba-handle span { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 56px; height: 56px; border-radius: 50%; background: var(--porcelain); color: var(--ink); display: grid; place-items: center; font-size: 1.2rem; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
 .ba-frame input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; margin: 0; }
@@ -443,7 +443,7 @@ em { font-style: italic; }
   display: flex; flex-direction: column;
   background: #0f0a08; color: var(--porcelain);
 }
-.hero-media { position: absolute; inset: 0; z-index: 0; background: #0f0a08 url(assets/img/hero/h1.jpg) center / cover no-repeat; overflow: hidden; }
+.hero-media { position: absolute; inset: 0; z-index: 0; background: #0f0a08 url(assets/img/work/hero-blond.jpg) center / cover no-repeat; overflow: hidden; }
 .hero.has-gl .hero-media { background-image: none; }
 .hero-canvas { display: block; width: 100%; height: 100%; }
 .hero-veil { position: absolute; inset: 0; pointer-events: none;
@@ -501,3 +501,20 @@ em { font-style: italic; }
   .hero-eyebrow::before { display: none; }
   .slide-label { overflow: hidden; text-overflow: ellipsis; font-size: 1rem; }
 }
+
+/* ===== Contenu réel du salon ===== */
+.ba-pairs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; max-width: 30rem; }
+.ba-pair { display: grid; gap: .45rem; text-align: left; padding: 0; font-size: .74rem; letter-spacing: .06em; color: var(--ink-soft); }
+.ba-pair img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 3px; opacity: .55; transition: opacity .4s, outline-color .4s; outline: 2px solid transparent; outline-offset: 2px; }
+.ba-pair:hover img { opacity: .85; }
+.ba-pair[aria-pressed="true"] img { opacity: 1; outline-color: var(--gold); }
+.ba-pair[aria-pressed="true"] span { color: var(--ink); }
+.team-photo { margin: 0 auto clamp(32px, 5vw, 64px); max-width: 1080px; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 4px; position: relative; box-shadow: 0 40px 80px -45px rgba(42, 29, 24, .6); }
+.team-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 28%; }
+.member-logo { aspect-ratio: 1280 / 780; border-radius: 3px; background: #f3efe9; }
+.member-logo img { object-fit: contain; }
+.hours-note { margin: 1rem 0 0; font-size: .86rem; color: var(--ink-soft); line-height: 1.5; }
+.insta { color: var(--gold); text-decoration: underline; text-underline-offset: 4px; }
+.srv-free { font-family: var(--f-display); font-style: italic; font-weight: 400; }
+.bday-minus small { font-size: .45em; margin-left: .05em; }
+@media (max-width: 560px) { .ba-pairs { gap: 6px; } .ba-pair { font-size: .66rem; } }
