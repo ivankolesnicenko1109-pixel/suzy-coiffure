@@ -70,6 +70,7 @@
   addEventListener("scroll", () => {
     const y = scrollY;
     nav.classList.toggle("is-scrolled", y > 40);
+    nav.classList.toggle("is-hidden", y > 500 && y > lastY && !$("#mobileMenu").classList.contains("is-open"));
     lastY = y;
   }, { passive: true });
   const burger = $("#burger"), menu = $("#mobileMenu");
