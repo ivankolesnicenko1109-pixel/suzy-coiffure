@@ -580,7 +580,7 @@
       const img = $("img", box);
       gsap.timeline({ scrollTrigger: { trigger: box, start: "top 82%" } })
         .to(c, { scaleY: 0, duration: 1.5, ease: "expo.inOut" })
-        .from(img, { scale: 1.35, duration: 2.2, ease: "expo.out" }, .25);
+        .from(box.classList.contains("member-logo") ? [] : img, { scale: 1.35, duration: 2.2, ease: "expo.out" }, .25);
     });
 
     // bande typographique géante
