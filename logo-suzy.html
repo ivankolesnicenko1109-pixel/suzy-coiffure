@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Logo Suzy animé</title>
+<style>
+  :root { --page: #f4f1ec; --ink: #2a1d18; --copper: #7a3d1c; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; min-height: 100vh; background: var(--page); color: var(--ink); font-family: system-ui, sans-serif;
+    display: grid; place-items: center; gap: 24px; padding: 32px max(16px, env(safe-area-inset-right, 0px)) 32px max(16px, env(safe-area-inset-left, 0px)); }
+  /* calques découpés dans l'image originale, superposés au pixel près */
+  .logo { position: relative; width: min(1100px, 100%); background: #fff; border-radius: 6px; overflow: hidden; box-shadow: 0 30px 70px -40px rgba(42, 29, 24, .45); }
+  .logo canvas, .logo img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; }
+  .logo .final { opacity: 0; }
+  .pen { position: absolute; width: 1.3%; aspect-ratio: 1; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; opacity: 0;
+    background: radial-gradient(circle, #fff3dc 0%, #e0a46a 38%, rgba(190, 110, 60, 0) 70%); box-shadow: 0 0 20px 7px rgba(214, 140, 80, .5); transition: opacity .3s; }
+  .caret { position: absolute; width: .35%; background: var(--copper); opacity: 0; }
+  button { font: inherit; font-size: .8rem; letter-spacing: .16em; text-transform: uppercase; color: #fff; background: var(--copper); border: 0; border-radius: 999px; padding: .8rem 1.5rem; cursor: pointer; }
+  button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+</style>
+</head>
+<body>
+<div class="logo" id="logo" role="img" aria-label="Suzy Coiffure, Cocooning Mood"></div>
+<button type="button" id="replay">Rejouer</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+(async () => {
+  "use strict";
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const img = new Image();
+  img.src = "assets/logo/suzy-logo.jpg";
+  await img.decode();
+  const W = img.naturalWidth, H = img.naturalHeight, N = W * H;
+  const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+  const cx = cv.getContext("2d", { willReadFrequently: true });
+  cx.drawImage(img, 0, 0);
+  const D = cx.getImageData(0, 0, W, H).data;
+
+  /* ---------- encre sur fond blanc : alpha + couleur ---------- */
+  const A = new Float32Array(N), C = new Uint8ClampedArray(N * 3);
+  for (let i = 0; i < N; i++) {
+    const m = Math.min(D[i * 4], D[i * 4 + 1], D[i * 4 + 2]);
+    const a = Math.min(1, Math.max(0, (1 - m / 250 - 0.03) / 0.97));
+    A[i] = a;
+    for (let c = 0; c < 3; c++) C[i * 3 + c] = a > 0.004 ? (D[i * 4 + c] - 255 * (1 - a)) / a : 0;
+  }
+  const ink = (i) => A[i] > 0.35;
+
+  /* ---------- les deux ovales : repérés sur les axes centraux ---------- */
+  const runs = (get, n) => { const r = []; let inR = false; for (let k = 0; k < n; k++) { const m = get(k); if (m && !inR) { r.push(k); inR = true; } else if (!m) inR = false; } return r; };
+  const mx = Math.round(W / 2), my = Math.round(H / 2);
+  const top = runs((k) => ink(k * W + mx), H), bot = runs((k) => ink((H - 1 - k) * W + mx), H).map((k) => H - 1 - k);
+  const left = runs((k) => ink(my * W + k), W), right = runs((k) => ink(my * W + W - 1 - k), W).map((k) => W - 1 - k);
+  const E = { cx: (left[0] + right[0]) / 2, cy: (top[0] + bot[0]) / 2, rx: (right[0] - left[0]) / 2, ry: (bot[0] - top[0]) / 2 };
+  const rN = (x, y) => Math.hypot((x - E.cx) / E.rx, (y - E.cy) / E.ry);
+  const innerR = ((E.cy - top[1]) / E.ry + (bot[1] - E.cy) / E.ry + (E.cx - left[1]) / E.rx + (right[1] - E.cx) / E.rx) / 4;
+  const split = (1 + innerR) / 2, textR = innerR - 0.04;
+
+  const L = { OUTER: 1, INNER: 2, TITLE: 3, MOOD: 4 };
+  const lab = new Uint8Array(N);
+  // les ovales sont les deux composantes d'encre qui font presque toute la largeur
+  const comp = new Int32Array(N).fill(-1); let nc = 0;
+  for (let s0 = 0; s0 < N; s0++) {
+    if (comp[s0] >= 0 || A[s0] < 0.08) continue;
+    const st = [s0], members = [s0]; comp[s0] = nc; let x0 = W, x1 = 0;
+    while (st.length) { const i = st.pop(), x = i % W; if (x < x0) x0 = x; if (x > x1) x1 = x;
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { const xx = x + dx, j = i + dy * W + dx;
+        if (xx < 0 || xx >= W || j < 0 || j >= N || comp[j] >= 0 || A[j] < 0.08) continue; comp[j] = nc; st.push(j); members.push(j); } }
+    if (x1 - x0 > W * 0.6) members.forEach((i) => { lab[i] = rN(i % W, (i / W) | 0) > split ? L.OUTER : L.INNER; });
+    nc++;
+  }
+  // titre / sous-titre : la rangée la plus vide entre les deux lignes
+  let cut = E.cy, bestN = Infinity;
+  for (let y = Math.round(E.cy - E.ry * .2); y < Math.round(E.cy + E.ry * .15); y++) {
+    let n = 0; for (let x = Math.round(E.cx - E.rx * .8); x < E.cx + E.rx * .8; x++) if (!lab[y * W + x] && ink(y * W + x)) n++;
+    if (n < bestN) { bestN = n; cut = y; }
+  }
+  for (let i = 0; i < N; i++) {
+    if (lab[i] || A[i] <= 0.01) continue;
+    // pixels très clairs au bord des ovales : restent avec l'ovale
+    const r = rN(i % W, (i / W) | 0);
+    lab[i] = r > textR ? (r > split ? L.OUTER : L.INNER) : ((i / W) | 0) < cut ? L.TITLE : L.MOOD;
+  }
+
+  /* ---------- calque animable ---------- */
+  function drawable(pick, order) {
+    const c = document.createElement("canvas"); c.width = W; c.height = H;
+    const ctx = c.getContext("2d"), im = ctx.createImageData(W, H), d = im.data;
+    const idx = [], base = [], tt = [];
+    let x0 = W, y0 = H, x1 = 0, y1 = 0;
+    for (let i = 0; i < N; i++) {
+      if (!pick(i)) continue;
+      d[i * 4] = C[i * 3]; d[i * 4 + 1] = C[i * 3 + 1]; d[i * 4 + 2] = C[i * 3 + 2]; d[i * 4 + 3] = 0;
+      idx.push(i); base.push(A[i] * 255); tt.push(order(i));
+      const x = i % W, y = (i / W) | 0; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+    }
+    const T = Float32Array.from(tt), B = Float32Array.from(base), I = Int32Array.from(idx);
+    let last = -1;
+    return {
+      el: c,
+      set(front, soft = 0.03) {
+        if (front === last) return; last = front;
+        for (let k = 0; k < I.length; k++) { const v = (front - T[k]) / soft; d[I[k] * 4 + 3] = v <= 0 ? 0 : v >= 1 ? B[k] : B[k] * v; }
+        ctx.putImageData(im, 0, 0, x0, y0, x1 - x0 + 1, y1 - y0 + 1);
+      },
+      tip(front) {
+        let best = -1, bd = Infinity;
+        for (let k = 0; k < I.length; k += 5) { const e = Math.abs(T[k] - front); if (e < bd) { bd = e; best = I[k]; } }
+        return best < 0 ? null : [best % W, (best / W) | 0];
+      },
+      box: () => ({ x0, y0, x1, y1 })
+    };
+  }
+
+  // ovales : ordre = angle autour du centre ; l'extérieur tourne dans un sens, l'intérieur dans l'autre
+  const ang = (i, dir) => { let a = Math.atan2(((i / W) | 0) - E.cy, (i % W - E.cx) * E.ry / E.rx) + Math.PI / 2; a = (a + 2 * Math.PI) % (2 * Math.PI); return dir > 0 ? a / (2 * Math.PI) : 1 - a / (2 * Math.PI); };
+  const OUT = drawable((i) => lab[i] === L.OUTER, (i) => ang(i, 1));
+  const INN = drawable((i) => lab[i] === L.INNER, (i) => ang(i, -1));
+
+  // titre : machine à écrire, lettre par lettre (colonnes séparées par un blanc)
+  const tb = { x0: W, y0: H, x1: 0, y1: 0 };
+  for (let i = 0; i < N; i++) if (lab[i] === L.TITLE && A[i] > .4) { const x = i % W, y = (i / W) | 0; tb.x0 = Math.min(tb.x0, x); tb.x1 = Math.max(tb.x1, x); tb.y0 = Math.min(tb.y0, y); tb.y1 = Math.max(tb.y1, y); }
+  const colInk = new Uint8Array(W);
+  for (let y = tb.y0; y <= tb.y1; y++) for (let x = tb.x0; x <= tb.x1; x++) if (lab[y * W + x] === L.TITLE && A[y * W + x] > .4) colInk[x] = 1;
+  const letters = []; let st = -1;
+  for (let x = tb.x0; x <= tb.x1 + 1; x++) {
+    if (colInk[x] && st < 0) st = x;
+    else if (!colInk[x] && st >= 0) { let g = 0; while (x + g <= tb.x1 && !colInk[x + g]) g++; if (g >= 4 || x + g > tb.x1) { letters.push([st, x - 1]); st = -1; } }
+  }
+  const letterOf = new Int16Array(W).fill(-1);
+  letters.forEach(([a, b], k) => { const lo = k ? Math.ceil((letters[k - 1][1] + a) / 2) : 0, hi = k < letters.length - 1 ? Math.floor((b + letters[k + 1][0]) / 2) : W - 1; for (let x = lo; x <= hi; x++) letterOf[x] = k; });
+  const TI = drawable((i) => lab[i] === L.TITLE, (i) => (letterOf[i % W] + 1) / (letters.length + 1));
+
+  // sous-titre : écrit à la main, de gauche à droite, légèrement penché
+  const MD = drawable((i) => lab[i] === L.MOOD, (() => {
+    let x0 = W, x1 = 0; for (let i = 0; i < N; i++) if (lab[i] === L.MOOD) { const x = i % W; if (x < x0) x0 = x; if (x > x1) x1 = x; }
+    return (i) => ((i % W) - x0 + ((i / W) | 0) * 0.2 - cut * 0.2) / (x1 - x0 + 40);
+  })());
+
+  const root = document.getElementById("logo");
+  root.style.aspectRatio = W + " / " + H;
+  const final = img.cloneNode(); final.className = "final"; final.alt = "";
+  const pen = document.createElement("div"); pen.className = "pen";
+  const caret = document.createElement("div"); caret.className = "caret";
+  caret.style.top = tb.y0 / H * 100 + "%"; caret.style.height = (tb.y1 - tb.y0) / H * 100 + "%";
+  root.append(OUT.el, INN.el, TI.el, MD.el, final, caret, pen);
+
+  const movePen = (l, f, on) => {
+    const p = on && l.tip(f);
+    pen.style.opacity = p ? 1 : 0;
+    if (p) { pen.style.left = p[0] / W * 100 + "%"; pen.style.top = p[1] / H * 100 + "%"; }
+  };
+
+  let tl;
+  function play() {
+    if (tl) tl.kill();
+    [OUT, INN, TI, MD].forEach((l) => l.set(0));
+    gsap.set(final, { opacity: 0 });
+    gsap.set(caret, { opacity: 0, left: letters[0][0] / W * 100 + "%" });
+    gsap.set(TI.el, { y: 0 });
+    const s = { m: 0, o: 0, i: 0 };
+    tl = gsap.timeline();
+    // 1. la machine à écrire : chaque lettre tombe en place, le curseur avance
+    tl.to(caret, { opacity: 1, duration: .15 })
+      .to(caret, { opacity: 0, duration: .2, repeat: 3, yoyo: true });
+    letters.forEach(([, b], k) => {
+      const f = (k + 1) / (letters.length + 1) + 0.001;
+      tl.add(() => { TI.set(f, 0.0001); caret.style.left = (b + 6) / W * 100 + "%"; caret.style.opacity = 1; }, ">")
+        .to({}, { duration: .11 + (k % 3) * .02 });
+    });
+    tl.to(caret, { opacity: 0, duration: .25, repeat: 3, yoyo: true })
+      .set(caret, { opacity: 0 })
+    // 2. le sous-titre s'écrit à la plume
+      .to(s, { m: 1.04, duration: 2.2, ease: "power1.inOut", onUpdate: () => { MD.set(s.m, 0.025); movePen(MD, s.m, s.m < 1); } }, "-=.5")
+    // 3. les deux ovales entourent le tout, en sens opposés
+      .to(s, { o: 1.02, duration: 2.2, ease: "power2.inOut", onUpdate: () => { OUT.set(s.o, 0.02); movePen(OUT, s.o, s.o < 1); } }, "-=.2")
+      .to(s, { i: 1.02, duration: 2.2, ease: "power2.inOut", onUpdate: () => INN.set(s.i, 0.02) }, "<.2")
+      .add(() => { pen.style.opacity = 0; })
+    // 4. image originale exacte
+      .to(final, { opacity: 1, duration: .5 });
+    if (reduced) tl.progress(1);
+  }
+  document.getElementById("replay").addEventListener("click", play);
+  play();
+})();
+</script>
+</body>
+</html>

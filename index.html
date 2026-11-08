@@ -11,18 +11,15 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400;1,6..96,500&family=Jost:wght@300;400;500&display=swap">
 <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="logos-pending">
 
 <!-- Préloader -->
 <div class="loader" id="loader" aria-hidden="true">
-  <div class="loader-inner">
-    <svg class="loader-mono" viewBox="0 0 200 200">
-      <circle cx="100" cy="100" r="92" class="lm-ring"/>
-      <text x="100" y="134" text-anchor="middle" class="lm-s">S</text>
-    </svg>
-    <div class="loader-name">Suzy Coiffure</div>
-    <div class="loader-count"><span id="loaderCount">0</span></div>
+  <div class="intro-logos">
+    <div class="intro-logo intro-suzy" id="introSuzy"></div>
+    <div class="intro-logo intro-val" id="introVal"></div>
   </div>
+  <button type="button" class="intro-skip" id="introSkip">Passer</button>
 </div>
 
 <div class="cursor" id="cursor" aria-hidden="true"><span class="cursor-label" id="cursorLabel"></span></div>
@@ -31,8 +28,10 @@
 <!-- Navigation -->
 <header class="nav" id="nav">
   <div class="nav-inner">
-    <a href="#top" class="logo" aria-label="Suzy Coiffure">
-      <span class="logo-s">Suzy</span><span class="logo-c">Coiffure</span>
+    <a href="#top" class="logo logo-duo" aria-label="Suzy Coiffure · Studio coiffure Valentina">
+      <img class="logo-suzy" src="assets/logo/suzy-light.png" alt="" width="1230" height="715">
+      <span class="logo-sep" aria-hidden="true"></span>
+      <img class="logo-val" src="assets/logo/valentina-light.png" alt="" width="929" height="640">
     </a>
     <nav class="nav-links" aria-label="Navigation principale">
       <a href="#experience" data-i18n="nav.experience"></a>
@@ -348,6 +347,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
 <script src="i18n.js"></script>
+<script src="logos.js"></script>
 <script src="main.js"></script>
 </body>
 </html>

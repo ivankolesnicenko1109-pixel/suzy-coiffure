@@ -515,49 +515,74 @@
      Préloader + intro + animations au scroll (GSAP)
      ========================================================= */
   const loader = $("#loader");
-  const countEl = $("#loaderCount");
   document.body.classList.add("is-loading");
+  // zone utile des versions claires (png recadrés) dans les images d'origine
+  const LOGO_CROP = {
+    suzy: { W: 1280, H: 786, x: 16, y: 32, w: 1230, h: 715, light: "assets/logo/suzy-light.png" },
+    valentina: { W: 1280, H: 736, x: 176, y: 48, w: 929, h: 640, light: "assets/logo/valentina-light.png" }
+  };
 
-  function startSite() {
+  // entrée du hero, une fois les logos posés dans l'en-tête
+  function revealHero() {
     document.body.classList.remove("is-loading");
-    if (!hasGsap || reduced) {
-      loader.remove();
-      if (heroGL) heroGL.uniforms.uIntro.value = 1;
-      return;
-    }
+    if (!hasGsap || reduced) { if (heroGL) heroGL.uniforms.uIntro.value = 1; return; }
     const tl = gsap.timeline();
-    tl.to(".loader-inner", { opacity: 0, scale: .94, duration: .6, ease: "power2.in" })
-      .to(loader, { clipPath: "inset(50% 0 50% 0)", duration: 1.3, ease: "expo.inOut" }, "-=.1")
-      .add(() => loader.remove());
-    if (heroGL) tl.to(heroGL.uniforms.uIntro, { value: 1, duration: 2.8, ease: "power2.inOut" }, "-=.7");
-    tl.from(".ht-1 .ch", { yPercent: 105, duration: 1.8, stagger: .07, ease: "expo.out" }, "-=2.1")
+    if (heroGL) tl.to(heroGL.uniforms.uIntro, { value: 1, duration: 2.8, ease: "power2.inOut" }, 0);
+    tl.from(".ht-1 .ch", { yPercent: 105, duration: 1.8, stagger: .07, ease: "expo.out" }, .5)
       .from(".ht-2 .ch", { yPercent: 110, opacity: 0, rotate: 8, duration: 1.6, stagger: .045, ease: "expo.out" }, "-=1.5")
       .from(".hero-top > *, .hero-aside > *", { y: 30, opacity: 0, duration: 1.2, stagger: .1, ease: "expo.out" }, "-=1.3")
       .from(".hero-bar > *", { y: 20, opacity: 0, duration: 1, stagger: .1, ease: "expo.out" }, "-=1")
-      .from(".nav", { y: -30, opacity: 0, duration: 1, ease: "expo.out" }, "<")
       .add(() => { if (heroGL) heroGL.start(); }, "-=.6");
   }
+  const showNavLogos = () => document.body.classList.remove("logos-pending");
 
-  if (reduced) { startSite(); }
-  else {
-    const minTime = 1900;
-    const t0 = performance.now();
-    const fontsReady = (document.fonts && document.fonts.ready) || Promise.resolve();
-    const texReady = heroGL ? heroGL.ready : Promise.resolve();
-    const timeout = new Promise((r) => setTimeout(r, 5000));
-    let done = false, started = false;
-    const go = () => { if (!started) { started = true; startSite(); } };
-    (function tick() {
-      if (started) return;
-      const p = Math.min((performance.now() - t0) / minTime, done ? 1 : 0.96);
-      countEl.textContent = String(Math.round(p * 100)).padStart(2, "0");
-      if (p < 1) requestAnimationFrame(tick);
-      else go();
-    })();
-    // onglet en arrière-plan : requestAnimationFrame peut être suspendu
-    setTimeout(go, 6000);
-    Promise.race([Promise.all([fontsReady, texReady]), timeout]).then(() => { done = true; });
+  // les logos animés s'envolent vers leur place dans l'en-tête et prennent leur couleur claire
+  function flyToNav(items) {
+    const tl = gsap.timeline({ onComplete: () => { showNavLogos(); loader.remove(); } });
+    items.forEach(({ el, target, crop }) => {
+      const r = el.getBoundingClientRect(), t = target.getBoundingClientRect();
+      const k = (t.width / crop.w) / (r.width / crop.W);
+      const x = t.left - crop.x * (t.width / crop.w) - r.left, y = t.top - crop.y * (t.height / crop.h) - r.top;
+      const light = document.createElement("img");
+      light.src = crop.light; light.alt = ""; light.className = "intro-light";
+      Object.assign(light.style, { left: crop.x / crop.W * 100 + "%", top: crop.y / crop.H * 100 + "%", width: crop.w / crop.W * 100 + "%", height: crop.h / crop.H * 100 + "%" });
+      el.appendChild(light);
+      tl.to(el, { x, y, scale: k, transformOrigin: "0 0", duration: 1.5, ease: "expo.inOut" }, 0)
+        .to(el.querySelectorAll("canvas, .pen, .caret"), { opacity: 0, duration: .7, ease: "power1.in" }, .45)
+        .to(light, { opacity: 1, duration: .7, ease: "power1.out" }, .4);
+    });
+    tl.to(loader, { backgroundColor: "rgba(255,255,255,0)", duration: 1.1, ease: "power2.inOut" }, .35)
+      .to(".intro-skip", { opacity: 0, duration: .3 }, 0)
+      .add(revealHero, .6);
+    return tl;
   }
+
+  async function intro() {
+    const ready = Promise.race([
+      Promise.all([(document.fonts && document.fonts.ready) || null, heroGL ? heroGL.ready : null]),
+      new Promise((r) => setTimeout(r, 5000))
+    ]);
+    if (!hasGsap || reduced || !window.SalonLogos) {
+      await ready; loader.remove(); showNavLogos(); revealHero(); return;
+    }
+    const [suzy, val] = await Promise.all([
+      SalonLogos.suzy($("#introSuzy"), { final: false }),
+      SalonLogos.valentina($("#introVal"), { final: false })
+    ]);
+    gsap.to(".intro-logos", { opacity: 1, duration: .4 });
+    const master = gsap.timeline({ paused: true });
+    master.add(suzy.play().timeScale(1.2), 0).add(val.play().timeScale(1.35), .3);
+    const items = [
+      { el: $("#introSuzy"), target: $(".nav .logo-suzy"), crop: LOGO_CROP.suzy },
+      { el: $("#introVal"), target: $(".nav .logo-val"), crop: LOGO_CROP.valentina }
+    ];
+    let flown = false;
+    const finish = () => { if (flown) return; flown = true; master.progress(1).pause(); ready.then(() => flyToNav(items)); };
+    master.eventCallback("onComplete", () => gsap.delayedCall(.5, finish));
+    $("#introSkip").addEventListener("click", finish);
+    master.play();
+  }
+  intro();
 
   if (hasGsap && window.ScrollTrigger && !reduced) {
     // le hero se referme en carte et les lettres s'envolent au scroll

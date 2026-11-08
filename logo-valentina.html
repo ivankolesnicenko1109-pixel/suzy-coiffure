@@ -1,0 +1,432 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Logo Valentina animé</title>
+<style>
+  :root { --page: #f4f1ec; --ink: #2a1d18; --gold: #8b5a1e; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; min-height: 100vh; background: var(--page); color: var(--ink); font-family: system-ui, sans-serif;
+    display: grid; place-items: center; gap: 24px; padding: 32px max(16px, env(safe-area-inset-right, 0px)) 32px max(16px, env(safe-area-inset-left, 0px)); }
+  /* calques découpés dans l'image originale, superposés au pixel près */
+  .logo { position: relative; width: min(1100px, 100%); background: #fff; border-radius: 6px; overflow: hidden; box-shadow: 0 30px 70px -40px rgba(42, 29, 24, .45); }
+  .logo canvas, .logo img, .logo .grp { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; }
+  .logo .final { opacity: 0; }
+  .pen { position: absolute; width: 1.4%; aspect-ratio: 1; border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; opacity: 0;
+    background: radial-gradient(circle, #fff6d8 0%, #f0c46a 35%, rgba(214, 160, 70, 0) 70%); box-shadow: 0 0 22px 8px rgba(226, 176, 86, .55); mix-blend-mode: multiply; transition: opacity .3s; }
+  button { font: inherit; font-size: .8rem; letter-spacing: .16em; text-transform: uppercase; color: #fff; background: var(--gold); border: 0; border-radius: 999px; padding: .8rem 1.5rem; cursor: pointer; }
+  button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+</style>
+</head>
+<body>
+<div class="logo" id="logo" role="img" aria-label="Studio coiffure Valentina"></div>
+<button type="button" id="replay">Rejouer</button>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+(async () => {
+  "use strict";
+  const DEBUG = /[?&]debug/.test(location.search);
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const img = new Image();
+  img.src = "assets/logo/valentina-logo.jpg";
+  await img.decode();
+  const W = img.naturalWidth, H = img.naturalHeight, N = W * H;
+  const cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+  const cx = cv.getContext("2d", { willReadFrequently: true });
+  cx.drawImage(img, 0, 0);
+  const D = cx.getImageData(0, 0, W, H).data;
+
+  /* ---------- encre sur fond blanc : alpha + couleur ---------- */
+  const A = new Float32Array(N), C = new Uint8ClampedArray(N * 3), chroma = new Float32Array(N);
+  for (let i = 0; i < N; i++) {
+    const r = D[i * 4], g = D[i * 4 + 1], b = D[i * 4 + 2];
+    let a = 1 - Math.min(r, g, b) / 250;
+    a = Math.min(1, Math.max(0, (a - 0.03) / 0.97));
+    A[i] = a;
+    for (let c = 0; c < 3; c++) C[i * 3 + c] = a > 0.004 ? (D[i * 4 + c] - 255 * (1 - a)) / a : 0;
+    chroma[i] = r - b;
+  }
+  const ink = (i) => A[i] > 0.25;
+  const gold = (i) => chroma[i] > 28;
+
+  /* ---------- composantes connexes de l'encre ---------- */
+  const comp = new Int32Array(N).fill(-1), comps = [];
+  for (let s = 0; s < N; s++) {
+    if (comp[s] >= 0 || !ink(s)) continue;
+    const id = comps.length, st = [s]; comp[s] = id;
+    let x0 = W, y0 = H, x1 = 0, y1 = 0, n = 0, ng = 0;
+    while (st.length) {
+      const i = st.pop(), x = i % W, y = (i / W) | 0; n++; if (gold(i)) ng++;
+      if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+        const xx = x + dx, yy = y + dy; if (xx < 0 || yy < 0 || xx >= W || yy >= H) continue;
+        const j = yy * W + xx; if (comp[j] < 0 && ink(j)) { comp[j] = id; st.push(j); }
+      }
+    }
+    comps.push({ x0, y0, x1, y1, n, gold: ng / n > 0.5 });
+  }
+
+  /* ---------- classes ---------- */
+  const L = { V: 1, FLOWER: 2, SCISSORS: 3, THREAD: 4, TEXT: 5, NAME: 6 };
+  const lab = new Uint8Array(N);
+  // V : or massif (fenêtre 9x9 presque pleine)
+  const isG = new Float32Array(N); for (let i = 0; i < N; i++) isG[i] = ink(i) && gold(i) && A[i] > 0.6 ? 1 : 0;
+  const boxSum = (src, r) => {
+    const t = new Float32Array(N), o = new Float32Array(N);
+    for (let y = 0; y < H; y++) { let a = 0; for (let x = -r; x <= r; x++) a += src[y * W + Math.min(W - 1, Math.max(0, x))];
+      for (let x = 0; x < W; x++) { t[y * W + x] = a; a += src[y * W + Math.min(W - 1, x + r + 1)] - src[y * W + Math.max(0, x - r)]; } }
+    for (let x = 0; x < W; x++) { let a = 0; for (let y = -r; y <= r; y++) a += t[Math.min(H - 1, Math.max(0, y)) * W + x];
+      for (let y = 0; y < H; y++) { o[y * W + x] = a; a += t[Math.min(H - 1, y + r + 1) * W + x] - t[Math.max(0, y - r) * W + x]; } }
+    return o;
+  };
+  const gSolid = boxSum(isG, 5);
+  for (let i = 0; i < N; i++) if (isG[i] && gSolid[i] > 0.82 * 121 && (i / W) < H * 0.66) lab[i] = L.V;
+  // grow V into its anti-aliased edge (2 px)
+  for (let k = 0; k < 2; k++) {
+    const add = [];
+    for (let i = 0; i < N; i++) if (!lab[i] && ink(i) && gold(i)) {
+      const x = i % W; if ((x > 0 && lab[i - 1] === L.V) || (x < W - 1 && lab[i + 1] === L.V) || lab[i - W] === L.V || lab[i + W] === L.V) add.push(i);
+    }
+    add.forEach((i) => { lab[i] = L.V; });
+  }
+  // noir : texte si la composante descend dans la zone du texte, sinon ciseaux + fils
+  const blackCore = new Float32Array(N); for (let i = 0; i < N; i++) blackCore[i] = ink(i) && !gold(i) && A[i] > 0.6 ? 1 : 0;
+  const bSolid = boxSum(blackCore, 2);
+  for (let i = 0; i < N; i++) {
+    if (lab[i] || !ink(i)) continue;
+    const c = comps[comp[i]], y = (i / W) | 0;
+    if (gold(i)) lab[i] = c.y0 > H * 0.76 ? L.NAME : L.FLOWER;
+    else if (c.y1 > H * 0.66 || c.y0 > H * 0.56) lab[i] = L.TEXT; // y compris les points des « i »
+    else lab[i] = bSolid[i] >= 14 ? L.SCISSORS : L.THREAD;
+  }
+  // les fils minces collés aux ciseaux (lame, pivot) restent avec les ciseaux
+  for (let k = 0; k < 3; k++) {
+    const add = [];
+    for (let i = 0; i < N; i++) if (lab[i] === L.THREAD) {
+      const x = i % W; if ((x > 0 && lab[i - 1] === L.SCISSORS) || lab[i + 1] === L.SCISSORS || lab[i - W] === L.SCISSORS || lab[i + W] === L.SCISSORS) add.push(i);
+    }
+    add.forEach((i) => { lab[i] = L.SCISSORS; });
+  }
+  // pixels très clairs (antialiasing) : classe du voisin le plus proche
+  let q = []; for (let i = 0; i < N; i++) if (lab[i]) q.push(i);
+  for (let k = 0; k < 4 && q.length; k++) {
+    const nq = [];
+    for (const i of q) { const x = i % W;
+      for (const j of [x > 0 ? i - 1 : -1, x < W - 1 ? i + 1 : -1, i - W, i + W]) if (j >= 0 && j < N && !lab[j] && A[j] > 0.01) { lab[j] = lab[i]; nq.push(j); } }
+    q = nq;
+  }
+
+  /* ---------- blancs enfermés (intérieur des pétales) : appartiennent à la fleur ---------- */
+  const out = new Uint8Array(N), st = [];
+  for (let x = 0; x < W; x++) { st.push(x, (H - 1) * W + x); } for (let y = 0; y < H; y++) { st.push(y * W, y * W + W - 1); }
+  while (st.length) { const i = st.pop(); if (out[i] || A[i] > 0.12) continue; out[i] = 1; const x = i % W;
+    if (x > 0) st.push(i - 1); if (x < W - 1) st.push(i + 1); if (i >= W) st.push(i - W); if (i < N - W) st.push(i + W); }
+  const fb = { x0: W, y0: H, x1: 0, y1: 0 };
+  for (let i = 0; i < N; i++) if (lab[i] === L.FLOWER && A[i] > .5) { const x = i % W, y = (i / W) | 0; fb.x0 = Math.min(fb.x0, x); fb.x1 = Math.max(fb.x1, x); fb.y0 = Math.min(fb.y0, y); fb.y1 = Math.max(fb.y1, y); }
+  const petal = new Uint8Array(N);
+  for (let i = 0; i < N; i++) { const x = i % W, y = (i / W) | 0;
+    if (!out[i] && !lab[i] && x >= fb.x0 && x <= fb.x1 && y >= fb.y0 && y <= fb.y1) petal[i] = 1; }
+  for (let i = 0; i < N; i++) if (!out[i] && lab[i] !== L.FLOWER && lab[i] !== L.V && A[i] <= 0.12 && petal[i] === 0) { /* blancs enfermés ailleurs (lettres, anneaux) : rien à faire */ }
+
+  // V « plein » pour son apparition seule : on bouche les trous des pétales posés dessus
+  const vb = { x0: W, y0: H, x1: 0, y1: 0 };
+  for (let i = 0; i < N; i++) if (lab[i] === L.V) { const x = i % W, y = (i / W) | 0; vb.x0 = Math.min(vb.x0, x); vb.x1 = Math.max(vb.x1, x); vb.y0 = Math.min(vb.y0, y); vb.y1 = Math.max(vb.y1, y); }
+  let vr = 0, vg = 0, vbb = 0, vn = 0;
+  for (let i = 0; i < N; i++) if (lab[i] === L.V && A[i] > .95) { vr += C[i * 3]; vg += C[i * 3 + 1]; vbb += C[i * 3 + 2]; vn++; }
+  const vCol = [vr / vn, vg / vn, vbb / vn];
+  // la lettre ne garde pas les petits points isolés
+  {
+    const seen = new Uint8Array(N);
+    for (let s0 = 0; s0 < N; s0++) {
+      if (lab[s0] !== L.V || seen[s0]) continue;
+      const set = [], st = [s0]; seen[s0] = 1;
+      while (st.length) { const i = st.pop(); set.push(i); const x = i % W;
+        for (const j of [x > 0 ? i - 1 : -1, x < W - 1 ? i + 1 : -1, i - W, i + W]) if (j >= 0 && j < N && !seen[j] && lab[j] === L.V) { seen[j] = 1; st.push(j); } }
+      if (set.length < 300) set.forEach((i) => { lab[i] = L.FLOWER; });
+    }
+  }
+  // V complet pour son apparition seule : la jambe gauche, cachée en partie par la fleur,
+  // est prolongée avec ses deux bords droits mesurés là où elle est bien visible
+  vb.x0 = W; vb.y0 = H; vb.x1 = 0; vb.y1 = 0;
+  for (let i = 0; i < N; i++) if (lab[i] === L.V) { const x = i % W, y = (i / W) | 0; vb.x0 = Math.min(vb.x0, x); vb.x1 = Math.max(vb.x1, x); vb.y0 = Math.min(vb.y0, y); vb.y1 = Math.max(vb.y1, y); }
+  const vFill = new Uint8Array(N);
+  const vH = vb.y1 - vb.y0;
+  const rowsL = [];
+  for (let y = Math.round(vb.y0 + vH * .55); y < Math.round(vb.y0 + vH * .82); y++) {
+    let x = vb.x0, run = null;
+    while (x <= vb.x1) {
+      if (lab[y * W + x] === L.V) { const st0 = x; while (x <= vb.x1 && lab[y * W + x] === L.V) x++; if (x - st0 > 12) { run = [st0, x - 1]; break; } }
+      x++;
+    }
+    if (run) rowsL.push([y, run[0], run[1]]);
+  }
+  const fitLine = (pts) => { const n = pts.length; let sy = 0, sx = 0, syy = 0, sxy = 0;
+    pts.forEach(([y, x]) => { sy += y; sx += x; syy += y * y; sxy += x * y; });
+    const b = (n * sxy - sx * sy) / (n * syy - sy * sy); return [(sx - b * sy) / n, b]; };
+  const [la, lb] = fitLine(rowsL.map(([y, l]) => [y, l]));
+  const [ra, rb] = fitLine(rowsL.map(([y, , r]) => [y, r]));
+  // couleur : profil moyen de la jambe visible (32 tranches dans la largeur), le dégradé est conservé
+  const vFillCol = new Uint8ClampedArray(N * 3);
+  const yRef = Math.round(vb.y0 + vH * .68), BINS = 32, prof = Array.from({ length: BINS }, () => [0, 0, 0, 0]);
+  for (let y = yRef - 25; y <= yRef + 25; y++) {
+    const xl = la + lb * y, xr = ra + rb * y;
+    for (let x = Math.ceil(xl); x <= xr; x++) { const k = y * W + x; if (lab[k] !== L.V || A[k] < .6) continue;
+      const bi = Math.min(BINS - 1, Math.max(0, Math.floor((x - xl) / (xr - xl) * BINS))); prof[bi][0] += D[k * 4]; prof[bi][1] += D[k * 4 + 1]; prof[bi][2] += D[k * 4 + 2]; prof[bi][3]++; }
+  }
+  const profCol = prof.map((p) => p[3] ? [p[0] / p[3], p[1] / p[3], p[2] / p[3]] : null);
+  for (let i = 0; i < BINS; i++) if (!profCol[i]) profCol[i] = profCol.find(Boolean) || vCol;
+  const putFill = (j, x, xl, xr) => {
+    vFill[j] = 1;
+    const c = profCol[Math.min(BINS - 1, Math.max(0, Math.floor((x - xl) / Math.max(1, xr - xl) * BINS)))];
+    vFillCol[j * 3] = c[0]; vFillCol[j * 3 + 1] = c[1]; vFillCol[j * 3 + 2] = c[2];
+  };
+  // seulement la partie haute de la jambe (là où la fleur la cache), jamais au-delà de la pointe
+  for (let y = vb.y0; y < yRef; y++) {
+    const xl = Math.round(la + lb * y), xr = Math.round(ra + rb * y);
+    for (let x = Math.max(vb.x0, xl); x <= Math.min(vb.x1, xr); x++) { const j = y * W + x; if (lab[j] !== L.V) putFill(j, x, xl, xr); }
+  }
+  // empattement gauche : épaisseur mesurée sur sa partie visible, prolongé jusqu'à la jambe
+  let serifH = 0;
+  for (let y = vb.y0; y < vb.y0 + 40; y++) { let n = 0; for (let x = vb.x0; x <= vb.x0 + 50; x++) if (lab[y * W + x] === L.V) n++; if (n > 15) serifH = y - vb.y0 + 1; else if (serifH) break; }
+  for (let y = vb.y0; y < vb.y0 + serifH; y++) {
+    let sx = -1; for (let x = vb.x0; x < vb.x0 + 60; x++) if (lab[y * W + x] === L.V) { sx = x; break; }
+    if (sx < 0) continue;
+    const xr = Math.round(ra + rb * y), c = profCol[Math.floor(BINS / 2)];
+    for (let x = sx; x <= xr; x++) { const j = y * W + x; if (lab[j] !== L.V) { vFill[j] = 1; vFillCol[j * 3] = c[0]; vFillCol[j * 3 + 1] = c[1]; vFillCol[j * 3 + 2] = c[2]; } }
+  }
+  // trous restants sous les pétales, entre deux pixels du V sur une même ligne
+  for (let y = vb.y0; y <= vb.y1; y++) { let last = -1;
+    for (let x = vb.x0; x <= vb.x1; x++) { const i = y * W + x;
+      if (lab[i] === L.V && A[i] > .7) { if (last >= 0 && x - last > 1 && x - last < 60) for (let k = last + 1; k < x; k++) { const j = y * W + k; if (lab[j] !== L.V && !vFill[j] && (petal[j] || lab[j] === L.FLOWER)) { vFill[j] = 1; for (let c = 0; c < 3; c++) vFillCol[j * 3 + c] = vCol[c]; } } last = x; } } }
+  /* ---------- ciseaux : deux moitiés de part et d'autre de l'axe ---------- */
+  const sb = { x0: W, y0: H, x1: 0, y1: 0 };
+  for (let i = 0; i < N; i++) if (lab[i] === L.SCISSORS && A[i] > .5) { const x = i % W, y = (i / W) | 0; sb.x0 = Math.min(sb.x0, x); sb.x1 = Math.max(sb.x1, x); sb.y0 = Math.min(sb.y0, y); sb.y1 = Math.max(sb.y1, y); }
+  // pointe = pixel le plus bas ; pivot = rangée la plus étroite au tiers supérieur des lames
+  let tip = null; for (let i = N - 1; i >= 0; i--) if (lab[i] === L.SCISSORS && A[i] > .5) { tip = [i % W, (i / W) | 0]; break; }
+  // pivot : jonction des deux branches, relevée sur l'image (1280 × 736)
+  const pivot = [788 * W / 1280, 228 * H / 736];
+  // au-dessus du pivot on sépare les deux anneaux, en dessous les deux lames (elles se croisent au pivot)
+  const ringsMid = [835 * W / 1280, 105 * H / 736];
+  const xOn = (a, b, y) => a[0] + (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]);
+  const side = (i) => {
+    const x = i % W, y = (i / W) | 0;
+    return y < pivot[1] ? (x < xOn(pivot, ringsMid, y) ? 1 : 2) : (x < xOn(pivot, tip, y) ? 2 : 1);
+  };
+
+  /* ---------- calques ---------- */
+  function layer(pick, opts = {}) {
+    const c = document.createElement("canvas"); c.width = W; c.height = H;
+    const x = c.getContext("2d"), o = x.createImageData(W, H), d = o.data;
+    for (let i = 0; i < N; i++) {
+      const p = pick(i); if (!p) continue;
+      if (p === "white") { d[i * 4] = d[i * 4 + 1] = d[i * 4 + 2] = 255; d[i * 4 + 3] = 255; continue; }
+      if (p === "fill") { d[i * 4] = vCol[0]; d[i * 4 + 1] = vCol[1]; d[i * 4 + 2] = vCol[2]; d[i * 4 + 3] = 255; continue; }
+      d[i * 4] = C[i * 3]; d[i * 4 + 1] = C[i * 3 + 1]; d[i * 4 + 2] = C[i * 3 + 2]; d[i * 4 + 3] = A[i] * 255;
+    }
+    x.putImageData(o, 0, 0);
+    if (opts.cls) c.className = opts.cls;
+    return c;
+  }
+  const root = document.getElementById("logo");
+  root.style.aspectRatio = W + " / " + H;
+  if (DEBUG) {
+    const col = { 1: [139, 90, 30], 2: [40, 160, 80], 3: [30, 60, 200], 4: [220, 40, 160], 5: [200, 30, 30], 6: [230, 160, 0] };
+    root.appendChild(layer((i) => lab[i] ? true : petal[i] ? "white" : false));
+    const dbg = layer((i) => lab[i] || petal[i]);
+    const x = dbg.getContext("2d"), o = x.getImageData(0, 0, W, H);
+    for (let i = 0; i < N; i++) { const c = petal[i] ? [255, 220, 120] : col[lab[i] === L.SCISSORS ? (side(i) === 1 ? 3 : 4) : lab[i]]; if (!c) continue; o.data[i * 4] = c[0]; o.data[i * 4 + 1] = c[1]; o.data[i * 4 + 2] = c[2]; o.data[i * 4 + 3] = petal[i] ? 160 : Math.max(120, A[i] * 255); }
+    x.putImageData(o, 0, 0); root.appendChild(dbg);
+    const p = document.createElement("div"); p.style.cssText = `position:absolute;width:10px;height:10px;border-radius:50%;background:red;left:${pivot[0] / W * 100}%;top:${pivot[1] / H * 100}%;transform:translate(-50%,-50%)`; root.appendChild(p);
+    return;
+  }
+
+  /* =========================================================
+     Animation : chaque calque se « dessine » le long de son tracé.
+     Pour chaque pixel on calcule t = distance le long du dessin
+     (distance géodésique depuis le point de départ), puis on révèle
+     les pixels dont t est derrière le front qui avance.
+     ========================================================= */
+  function geodesic(member, start, bridge) {
+    // BFS 8-voisins à l'intérieur du calque (pont de « bridge » px pour franchir les petits blancs)
+    const dist = new Int32Array(N).fill(-1);
+    let q = [start]; dist[start] = 0;
+    let maxD = 0;
+    const ok = (j) => member[j] || (bridge && bridge[j]);
+    while (q.length) {
+      const nq = [];
+      for (const i of q) {
+        const x = i % W, d = dist[i] + 1;
+        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+          if (!dx && !dy) continue;
+          const xx = x + dx; if (xx < 0 || xx >= W) continue;
+          const j = i + dy * W + dx; if (j < 0 || j >= N || dist[j] >= 0 || !ok(j)) continue;
+          dist[j] = d; if (d > maxD) maxD = d; nq.push(j);
+        }
+      }
+      q = nq;
+    }
+    return { dist, maxD };
+  }
+  function dilate(m, r) {
+    const o = new Uint8Array(N);
+    for (let i = 0; i < N; i++) if (m[i]) { const x = i % W, y = (i / W) | 0;
+      for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { const xx = x + dx, yy = y + dy; if (xx >= 0 && yy >= 0 && xx < W && yy < H) o[yy * W + xx] = 1; } }
+    return o;
+  }
+  const extreme = (m, score) => { let b = -1, bs = -Infinity; for (let i = 0; i < N; i++) if (m[i]) { const s = score(i % W, (i / W) | 0); if (s > bs) { bs = s; b = i; } } return b; };
+
+  // calque animable : pixels, couleurs, ordre de dessin
+  function drawable(pick, order) {
+    const c = document.createElement("canvas"); c.width = W; c.height = H;
+    const ctx = c.getContext("2d"), img = ctx.createImageData(W, H), d = img.data;
+    const idx = [], base = [], tt = [];
+    let x0 = W, y0 = H, x1 = 0, y1 = 0;
+    for (let i = 0; i < N; i++) {
+      const p = pick(i); if (!p) continue;
+      let r, g, b, a;
+      if (Array.isArray(p)) { [r, g, b, a] = p; }
+      else if (p === "white") { r = g = b = 255; a = 255; }
+      else if (p === "fill") { r = vFillCol[i * 3]; g = vFillCol[i * 3 + 1]; b = vFillCol[i * 3 + 2]; a = 255; }
+      else { r = C[i * 3]; g = C[i * 3 + 1]; b = C[i * 3 + 2]; a = A[i] * 255; }
+      d[i * 4] = r; d[i * 4 + 1] = g; d[i * 4 + 2] = b; d[i * 4 + 3] = 0;
+      idx.push(i); base.push(a); tt.push(order(i));
+      const x = i % W, y = (i / W) | 0; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+    }
+    const T = Float32Array.from(tt), B = Float32Array.from(base), I = Int32Array.from(idx);
+    let last = -1;
+    return {
+      el: c,
+      // front ∈ [0,1+soft] ; soft = largeur du dégradé au bord du trait
+      set(front, soft = 0.04) {
+        if (front === last) return; last = front;
+        for (let k = 0; k < I.length; k++) {
+          const v = (front - T[k]) / soft;
+          d[I[k] * 4 + 3] = v <= 0 ? 0 : v >= 1 ? B[k] : B[k] * v;
+        }
+        ctx.putImageData(img, 0, 0, x0, y0, x1 - x0 + 1, y1 - y0 + 1);
+      },
+      // position du front (pour la plume lumineuse)
+      tip(front) {
+        let best = -1, bd = Infinity;
+        for (let k = 0; k < I.length; k += 7) { const e = Math.abs(T[k] - front); if (e < bd) { bd = e; best = I[k]; } }
+        return best < 0 ? null : [best % W, (best / W) | 0];
+      }
+    };
+  }
+
+  // V propre pour sa propre apparition : forme vectorielle construite sur les bords droits de la vraie lettre
+  // (jambe gauche et jambe droite), unie aux pixels visibles du V (empattements compris)
+  const rowsR = [];
+  for (let y = Math.round(vb.y0 + vH * .15); y < Math.round(vb.y0 + vH * .6); y++) {
+    let x = vb.x1, run = null;
+    while (x >= vb.x0) {
+      if (lab[y * W + x] === L.V) { const e = x; while (x >= vb.x0 && lab[y * W + x] === L.V) x--; if (e - x > 8) { run = [x + 1, e]; break; } }
+      x--;
+    }
+    if (run) rowsR.push([y, run[0], run[1]]);
+  }
+  const [rla, rlb] = fitLine(rowsR.map(([y, l]) => [y, l]));
+  const [rra, rrb] = fitLine(rowsR.map(([y, , r]) => [y, r]));
+  const meet = (a1, b1, a2, b2) => { const y = (a2 - a1) / (b1 - b2); return [a1 + b1 * y, y]; };
+  const yTop = vb.y0 + 2;
+  const tipP = meet(la, lb, rra, rrb), crotch = meet(ra, rb, rla, rlb);
+  // léger élargissement (≈1,5 px) pour recouvrir l'antialiasing des bords réels
+  const E = 1.5, Lla = la - E, Lra = ra + E, Rla = rla - E, Rra = rra + E;
+  const tipQ = meet(Lla, lb, Rra, rrb), crotchQ = meet(Lra, rb, Rla, rlb);
+  const vPoly = [[Lla + lb * yTop, yTop], [Lra + rb * yTop, yTop], crotchQ, [Rla + rlb * yTop, yTop], [Rra + rrb * yTop, yTop], tipQ];
+  let cr = 0, cg = 0, cbb = 0, cn = 0;
+  for (let i = 0; i < N; i++) if (lab[i] === L.V && A[i] > .8) { cr += D[i * 4]; cg += D[i * 4 + 1]; cbb += D[i * 4 + 2]; cn++; }
+  const vInk = [cr / cn, cg / cn, cbb / cn];
+  const vc = document.createElement("canvas"); vc.width = W; vc.height = H;
+  const vx = vc.getContext("2d");
+  vx.fillStyle = `rgb(${vInk.map(Math.round).join(",")})`;
+  vx.beginPath(); vPoly.forEach(([x, y], k) => k ? vx.lineTo(x, y) : vx.moveTo(x, y)); vx.closePath(); vx.fill();
+  // empattement gauche : rectangle à la hauteur mesurée, de son bout visible jusqu'à la jambe
+  if (serifH) {
+    let sx = W; for (let y = vb.y0; y < vb.y0 + serifH; y++) for (let x = vb.x0; x < vb.x0 + 60; x++) if (lab[y * W + x] === L.V) { sx = Math.min(sx, x); break; }
+    vx.fillRect(sx, vb.y0, (ra + rb * vb.y0) - sx + 3, serifH + .5);
+  }
+  const vClean = vx.getImageData(0, 0, W, H).data;
+  // union avec les pixels réels du V (bords exacts là où la lettre est visible)
+  const vAt = (i) => {
+    // pixels réels seulement pour les empattements (et leur raccord) ; en dessous, la forme vectorielle seule
+    const inSerifs = ((i / W) | 0) < vb.y0 + serifH + 14;
+    const pa = vClean[i * 4 + 3] / 255, oa = inSerifs && lab[i] === L.V ? 1 - Math.min(D[i * 4], D[i * 4 + 1], D[i * 4 + 2]) / 250 : 0;
+    if (pa <= 0.004 && oa <= 0.004) return null;
+    if (pa >= oa) return [vInk[0], vInk[1], vInk[2], pa * 255];
+    return [C[i * 3], C[i * 3 + 1], C[i * 3 + 2], A[i] * 255];
+  };
+  const vMember = new Uint8Array(N); for (let i = 0; i < N; i++) { const p = vAt(i); vMember[i] = p && p[3] > 128 ? 1 : 0; }
+  const vStart = extreme(vMember, (x, y) => -(x + y * 1.4));
+  const gV = geodesic(vMember, vStart, dilate(vMember, 1));
+  const V = drawable((i) => vAt(i), (i) => gV.dist[i] >= 0 ? gV.dist[i] / gV.maxD : 1);
+
+  // fleur : pousse depuis le bas de sa tige, le long des branches, jusqu'aux pétales
+  const fMember = new Uint8Array(N); for (let i = 0; i < N; i++) fMember[i] = lab[i] === L.FLOWER || petal[i] ? 1 : 0;
+  const fStart = extreme(fMember, (x, y) => y - x * 0.2);
+  const gF = geodesic(fMember, fStart, dilate(fMember, 3));
+  const F = drawable((i) => petal[i] ? "white" : lab[i] === L.FLOWER, (i) => gF.dist[i] >= 0 ? gF.dist[i] / gF.maxD : 1);
+
+  // fils : depuis le haut, ils s'enroulent autour des ciseaux
+  const tMember = new Uint8Array(N); for (let i = 0; i < N; i++) tMember[i] = lab[i] === L.THREAD ? 1 : 0;
+  const tStart = extreme(tMember, (x, y) => -y);
+  const gT = geodesic(tMember, tStart, dilate(tMember, 4));
+  const TH = drawable((i) => lab[i] === L.THREAD, (i) => gT.dist[i] >= 0 ? gT.dist[i] / gT.maxD : ((i / W) | 0) / H);
+
+  // textes : écriture de gauche à droite, légèrement penchée comme une main
+  const writeOrder = (cls) => {
+    let x0 = W, x1 = 0; for (let i = 0; i < N; i++) if (lab[i] === cls) { const x = i % W; if (x < x0) x0 = x; if (x > x1) x1 = x; }
+    return (i) => ((i % W) - x0 + ((i / W) | 0) * 0.25 - H * 0.15) / (x1 - x0 + H * 0.1);
+  };
+  const TX = drawable((i) => lab[i] === L.TEXT, writeOrder(L.TEXT));
+  const NM = drawable((i) => lab[i] === L.NAME, writeOrder(L.NAME));
+
+  const scissors = layer((i) => lab[i] === L.SCISSORS);
+  const final = img.cloneNode(); final.className = "final"; final.alt = "";
+  const pen = document.createElement("div"); pen.className = "pen";
+  root.append(V.el, F.el, scissors, TH.el, TX.el, NM.el, final, pen);
+
+  const pct = (x, y) => `${x / W * 100}% ${y / H * 100}%`;
+  const movePen = (layerObj, f, on) => {
+    const p = on && layerObj.tip(f);
+    pen.style.opacity = p ? 1 : 0;
+    if (p) { pen.style.left = p[0] / W * 100 + "%"; pen.style.top = p[1] / H * 100 + "%"; }
+  };
+
+  let tl;
+  function play() {
+    if (tl) tl.kill();
+    const s = { v: 0, f: 0, th: 0, tx: 0, nm: 0 };
+    [V, F, TH, TX, NM].forEach((l) => l.set(0));
+    gsap.set(final, { opacity: 0 });
+    gsap.set(scissors, { opacity: 0, y: "-85%", rotation: -18, transformOrigin: pct(pivot[0], pivot[1]) });
+    gsap.set(V.el, { filter: "drop-shadow(0 0 0 rgba(212,160,70,0))" });
+
+    tl = gsap.timeline();
+    // 1. la plume dessine le V : du haut à gauche vers la pointe, puis remonte à droite
+    tl.to(s, { v: 1.06, duration: 2.6, ease: "power1.inOut", onUpdate: () => { V.set(s.v, 0.035); movePen(V, s.v, s.v < 1); } })
+      .to(V.el, { filter: "drop-shadow(0 0 14px rgba(212,160,70,.75))", duration: .35, yoyo: true, repeat: 1, ease: "sine.inOut" })
+    // 2. la fleur pousse lentement du bas, s'enroule autour du V et s'ouvre en haut
+      .to(s, { f: 1.06, duration: 3.6, ease: "sine.inOut", onUpdate: () => { F.set(s.f, 0.05); movePen(F, s.f, s.f < 1); } }, "-=.3")
+    // 3. les ciseaux tombent du haut
+      .to(scissors, { opacity: 1, duration: .25 }, "-=.2")
+      .to(scissors, { y: "0%", rotation: 0, duration: 1.1, ease: "bounce.out" }, "<")
+    // 4. les mèches s'enroulent autour des ciseaux
+      .to(s, { th: 1.06, duration: 1.6, ease: "power1.inOut", onUpdate: () => TH.set(s.th, 0.05) }, "-=.25")
+    // 5. le texte s'écrit, puis le prénom
+      .to(s, { tx: 1.05, duration: 2.4, ease: "power1.inOut", onUpdate: () => TX.set(s.tx, 0.03) }, "-=.9")
+      .to(s, { nm: 1.05, duration: 1.4, ease: "power1.inOut", onUpdate: () => NM.set(s.nm, 0.03) }, "-=.6")
+    // 6. image originale exacte
+      .add(() => { pen.style.opacity = 0; })
+      .to(final, { opacity: 1, duration: .5 });
+    if (reduced) tl.progress(1);
+  }
+  document.getElementById("replay").addEventListener("click", play);
+  play();
+})();
+</script>
+</body>
+</html>

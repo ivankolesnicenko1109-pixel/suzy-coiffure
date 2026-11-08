@@ -6,3 +6,5 @@ assets/instagram/
 assets/salon/
 # Essai d animation des logos, mis de côté
 logos.html
+# Fichiers de travail des logos
+assets/logo/_*
