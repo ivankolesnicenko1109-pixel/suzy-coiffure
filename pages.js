@@ -143,8 +143,8 @@
     function renderStylists() {
       const list = [
         ["any", t("book.any"), t("book.anyHint"), null],
-        ["suzy", "Suzy", t("book.suzyHint"), "assets/logo/suzy-original.jpg"],
-        ["valentina", "Valentina", t("book.valHint"), "assets/logo/valentina-original.jpg"]
+        ["suzy", "Suzy", t("book.suzyHint"), "assets/logo/suzy-logo.jpg"],
+        ["valentina", "Valentina", t("book.valHint"), "assets/logo/valentina-logo.jpg"]
       ];
       $("#bkStylists").innerHTML = list.map(([id, name, hint, img]) => `
         <button type="button" class="bk-who" data-who="${id}" aria-pressed="${state.who === id}">

@@ -511,7 +511,7 @@ em { font-style: italic; }
 .ba-pair[aria-pressed="true"] span { color: var(--ink); }
 .team-photo { margin: 0 auto clamp(32px, 5vw, 64px); max-width: 1080px; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 4px; position: relative; box-shadow: 0 40px 80px -45px rgba(42, 29, 24, .6); }
 .team-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 28%; }
-.member-logo { aspect-ratio: 1280 / 780; border-radius: 3px; background: #f3efe9; }
+.member-logo { aspect-ratio: 1280 / 780; border-radius: 3px; background: #fff; }
 .member-logo img { object-fit: contain; }
 .hours-note { margin: 1rem 0 0; font-size: .86rem; color: var(--ink-soft); line-height: 1.5; }
 .insta { color: var(--gold); text-decoration: underline; text-underline-offset: 4px; }
