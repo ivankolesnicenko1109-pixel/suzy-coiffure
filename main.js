@@ -183,7 +183,6 @@
   let lastY = 0;
   const onScroll = (y) => {
     nav.classList.toggle("is-scrolled", y > 40);
-    nav.classList.toggle("is-hidden", y > 500 && y > lastY && !$("#mobileMenu").classList.contains("is-open"));
     lastY = y;
   };
   if (lenis) lenis.on("scroll", ({ scroll }) => onScroll(scroll));
@@ -534,7 +533,6 @@
       .from(".ht-2 .ch", { yPercent: 110, opacity: 0, rotate: 8, duration: 1.6, stagger: .045, ease: "expo.out" }, "-=1.5")
       .from(".hero-top > *, .hero-aside > *", { y: 30, opacity: 0, duration: 1.2, stagger: .1, ease: "expo.out" }, "-=1.3")
       .from(".hero-bar > *", { y: 20, opacity: 0, duration: 1, stagger: .1, ease: "expo.out" }, "-=1")
-      .from(".nav", { y: -30, opacity: 0, duration: 1, ease: "expo.out" }, "<")
       .add(() => { if (heroGL) heroGL.start(); }, "-=.6");
   }
 
