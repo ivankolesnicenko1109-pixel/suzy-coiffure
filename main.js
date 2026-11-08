@@ -183,7 +183,6 @@
   let lastY = 0;
   const onScroll = (y) => {
     nav.classList.toggle("is-scrolled", y > 40);
-    nav.classList.toggle("is-hidden", y > 500 && y > lastY && !$("#mobileMenu").classList.contains("is-open"));
     lastY = y;
   };
   if (lenis) lenis.on("scroll", ({ scroll }) => onScroll(scroll));
@@ -571,14 +570,14 @@
     ]);
     gsap.to(".intro-logos", { opacity: 1, duration: .4 });
     const master = gsap.timeline({ paused: true });
-    master.add(suzy.play().timeScale(1.2), 0).add(val.play().timeScale(1.35), .3);
+    master.add(suzy.play().timeScale(2.1), 0).add(val.play().timeScale(2.3), .15);
     const items = [
       { el: $("#introSuzy"), target: $(".nav .logo-suzy"), crop: LOGO_CROP.suzy },
       { el: $("#introVal"), target: $(".nav .logo-val"), crop: LOGO_CROP.valentina }
     ];
     let flown = false;
     const finish = () => { if (flown) return; flown = true; master.progress(1).pause(); ready.then(() => flyToNav(items)); };
-    master.eventCallback("onComplete", () => gsap.delayedCall(.5, finish));
+    master.eventCallback("onComplete", () => gsap.delayedCall(.25, finish));
     $("#introSkip").addEventListener("click", finish);
     master.play();
   }
