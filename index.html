@@ -4,12 +4,33 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Suzy Coiffure</title>
-<meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Suzy Coiffure, salon de coiffure à Neuchâtel depuis plus de 25 ans. Brushing, balayage, coupes tendance, soins et ongles. Rue des Chavannes 13.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Suzy Coiffure">
+<meta property="og:title" content="Suzy Coiffure · Salon de coiffure à Neuchâtel">
+<meta property="og:description" content="Salon cocooning au cœur de Neuchâtel depuis 2000. Coupes, couleurs, balayages, brushings et soins. Rue des Chavannes 13.">
+<meta property="og:image" content="https://suzy-coiffure.vercel.app/assets/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://suzy-coiffure.vercel.app/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400;1,6..96,500&family=Jost:wght@300;400;500&display=swap">
-<link rel="stylesheet" href="styles.css?v=1794170519">
+<link rel="stylesheet" href="styles.css?v=1794210711">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"HairSalon","name":"Suzy Coiffure","image":"https://suzy-coiffure.vercel.app/assets/img/og.jpg",
+"url":"https://suzy-coiffure.vercel.app/","telephone":"+41763213239","priceRange":"CHF",
+"address":{"@type":"PostalAddress","streetAddress":"Rue des Chavannes 13","postalCode":"2000","addressLocality":"Neuchâtel","addressCountry":"CH"},
+"openingHoursSpecification":[
+{"@type":"OpeningHoursSpecification","dayOfWeek":"Monday","opens":"09:30","closes":"18:30"},
+{"@type":"OpeningHoursSpecification","dayOfWeek":["Wednesday","Thursday","Friday"],"opens":"10:00","closes":"18:00"},
+{"@type":"OpeningHoursSpecification","dayOfWeek":"Saturday","opens":"10:00","closes":"15:30"}],
+"sameAs":["https://www.instagram.com/salon_suzycoiffure/","https://salonkee.ch/salon/suzy-coiffure"]}
+</script>
 </head>
 <body>
 
@@ -32,9 +53,9 @@
 <header class="nav" id="nav">
   <div class="nav-inner">
     <a href="#top" class="logo logo-duo" aria-label="Suzy Coiffure · Studio coiffure Valentina">
-      <img class="logo-suzy" src="assets/logo/suzy-light.png" alt="" width="1230" height="715">
+      <img class="logo-suzy" src="assets/logo/suzy-light.png" alt="Suzy Coiffure" width="1230" height="715">
       <span class="logo-sep" aria-hidden="true"></span>
-      <img class="logo-val" src="assets/logo/valentina-light.png" alt="" width="929" height="640">
+      <img class="logo-val" src="assets/logo/valentina-light.png" alt="Studio coiffure Valentina" width="929" height="640">
     </a>
     <nav class="nav-links" aria-label="Navigation principale">
       <a href="#experience" data-i18n="nav.experience"></a>
@@ -49,7 +70,7 @@
         <button type="button" data-lang="en">EN</button>
         <button type="button" data-lang="de">DE</button>
       </div>
-      <a href="reservation.html" class="btn btn-gold btn-sm magnetic" data-i18n="nav.book"></a>
+      <a href="https://salonkee.ch/salon/suzy-coiffure?lang=fr" target="_blank" rel="noopener" class="btn btn-gold btn-sm magnetic" data-i18n="nav.book"></a>
       <button type="button" class="burger" id="burger" aria-label="Menu" aria-expanded="false"><span></span><span></span></button>
     </div>
   </div>
@@ -84,7 +105,7 @@
       <div class="hero-aside">
         <p class="hero-line" data-i18n-html="hero.line"></p>
         <div class="hero-actions">
-          <a href="reservation.html" class="btn btn-gold magnetic"><span data-i18n="hero.cta"></span></a>
+          <a href="https://salonkee.ch/salon/suzy-coiffure?lang=fr" target="_blank" rel="noopener" class="btn btn-gold magnetic"><span data-i18n="hero.cta"></span></a>
           <a href="#experience" class="btn btn-ghost magnetic"><span data-i18n="hero.discover"></span></a>
         </div>
       </div>
@@ -114,10 +135,10 @@
     <div class="wrap exp-grid">
       <div class="exp-media">
         <figure class="exp-img exp-img-a parallax" data-speed="-0.08">
-          <img src="assets/img/work/facade.jpg" alt="La façade du salon, rue des Chavannes 13" loading="lazy">
+          <img src="assets/img/work/facade.webp" alt="La façade du salon, rue des Chavannes 13">
         </figure>
         <figure class="exp-img exp-img-b parallax" data-speed="0.1">
-          <img src="assets/img/work/ig-74.jpg" alt="L'intérieur du salon" loading="lazy">
+          <img src="assets/img/work/ig-74.webp" alt="L'intérieur du salon">
         </figure>
         <p class="exp-caption" data-i18n="exp.caption"></p>
       </div>
@@ -149,7 +170,7 @@
       <div class="srv-tabs" id="srvTabs" role="tablist"></div>
       <div class="srv-body">
         <figure class="srv-visual" aria-hidden="true">
-          <img id="srvImg" src="assets/img/work/ig-11.jpg" alt="">
+          <img id="srvImg" src="assets/img/work/ig-11.webp" alt="Réalisation du salon">
           <span class="srv-visual-label" id="srvLabel"></span>
         </figure>
         <ul class="srv-list" id="srvList" role="tabpanel"></ul>
@@ -158,7 +179,7 @@
         <p class="srv-note" data-i18n="srv.note"></p>
         <div class="more-actions">
           <a class="btn btn-ghost magnetic" href="tarifs.html"><span data-i18n="more.prices"></span></a>
-          <a class="btn btn-gold magnetic" href="reservation.html"><span data-i18n="nav.book"></span></a>
+          <a class="btn btn-gold magnetic" href="https://salonkee.ch/salon/suzy-coiffure?lang=fr" target="_blank" rel="noopener"><span data-i18n="nav.book"></span></a>
         </div>
       </div>
     </div>
@@ -175,15 +196,15 @@
         <a class="gal-more" href="realisations.html"><span data-i18n="more.works"></span> →</a>
       </div>
       <div class="gal-track" id="galTrack">
-        <figure class="gal-item" data-cursor="Voir"><img src="assets/img/work/ig-01.jpg" alt="Blond dégradé" loading="lazy"><figcaption><span>01</span>Blond dégradé</figcaption></figure>
-        <figure class="gal-item tall" data-cursor="Voir"><img src="assets/img/work/ig-12.jpg" alt="Carré cuivré" loading="lazy"><figcaption><span>02</span>Carré cuivré</figcaption></figure>
-        <figure class="gal-item" data-cursor="Voir"><img src="assets/img/work/ig-35.jpg" alt="Boucles blondes" loading="lazy"><figcaption><span>03</span>Boucles blondes</figcaption></figure>
-        <figure class="gal-item tall" data-cursor="Voir"><img src="assets/img/work/ig-44.jpg" alt="Carré polaire" loading="lazy"><figcaption><span>04</span>Carré polaire</figcaption></figure>
-        <figure class="gal-item" data-cursor="Voir"><img src="assets/img/work/ig-20.jpg" alt="Cuivré dégradé" loading="lazy"><figcaption><span>05</span>Cuivré dégradé</figcaption></figure>
-        <figure class="gal-item tall" data-cursor="Voir"><img src="assets/img/work/ig-36.jpg" alt="Boucles naturelles" loading="lazy"><figcaption><span>06</span>Boucles naturelles</figcaption></figure>
-        <figure class="gal-item" data-cursor="Voir"><img src="assets/img/work/ig-49.jpg" alt="Chignon d'évènement" loading="lazy"><figcaption><span>07</span>Chignon d'évènement</figcaption></figure>
-        <figure class="gal-item tall" data-cursor="Voir"><img src="assets/img/work/ig-54.jpg" alt="Tresse épi" loading="lazy"><figcaption><span>08</span>Tresse épi</figcaption></figure>
-        <figure class="gal-item" data-cursor="Voir"><img src="assets/img/work/ig-29.jpg" alt="Wave blond" loading="lazy"><figcaption><span>09</span>Wave blond</figcaption></figure>
+        <figure class="gal-item" data-cursor="Voir"><img src="assets/img/work/ig-01.webp" alt="Blond dégradé" loading="lazy"><figcaption><span>01</span>Blond dégradé</figcaption></figure>
+        <figure class="gal-item tall" data-cursor="Voir"><img src="assets/img/work/ig-12.webp" alt="Carré cuivré" loading="lazy"><figcaption><span>02</span>Carré cuivré</figcaption></figure>
+        <figure class="gal-item" data-cursor="Voir"><img src="assets/img/work/ig-35.webp" alt="Boucles blondes" loading="lazy"><figcaption><span>03</span>Boucles blondes</figcaption></figure>
+        <figure class="gal-item tall" data-cursor="Voir"><img src="assets/img/work/ig-44.webp" alt="Carré polaire" loading="lazy"><figcaption><span>04</span>Carré polaire</figcaption></figure>
+        <figure class="gal-item" data-cursor="Voir"><img src="assets/img/work/ig-20.webp" alt="Cuivré dégradé" loading="lazy"><figcaption><span>05</span>Cuivré dégradé</figcaption></figure>
+        <figure class="gal-item tall" data-cursor="Voir"><img src="assets/img/work/ig-36.webp" alt="Boucles naturelles" loading="lazy"><figcaption><span>06</span>Boucles naturelles</figcaption></figure>
+        <figure class="gal-item" data-cursor="Voir"><img src="assets/img/work/ig-49.webp" alt="Chignon d'évènement" loading="lazy"><figcaption><span>07</span>Chignon d'évènement</figcaption></figure>
+        <figure class="gal-item tall" data-cursor="Voir"><img src="assets/img/work/ig-54.webp" alt="Tresse épi" loading="lazy"><figcaption><span>08</span>Tresse épi</figcaption></figure>
+        <figure class="gal-item" data-cursor="Voir"><img src="assets/img/work/ig-29.webp" alt="Wave blond" loading="lazy"><figcaption><span>09</span>Wave blond</figcaption></figure>
       </div>
     </div>
   </section>
@@ -198,8 +219,8 @@
         <div class="ba-pairs" id="baPairs"></div>
       </div>
       <div class="ba-frame" id="baFrame" style="--pos:50%">
-        <img class="ba-after" src="assets/img/work/apres-14.jpg" alt="Lissage blond">
-        <div class="ba-before-wrap"><img class="ba-before" src="assets/img/work/avant-14.jpg" alt="Avant"></div>
+        <img class="ba-after" src="assets/img/work/apres-14.webp" alt="Lissage blond">
+        <div class="ba-before-wrap"><img class="ba-before" src="assets/img/work/avant-14.webp" alt="Avant"></div>
         <span class="ba-tag ba-tag-l" data-i18n="ba.before"></span>
         <span class="ba-tag ba-tag-r" data-i18n="ba.after"></span>
         <div class="ba-handle" aria-hidden="true"><span>⟷</span></div>
@@ -217,11 +238,11 @@
         <h2 class="h2 reveal-lines" data-i18n-html="team.title"></h2>
       </div>
       <figure class="team-photo">
-        <img src="assets/img/work/equipe.jpg" alt="Suzy et Valentina au salon" loading="lazy">
+        <img src="assets/img/work/equipe.webp" alt="Suzy et Valentina au salon">
       </figure>
       <div class="team-grid">
         <article class="member tilt">
-          <div class="member-img member-logo"><img src="assets/logo/suzy-logo.jpg" alt="Logo Suzy Coiffure, Cocooning Mood" loading="lazy"></div>
+          <div class="member-img member-logo"><img src="assets/logo/suzy-logo.webp" alt="Logo Suzy Coiffure, Cocooning Mood"></div>
           <div class="member-body">
             <p class="member-role" data-i18n="team.suzy.role"></p>
             <h3 class="member-name">Suzy</h3>
@@ -229,7 +250,7 @@
           </div>
         </article>
         <article class="member tilt">
-          <div class="member-img member-logo"><img src="assets/logo/valentina-logo.jpg" alt="Logo Studio coiffure Valentina" loading="lazy"><span class="member-flag">Italia</span></div>
+          <div class="member-img member-logo"><img src="assets/logo/valentina-logo.webp" alt="Logo Studio coiffure Valentina"><span class="member-flag">Venue d’Italie</span></div>
           <div class="member-body">
             <p class="member-role" data-i18n="team.val.role"></p>
             <h3 class="member-name">Valentina</h3>
@@ -318,7 +339,7 @@
           <h3 class="book-title" data-i18n="info.book"></h3>
           <p data-i18n="info.bookText"></p>
           <div class="book-actions">
-            <a href="reservation.html" class="btn btn-gold magnetic"><span data-i18n="more.online"></span></a>
+            <a href="https://salonkee.ch/salon/suzy-coiffure?lang=fr" target="_blank" rel="noopener" class="btn btn-gold magnetic"><span data-i18n="more.online"></span></a>
             <a href="tel:+41763213239" class="btn btn-ghost-dark magnetic"><span data-i18n="info.call"></span> · 076 321 32 39</a>
             <a href="https://wa.me/41763213239" target="_blank" rel="noopener" class="btn btn-ghost-dark magnetic">WhatsApp</a>
             <button type="button" class="link-btn" id="copyPhone" data-i18n="info.copy"></button>
@@ -335,13 +356,17 @@
     <p data-i18n="foot.tag"></p>
     <p><a class="insta" href="https://www.instagram.com/salon_suzycoiffure/" target="_blank" rel="noopener">Instagram · @salon_suzycoiffure</a></p>
     <p class="muted">© <span id="year"></span> Suzy Coiffure · Rue des Chavannes 13, 2000 Neuchâtel · <span data-i18n="foot.rights"></span></p>
-    <p class="muted small" data-i18n="foot.demo"></p>
   </div>
 </footer>
 
+<div class="m-cta" aria-label="Contact rapide">
+  <a class="m-wa" href="https://wa.me/41763213239" target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 3a13 13 0 0 0-11.2 19.6L3 29l6.6-1.7A13 13 0 1 0 16 3zm0 23.6a10.6 10.6 0 0 1-5.4-1.5l-.4-.2-3.9 1 1-3.8-.2-.4A10.6 10.6 0 1 1 16 26.6zm5.8-7.9c-.3-.2-1.9-.9-2.2-1s-.5-.2-.7.2-.8 1-1 1.2-.4.2-.7.1a8.7 8.7 0 0 1-4.3-3.8c-.3-.6.3-.5.9-1.7.1-.2 0-.4 0-.5l-1-2.4c-.3-.6-.5-.5-.7-.5h-.6a1.2 1.2 0 0 0-.9.4 3.6 3.6 0 0 0-1.1 2.7 6.3 6.3 0 0 0 1.3 3.3 14.4 14.4 0 0 0 5.5 4.9c2 .9 2.8 1 3.8.8a3.2 3.2 0 0 0 2.1-1.5 2.6 2.6 0 0 0 .2-1.5c-.1-.1-.3-.2-.6-.3z"/></svg></a>
+  <a class="m-book" href="https://salonkee.ch/salon/suzy-coiffure?lang=fr" target="_blank" rel="noopener"><span data-i18n="nav.book"></span></a>
+</div>
+
 <div class="lightbox" id="lightbox" hidden>
   <button type="button" class="lb-close" id="lbClose" aria-label="Fermer">×</button>
-  <img id="lbImg" alt="">
+  <img id="lbImg" alt="" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=">
   <p id="lbCap"></p>
 </div>
 
@@ -349,7 +374,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
-<script src="i18n.js?v=1794170519"></script>
-<script src="main.js?v=1794170519"></script>
+<script src="i18n.js?v=1794210711"></script>
+<script src="main.js?v=1794210711"></script>
 </body>
 </html>

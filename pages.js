@@ -61,7 +61,7 @@
   const fmtPrice = (p) => typeof p === "number" ? (Number.isInteger(p) ? String(p) : p.toFixed(2)) : p;
   const priceHtml = (price, from) => price === null
     ? `<b class="srv-free">${t("srv.free")}</b>`
-    : `${from ? `<small>${t("srv.from")}</small>` : ""}<b>${fmtPrice(price)}</b> CHF`;
+    : `${from ? `<small>${t("srv.from")}</small> ` : ""}<b>${fmtPrice(price)}</b> CHF`;
   const priceText = (price, from) => price === null ? t("srv.free") : `${from ? t("srv.from") + " " : ""}${fmtPrice(price)} CHF`;
 
   /* ---------- navigation ---------- */
@@ -108,95 +108,6 @@
   }
 
   /* =========================================================
-     RÉSERVATION
-     ========================================================= */
-  function initBooking() {
-    const root = $("#booking");
-    if (!root) return;
-
-    // Les créneaux libres en temps réel sont sur Salonkee : ici on prépare le choix
-    const SALONKEE = "https://salonkee.ch/salon/suzy-coiffure?lang=";
-    const params = new URLSearchParams(location.search);
-    const startCat = SERVICES.find((c) => c.id === params.get("cat")) ? params.get("cat") : SERVICES[0].id;
-    const state = {
-      cat: startCat,
-      svc: params.has("s") && params.get("cat") ? { cat: startCat, i: +params.get("s") } : null,
-      who: "any"
-    };
-    if (state.svc && !SERVICES.find((c) => c.id === state.svc.cat).items[state.svc.i]) state.svc = null;
-    const svcItem = () => state.svc && SERVICES.find((c) => c.id === state.svc.cat).items[state.svc.i];
-    const stylistName = (w) => w === "suzy" ? "Suzy" : w === "valentina" ? "Valentina" : t("book.any");
-
-    function renderServices() {
-      $("#bkTabs").innerHTML = SERVICES.map((c) => `<button type="button" class="srv-tab" data-cat="${c.id}" aria-selected="${c.id === state.cat}">${c.label[lang]}</button>`).join("");
-      const cat = SERVICES.find((c) => c.id === state.cat);
-      $("#bkServices").innerHTML = cat.items.map(([name, price, from], i) => {
-        const on = state.svc && state.svc.cat === cat.id && state.svc.i === i;
-        return `<button type="button" class="bk-svc" data-i="${i}" aria-pressed="${!!on}"><span class="bk-svc-name">${name}</span><span class="bk-svc-price">${priceHtml(price, from)}</span></button>`;
-      }).join("");
-      $$("#bkTabs .srv-tab").forEach((b) => b.addEventListener("click", () => { state.cat = b.dataset.cat; renderServices(); }));
-      $$("#bkServices .bk-svc").forEach((b) => b.addEventListener("click", () => {
-        state.svc = { cat: state.cat, i: +b.dataset.i };
-        renderServices(); renderSummary();
-      }));
-    }
-    function renderStylists() {
-      const list = [
-        ["any", t("book.any"), t("book.anyHint"), null],
-        ["suzy", "Suzy", t("book.suzyHint"), "assets/logo/suzy-logo.jpg"],
-        ["valentina", "Valentina", t("book.valHint"), "assets/logo/valentina-logo.jpg"]
-      ];
-      $("#bkStylists").innerHTML = list.map(([id, name, hint, img]) => `
-        <button type="button" class="bk-who" data-who="${id}" aria-pressed="${state.who === id}">
-          <span class="bk-who-img">${img ? `<img src="${img}" alt="">` : `<span class="bk-who-any">✦</span>`}</span>
-          <span class="bk-who-name">${name}</span><span class="bk-who-hint">${hint}</span>
-        </button>`).join("");
-      $$("#bkStylists .bk-who").forEach((b) => b.addEventListener("click", () => {
-        state.who = b.dataset.who;
-        renderStylists(); renderWeek(); renderSummary();
-      }));
-    }
-
-    // Semaine type : horaires du salon ; le lundi, présence de chaque coiffeuse (source : page Salonkee)
-    const AXIS = [9, 19];
-    const toH = (s) => { const [a, b] = s.split(":").map(Number); return a + b / 60; };
-    const MONDAY = { suzy: [["15:00", "18:30"]], valentina: [["09:30", "12:00"], ["15:00", "18:30"]] };
-    function renderWeek() {
-      const days = t("days");
-      const pos = (a, b) => `left:${(toH(a) - AXIS[0]) / (AXIS[1] - AXIS[0]) * 100}%;width:${(toH(b) - toH(a)) / (AXIS[1] - AXIS[0]) * 100}%`;
-      const bar = (cls, a, b, label) => `<span class="wk-bar ${cls}" style="${pos(a, b)}"><span>${label || a + " – " + b}</span></span>`;
-      const today = new Date().getDay();
-      let html = `<div class="wk-axis">${[9, 11, 13, 15, 17, 19].map((h) => `<span style="left:${(h - AXIS[0]) / (AXIS[1] - AXIS[0]) * 100}%">${h}h</span>`).join("")}</div>`;
-      [1, 2, 3, 4, 5, 6, 0].forEach((d) => {
-        const h = HOURS[d];
-        let lanes = "";
-        if (!h) lanes = `<div class="wk-lane"><span class="wk-closed">${t("info.closed")}</span></div>`;
-        else if (d === 1) {
-          ["suzy", "valentina"].filter((w) => state.who === "any" || state.who === w).forEach((w) => {
-            lanes += `<div class="wk-lane" data-who="${w}">${MONDAY[w].map(([a, b]) => bar(w === "suzy" ? "is-suzy" : "is-val", a, b)).join("")}</div>`;
-          });
-        } else lanes = `<div class="wk-lane">${bar("is-salon", h[0], h[1])}</div>`;
-        html += `<div class="wk-row ${d === today ? "is-today" : ""} ${h ? "" : "is-closed"}"><span class="wk-day">${days[d]}</span><div class="wk-lanes">${lanes}</div></div>`;
-      });
-      $("#bkWeek").innerHTML = html;
-    }
-    function renderSummary() {
-      const it = svcItem();
-      const row = (k, v, ok) => `<div class="bk-sum-row"><span>${k}</span><b class="${ok ? "" : "is-empty"}">${v}</b></div>`;
-      $("#bkSummary").innerHTML =
-        row(t("book.s1"), it ? it[0] : t("book.pick"), !!it) +
-        row(t("book.s2"), stylistName(state.who), true) +
-        `<div class="bk-sum-total"><span>${t("book.price")}</span><b>${it ? priceText(it[1], it[2]) : "—"}</b></div>`;
-      const how2 = it ? t("book.how2svc").replace("{svc}", `<strong>${it[0]}</strong>`) : t("book.how2");
-      const how = state.who === "any" ? how2 : how2 + " " + t("book.how2who").replace("{who}", `<strong>${stylistName(state.who)}</strong>`);
-      $("#bkHow2").innerHTML = `<span>${how}</span>`;
-      $$("#bkGo, #bkGo2").forEach((a) => { a.href = SALONKEE + lang; });
-    }
-    function renderAll() { renderServices(); renderStylists(); renderWeek(); renderSummary(); }
-    renderers.push(renderAll);
-  }
-
-  /* =========================================================
      RÉALISATIONS
      ========================================================= */
   function initWorks() {
@@ -218,7 +129,7 @@
       const list = visible();
       grid.innerHTML = list.map(([id, tags], k) => `
         <button type="button" class="work" data-k="${k}" data-cursor="Voir">
-          <img src="assets/img/portfolio/p-${id}.jpg" alt="${t(label[tags.split(" ")[0]])}" loading="lazy">
+          <img src="assets/img/portfolio/p-${id}.webp" alt="${t(label[tags.split(" ")[0]])}" loading="lazy">
           <span class="work-tag">${t(label[tags.split(" ")[0]])}</span>
         </button>`).join("");
       $("#worksCount").textContent = list.length + " " + t("works.count");
@@ -231,7 +142,7 @@
     let cur = 0;
     function showLb() {
       const list = visible(), [id, tags] = list[cur];
-      $("#lbImg").src = `assets/img/portfolio/p-${id}.jpg`;
+      $("#lbImg").src = `assets/img/portfolio/p-${id}.webp`;
       $("#lbImg").alt = t(label[tags.split(" ")[0]]);
       $("#lbCap").textContent = `${t(label[tags.split(" ")[0]])} · ${cur + 1} / ${list.length}`;
     }
@@ -279,10 +190,10 @@
         <section class="price-cat" id="cat-${c.id}">
           <figure class="price-cat-img"><img src="${c.img}" alt="" loading="lazy"><figcaption>${c.label[lang]}</figcaption></figure>
           <div class="price-cat-body">
-            <div class="price-cat-head"><h2>${c.label[lang]}</h2><a class="btn btn-ghost-dark btn-sm" href="reservation.html?cat=${c.id}">${t("prices.book")}</a></div>
+            <div class="price-cat-head"><h2>${c.label[lang]}</h2><a class="btn btn-ghost-dark btn-sm" href="https://salonkee.ch/salon/suzy-coiffure?lang=fr" target="_blank" rel="noopener">${t("prices.book")}</a></div>
             <ul class="srv-list">${c.items.map(([name, price, from], i) => `
-              <li><a class="srv-item" href="reservation.html?cat=${c.id}&s=${i}">
-                <span class="srv-name">${name}</span><span class="srv-dots" aria-hidden="true"></span>
+              <li><a class="srv-item" href="https://salonkee.ch/salon/suzy-coiffure?lang=fr" target="_blank" rel="noopener">
+                <span class="srv-name">${Array.isArray(name) ? name[{ fr: 0, en: 1, de: 2 }[lang]] : name}</span><span class="srv-dots" aria-hidden="true"></span>
                 <span class="srv-price">${priceHtml(price, from)}</span></a></li>`).join("")}
             </ul>
           </div>
@@ -291,7 +202,6 @@
     renderers.push(render);
   }
 
-  initBooking();
   initWorks();
   initPrices();
   applyLang(lang);

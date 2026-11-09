@@ -274,89 +274,89 @@ window.I18N = {
 // Carte des prestations, relevée sur la page Salonkee du salon (noms tels qu'affichés par le salon)
 // [nom, prix (nombre, texte ou null = offert), « dès » ?]
 window.SERVICES = [
-  { id: "coupes", label: { fr: "Coupes femme", en: "Women's cuts", de: "Damenschnitte" }, img: "assets/img/work/ig-11.jpg",
+  { id: "coupes", label: { fr: "Coupes femme", en: "Women's cuts", de: "Damenschnitte" }, img: "assets/img/work/ig-11.webp",
     items: [
-      ["Butterfly Cut avec shampoing, sans séchage", 69],
-      ["Shag long", 60],
-      ["Pixie texturisé / structuré, sans séchage", 52],
-      ["Blunt Bob, sans séchage", 52],
-      ["Bixie Cut destructuré, sans séchage", 52],
-      ["Coupe Bob, sans séchage", 52],
-      ["Shampoing, coupe, brushing — cheveux courts", 82, true],
-      ["Shampoing, coupe, séchage naturel — cheveux courts", 69],
-      ["Shampoing, coupe, séchage naturel — cheveux mi-longs", 79],
-      ["Coupe énergétique / détente / séchage naturel", 80],
-      ["Transformation & séchage naturel", 88],
-      ["Coupe spéciale cheveux frisés", 66],
-      ["Coupe pointes aux ciseaux, cheveux lavés du jour", 44, true],
-      ["Coupe pointes & self séchage, cheveux lavés du jour", 53],
-      ["Coupe simple AVS, sur cheveux propres", 49],
-      ["Frange", 9.5],
-      ["Coupe à domicile", 70]
+      [["Butterfly Cut avec shampoing, sans séchage", "Butterfly cut with shampoo, no drying", "Butterfly Cut mit Haarwäsche, ohne Föhnen"], 69],
+      [["Shag long", "Long shag", "Langer Shag"], 60],
+      [["Pixie texturisé / structuré, sans séchage", "Textured / structured pixie, no drying", "Texturierter Pixie, ohne Föhnen"], 52],
+      [["Blunt Bob, sans séchage", "Blunt bob, no drying", "Blunt Bob, ohne Föhnen"], 52],
+      [["Bixie Cut destructuré, sans séchage", "Undone bixie cut, no drying", "Lockerer Bixie Cut, ohne Föhnen"], 52],
+      [["Coupe Bob, sans séchage", "Bob cut, no drying", "Bob-Schnitt, ohne Föhnen"], 52],
+      [["Shampoing, coupe, brushing — cheveux courts", "Shampoo, cut, blow-dry — short hair", "Waschen, Schneiden, Föhnen — kurzes Haar"], 82, true],
+      [["Shampoing, coupe, séchage naturel — cheveux courts", "Shampoo, cut, air-dry — short hair", "Waschen, Schneiden, Lufttrocknen — kurzes Haar"], 69],
+      [["Shampoing, coupe, séchage naturel — cheveux mi-longs", "Shampoo, cut, air-dry — mid-length hair", "Waschen, Schneiden, Lufttrocknen — mittellanges Haar"], 79],
+      [["Coupe énergétique / détente / séchage naturel", "Energy / relaxing cut, air-dry", "Energie- / Entspannungsschnitt, Lufttrocknen"], 80],
+      [["Transformation & séchage naturel", "Makeover & air-dry", "Typveränderung & Lufttrocknen"], 88],
+      [["Coupe spéciale cheveux frisés", "Special cut for curly hair", "Spezialschnitt für lockiges Haar"], 66],
+      [["Coupe pointes aux ciseaux, cheveux lavés du jour", "Trim with scissors, hair washed the same day", "Spitzenschnitt mit Schere, am selben Tag gewaschenes Haar"], 44, true],
+      [["Coupe pointes & self séchage, cheveux lavés du jour", "Trim & self-drying, hair washed the same day", "Spitzenschnitt & selbst föhnen, am selben Tag gewaschenes Haar"], 53],
+      [["Coupe simple AVS, sur cheveux propres", "Simple cut for seniors (AVS), on clean hair", "Einfacher Schnitt für Senioren (AHV), auf sauberem Haar"], 49],
+      [["Frange", "Fringe", "Pony"], 9.5],
+      [["Coupe à domicile", "Home haircut", "Haarschnitt zu Hause"], 70]
     ] },
-  { id: "brushing", label: { fr: "Brushing & coiffage", en: "Blow-dry & styling", de: "Brushing & Styling" }, img: "assets/img/work/hero-wave.jpg",
+  { id: "brushing", label: { fr: "Brushing & coiffage", en: "Blow-dry & styling", de: "Brushing & Styling" }, img: "assets/img/work/hero-wave.webp",
     items: [
-      ["Shampoing & brushing", 41, true],
-      ["Shampoing & brushing wave", 58],
-      ["Shampoing & séchage naturel", 21, true],
-      ["Ondulation", 89],
-      ["Curlys tête complète", 80, true],
-      ["Permanente classique", 90, true],
-      ["Lissage à effet lissant", 88],
-      ["Coiffure événement", 59],
-      ["Coiffures d'évènements", 89]
+      [["Shampoing & brushing", "Shampoo & blow-dry", "Waschen & Föhnen"], 41, true],
+      [["Shampoing & brushing wave", "Shampoo & wave blow-dry", "Waschen & Wave-Brushing"], 58],
+      [["Shampoing & séchage naturel", "Shampoo & air-dry", "Waschen & Lufttrocknen"], 21, true],
+      [["Ondulation", "Waves", "Wellen"], 89],
+      [["Curlys tête complète", "Full-head curls", "Locken, ganzer Kopf"], 80, true],
+      [["Permanente classique", "Classic perm", "Klassische Dauerwelle"], 90, true],
+      [["Lissage à effet lissant", "Smoothing treatment", "Glättungsbehandlung"], 88],
+      [["Coiffure événement", "Event hairstyle", "Event-Frisur"], 59],
+      [["Coiffures d'évènements", "Special-occasion hairstyles", "Frisuren für besondere Anlässe"], 89]
     ] },
-  { id: "couleur", label: { fr: "Couleur & balayage", en: "Colour & balayage", de: "Farbe & Balayage" }, img: "assets/img/work/hero-cuivre.jpg",
+  { id: "couleur", label: { fr: "Couleur & balayage", en: "Colour & balayage", de: "Farbe & Balayage" }, img: "assets/img/work/hero-cuivre.webp",
     items: [
-      ["Balayage Air Touch", 120],
-      ["Balayage, différentes techniques", 100],
-      ["Mèches, différentes techniques", 90, true],
-      ["Rogue Hair / Contouring", 59],
-      ["Gloss aux protéines / hydratant", 49],
-      ["Coloration hydratante, coupe & brushing", 144],
-      ["Coloration hydratante, coupe & séchage", 139],
-      ["Coloration hydratante aux huiles végétales", 79],
-      ["Coloration vegan-friendly", 79],
-      ["Teinture des sourcils", 18],
-      ["Modèle pour balayages", null]
+      [["Balayage Air Touch", "Air Touch balayage", "Air-Touch-Balayage"], 120],
+      [["Balayage, différentes techniques", "Balayage, various techniques", "Balayage, verschiedene Techniken"], 100],
+      [["Mèches, différentes techniques", "Highlights, various techniques", "Strähnen, verschiedene Techniken"], 90, true],
+      [["Rogue Hair / Contouring", "Rogue hair / contouring", "Rogue Hair / Contouring"], 59],
+      [["Gloss aux protéines / hydratant", "Protein / moisturising gloss", "Protein- / Feuchtigkeitsglossing"], 49],
+      [["Coloration hydratante, coupe & brushing", "Moisturising colour, cut & blow-dry", "Pflegende Farbe, Schnitt & Föhnen"], 144],
+      [["Coloration hydratante, coupe & séchage", "Moisturising colour, cut & drying", "Pflegende Farbe, Schnitt & Trocknen"], 139],
+      [["Coloration hydratante aux huiles végétales", "Moisturising colour with plant oils", "Pflegende Farbe mit Pflanzenölen"], 79],
+      [["Coloration vegan-friendly", "Vegan-friendly colour", "Vegane Haarfarbe"], 79],
+      [["Teinture des sourcils", "Brow tint", "Augenbrauen färben"], 18],
+      [["Modèle pour balayages", "Balayage model", "Modell für Balayage"], null]
     ] },
-  { id: "soins", label: { fr: "Soins & SPA", en: "Treatments & SPA", de: "Pflege & SPA" }, img: "assets/img/work/apres-25.jpg",
+  { id: "soins", label: { fr: "Soins & SPA", en: "Treatments & SPA", de: "Pflege & SPA" }, img: "assets/img/work/apres-25.webp",
     items: [
-      ["Soin botox / soin réparateur", 29],
-      ["Soin à la kératine", 15],
-      ["Traitement, masque, soin botox, collagène, massage", 6],
-      ["Shampoing spécial, soins, masques avec pause", 6.5],
-      ["Shampoing SPA", 14],
-      ["Massage crânien & soin de détente", 20],
-      ["Head SPA du cuir chevelu (femmes & hommes)", 22],
-      ["Soin du visage antioxydant", 63],
-      ["Conseil / expertise personnalisée", null]
+      [["Soin botox / soin réparateur", "Botox / repair treatment", "Botox- / Reparaturpflege"], 29],
+      [["Soin à la kératine", "Keratin treatment", "Keratinpflege"], 15],
+      [["Traitement, masque, soin botox, collagène, massage", "Treatment, mask, botox, collagen, massage", "Behandlung, Maske, Botox, Kollagen, Massage"], 6],
+      [["Shampoing spécial, soins, masques avec pause", "Special shampoo, treatments, masks with rest time", "Spezialshampoo, Pflege, Masken mit Einwirkzeit"], 6.5],
+      [["Shampoing SPA", "SPA shampoo", "SPA-Haarwäsche"], 14],
+      [["Massage crânien & soin de détente", "Head massage & relaxing treatment", "Kopfmassage & Entspannungspflege"], 20],
+      [["Head SPA du cuir chevelu (femmes & hommes)", "Scalp head SPA (women & men)", "Kopfhaut-Head-SPA (Damen & Herren)"], 22],
+      [["Soin du visage antioxydant", "Antioxidant facial", "Antioxidative Gesichtspflege"], 63],
+      [["Conseil / expertise personnalisée", "Personal advice / consultation", "Persönliche Beratung"], null]
     ] },
-  { id: "hommes", label: { fr: "Hommes", en: "Men", de: "Herren" }, img: "assets/img/work/ig-75.jpg",
+  { id: "hommes", label: { fr: "Hommes", en: "Men", de: "Herren" }, img: "assets/img/work/ig-75.webp",
     items: [
-      ["Coupe homme + shampoing / sourcils", 39, true],
-      ["Coupe dégradée", 30],
-      ["Coupe mulet", 49],
-      ["Coupe casquette", 44],
-      ["Coupe tondeuse", 26],
-      ["Entretien du dégradé", 20],
-      ["Coupe barbe & soin hydratant", 30],
-      ["Permanente / curlys", 89],
-      ["Soin et éclat du visage", 60],
-      ["Coupe homme en mode modèle, par Valentina", 25]
+      [["Coupe homme + shampoing / sourcils", "Men's cut + shampoo / brows", "Herrenschnitt + Waschen / Augenbrauen"], 39, true],
+      [["Coupe dégradée", "Fade cut", "Fade-Schnitt"], 30],
+      [["Coupe mulet", "Mullet cut", "Vokuhila-Schnitt"], 49],
+      [["Coupe casquette", "Cap cut", "Cap-Schnitt"], 44],
+      [["Coupe tondeuse", "Clipper cut", "Maschinenschnitt"], 26],
+      [["Entretien du dégradé", "Fade touch-up", "Fade nachschneiden"], 20],
+      [["Coupe barbe & soin hydratant", "Beard trim & moisturising care", "Bartschnitt & Feuchtigkeitspflege"], 30],
+      [["Permanente / curlys", "Perm / curls", "Dauerwelle / Locken"], 89],
+      [["Soin et éclat du visage", "Radiance facial", "Gesichtspflege für strahlende Haut"], 60],
+      [["Coupe homme en mode modèle, par Valentina", "Men's model cut, by Valentina", "Herrenschnitt als Modell, von Valentina"], 25]
     ] },
-  { id: "enfants", label: { fr: "Enfants", en: "Children", de: "Kinder" }, img: "assets/img/work/ig-46.jpg",
+  { id: "enfants", label: { fr: "Enfants", en: "Children", de: "Kinder" }, img: "assets/img/work/ig-46.webp",
     items: [
-      ["Coupe kids", 25, true],
-      ["Séchage kids", 10]
+      [["Coupe kids", "Kids' cut", "Kinderschnitt"], 25, true],
+      [["Séchage kids", "Kids' drying", "Föhnen für Kinder"], 10]
     ] },
-  { id: "ongles", label: { fr: "Mains & pieds", en: "Hands & feet", de: "Hände & Füsse" }, img: "assets/img/work/ig-07-reel.jpg",
+  { id: "ongles", label: { fr: "Mains & pieds", en: "Hands & feet", de: "Hände & Füsse" }, img: "assets/img/work/ig-07-reel.webp",
     items: [
-      ["Manucure complète + massage avec vernis", 38],
-      ["Pose vernis semi-permanent, par Valentina", 39],
-      ["Pose vernis semi-permanent renforcé, par Valentina", 49],
-      ["Nail art (baby-boomer) / french", 19],
-      ["Pose complète en gel avec allongement", 79]
+      [["Manucure complète + massage avec vernis", "Full manicure + massage with polish", "Komplette Maniküre + Massage mit Lack"], 38],
+      [["Pose vernis semi-permanent, par Valentina", "Gel polish, by Valentina", "Shellac, von Valentina"], 39],
+      [["Pose vernis semi-permanent renforcé, par Valentina", "Reinforced gel polish, by Valentina", "Verstärkter Shellac, von Valentina"], 49],
+      [["Nail art (baby-boomer) / french", "Nail art (baby boomer) / French", "Nail Art (Babyboomer) / French"], 19],
+      [["Pose complète en gel avec allongement", "Full gel set with extensions", "Gel-Modellage mit Verlängerung"], 79]
     ] }
 ];
 
@@ -375,10 +375,10 @@ window.REVIEWS = [
 
 // Avant / après : photos des carrousels Instagram du salon
 window.BA_PAIRS = [
-  { before: "assets/img/work/avant-14.jpg", after: "assets/img/work/apres-14.jpg", label: { fr: "Lissage blond", en: "Blonde smoothing", de: "Blonde Glättung" } },
-  { before: "assets/img/work/avant-11.jpg", after: "assets/img/work/apres-11.jpg", label: { fr: "Carré lissé", en: "Smooth bob", de: "Glatter Bob" } },
-  { before: "assets/img/work/avant-16.jpg", after: "assets/img/work/apres-16.jpg", label: { fr: "Cuivré lissé", en: "Smooth copper", de: "Glattes Kupfer" } },
-  { before: "assets/img/work/avant-25.jpg", after: "assets/img/work/apres-25.jpg", label: { fr: "Lissage long", en: "Long smoothing", de: "Lange Glättung" } }
+  { before: "assets/img/work/avant-14.webp", after: "assets/img/work/apres-14.webp", label: { fr: "Lissage blond", en: "Blonde smoothing", de: "Blonde Glättung" } },
+  { before: "assets/img/work/avant-11.webp", after: "assets/img/work/apres-11.webp", label: { fr: "Carré lissé", en: "Smooth bob", de: "Glatter Bob" } },
+  { before: "assets/img/work/avant-16.webp", after: "assets/img/work/apres-16.webp", label: { fr: "Cuivré lissé", en: "Smooth copper", de: "Glattes Kupfer" } },
+  { before: "assets/img/work/avant-25.webp", after: "assets/img/work/apres-25.webp", label: { fr: "Lissage long", en: "Long smoothing", de: "Lange Glättung" } }
 ];
 
 // Textes des pages intérieures (réservation, réalisations, tarifs)

@@ -66,7 +66,7 @@
   const fmtPrice = (p) => typeof p === "number" ? (Number.isInteger(p) ? String(p) : p.toFixed(2)) : p;
   const priceHtml = (price, from) => price === null
     ? `<b class="srv-free">${t("srv.free")}</b>`
-    : `${from ? `<small>${t("srv.from")}</small>` : ""}<b>${fmtPrice(price)}</b> CHF`;
+    : `${from ? `<small>${t("srv.from")}</small> ` : ""}<b>${fmtPrice(price)}</b> CHF`;
 
   function renderServices() {
     const tabs = $("#srvTabs");
@@ -173,7 +173,7 @@
     if (target === null) return;
     e.preventDefault();
     closeMenu();
-    if (lenis) lenis.scrollTo(target, { offset: id === "#top" ? 0 : -70, duration: 1.6 });
+    if (lenis) lenis.scrollTo(target, { offset: id === "#top" ? 0 : -70, duration: 1.6, onComplete: () => { if (window.ScrollTrigger) ScrollTrigger.update(); } });
     else if (target === 0) window.scrollTo({ top: 0, behavior: "smooth" });
     else target.scrollIntoView({ behavior: "smooth" });
   }));
@@ -292,10 +292,10 @@
      transitions « or liquide » + distorsion fluide à la souris
      ========================================================= */
   const SLIDES = [
-    { img: "assets/img/work/hero-blond.jpg", name: { fr: "Ondulations blondes", en: "Blonde waves", de: "Blonde Wellen" } },
-    { img: "assets/img/work/hero-cuivre.jpg", name: { fr: "Cuivré lumineux", en: "Luminous copper", de: "Leuchtendes Kupfer" } },
-    { img: "assets/img/work/hero-boucles.jpg", name: { fr: "Boucles définies", en: "Defined curls", de: "Definierte Locken" } },
-    { img: "assets/img/work/hero-wave.jpg", name: { fr: "Brushing wave", en: "Wave blow-dry", de: "Wave-Brushing" } }
+    { img: "assets/img/work/hero-blond.webp", name: { fr: "Ondulations blondes", en: "Blonde waves", de: "Blonde Wellen" } },
+    { img: "assets/img/work/hero-cuivre.webp", name: { fr: "Cuivré lumineux", en: "Luminous copper", de: "Leuchtendes Kupfer" } },
+    { img: "assets/img/work/hero-boucles.webp", name: { fr: "Boucles définies", en: "Defined curls", de: "Definierte Locken" } },
+    { img: "assets/img/work/hero-wave.webp", name: { fr: "Brushing wave", en: "Wave blow-dry", de: "Wave-Brushing" } }
   ];
   heroGL = initHeroGL();
 

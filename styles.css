@@ -443,7 +443,7 @@ em { font-style: italic; }
   display: flex; flex-direction: column;
   background: #0f0a08; color: var(--porcelain);
 }
-.hero-media { position: absolute; inset: 0; z-index: 0; background: #0f0a08 url(assets/img/work/hero-blond.jpg) center / cover no-repeat; overflow: hidden; }
+.hero-media { position: absolute; inset: 0; z-index: 0; background: #0f0a08 url(assets/img/work/hero-blond.webp) center / cover no-repeat; overflow: hidden; }
 .hero.has-gl .hero-media { background-image: none; }
 .hero-canvas { display: block; width: 100%; height: 100%; }
 .hero-veil { position: absolute; inset: 0; pointer-events: none;
@@ -702,3 +702,38 @@ em { font-style: italic; }
 /* logos des cartes équipe : toujours entiers, jamais zoomés */
 .member-logo { padding: 5% 6%; display: grid; place-items: center; }
 .member-logo img, .member:hover .member-logo img { transform: none !important; width: 100%; height: 100%; object-fit: contain; }
+
+/* ===== Corrections avant envoi ===== */
+/* en-tête : sur écran moyen, logos plus petits et menu resserré pour ne pas se chevaucher */
+@media (max-width: 1280px) and (min-width: 1021px) {
+  .nav-links { gap: 1.3rem; font-size: .7rem; }
+  .logo-duo img { height: 46px; } .logo-duo .logo-val { height: 50px; }
+  .lang button { padding: .3rem .45rem; }
+}
+/* hero : voile sombre sous le texte de droite */
+.hero-veil { background:
+    linear-gradient(180deg, rgba(12, 8, 6, .62) 0%, rgba(12, 8, 6, 0) 22%, rgba(12, 8, 6, 0) 42%, rgba(12, 8, 6, .55) 72%, rgba(12, 8, 6, .9) 100%),
+    linear-gradient(90deg, rgba(12, 8, 6, .35), rgba(12, 8, 6, 0) 45%),
+    linear-gradient(270deg, rgba(12, 8, 6, .62), rgba(12, 8, 6, 0) 48%); }
+/* téléphone : la queue du « y » ne touche plus « Coiffure » */
+@media (max-width: 760px) { .ht-2 { margin-top: .22em; } }
+/* Valentina : « Venue d'Italie » */
+.member-flag { background: rgba(255, 250, 246, .92); color: var(--ink); letter-spacing: .12em; padding: .4rem .8rem .4rem 1.6rem; }
+.member-flag::before { content: ""; position: absolute; left: .7rem; top: 50%; width: .6rem; height: .6rem; margin-top: -.3rem; border-radius: 50%;
+  background: linear-gradient(90deg, #2f7a4d 0 33%, #f3efe9 33% 66%, #b9353d 66%); box-shadow: 0 0 0 1px rgba(42, 29, 24, .2); }
+/* avant / après : poignée plus grande et invitation à glisser */
+.ba-handle span { width: 68px; height: 68px; font-size: 1.5rem; }
+.ba-frame::after { content: "← Glissez →"; position: absolute; left: 50%; bottom: 1.1rem; transform: translateX(-50%); pointer-events: none;
+  font-size: .72rem; letter-spacing: .2em; text-transform: uppercase; color: var(--porcelain); background: rgba(26, 18, 15, .55); padding: .45rem .9rem; border-radius: 999px; }
+/* téléphone : WhatsApp + réserver toujours à portée de main */
+.m-cta { display: none; }
+@media (max-width: 760px) {
+  .m-cta { display: flex; gap: 10px; position: fixed; z-index: 60; left: 0; right: 0; bottom: 0;
+    padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+    background: linear-gradient(180deg, rgba(26, 18, 15, 0), rgba(26, 18, 15, .85) 40%); }
+  .m-wa { flex: 0 0 52px; height: 52px; border-radius: 50%; background: #25d366; display: grid; place-items: center; box-shadow: 0 10px 24px -10px rgba(0, 0, 0, .6); }
+  .m-wa svg { width: 28px; height: 28px; fill: #fff; }
+  .m-book { flex: 1; height: 52px; border-radius: 999px; display: grid; place-items: center; background: linear-gradient(120deg, #b8894f, var(--gold) 40%, var(--gold-light) 60%, var(--gold));
+    color: var(--espresso); font-size: .82rem; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; box-shadow: 0 10px 24px -10px rgba(0, 0, 0, .6); }
+  .footer { padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)); }
+}
