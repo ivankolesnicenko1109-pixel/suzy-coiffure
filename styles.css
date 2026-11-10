@@ -867,3 +867,8 @@ body { background: var(--porcelain); color: var(--ink); }
 .prices, .works { background: var(--porcelain); }
 .works-ba { background: var(--blush); }
 .cta-band { background: var(--cocoa); }
+/* téléphone : bouton anniversaire dans la carte, « Coiffure » sous la queue du « y » */
+@media (max-width: 760px) {
+  .bday .btn { white-space: normal; text-align: center; max-width: 100%; }
+  .ht-2 { margin-top: .5em; }
+}
