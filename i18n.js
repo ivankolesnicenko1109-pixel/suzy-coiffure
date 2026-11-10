@@ -23,11 +23,16 @@ window.I18N = {
     "exp.r2.t": "Conseil sur mesure",
     "exp.r2.d": "Coupe et couleur choisies selon votre visage, votre style, votre quotidien.",
     "exp.r3.t": "Depuis le 1er décembre 2000",
-    "exp.r3.d": "Toujours rue des Chavannes. Le salon fête ses 26 ans en décembre 2026.",
+    "exp.r3.d": "Toujours rue des Chavannes, plus de 25 ans de fidélité de nos clientes.",
     "exp.s1": "ans au cœur de Neuchâtel",
     "exp.s2": "note Google",
     "exp.s3": "avis de clientes",
     "exp.caption": "Le salon, rue des Chavannes 13",
+    "rev.all": "Voir tous les avis sur Salonkee",
+    "bday.cta": "Réserver pour mon anniversaire",
+    "srv.popular": "Populaire",
+    "info.door": "L'entrée, au 13 de la rue des Chavannes",
+    "foot.legal": "Mentions légales & confidentialité",
 
     "srv.eyebrow": "Carte des prestations",
     "srv.title": "Prestations <em>&amp; tarifs</em>",
@@ -54,7 +59,7 @@ window.I18N = {
 
     "rev.eyebrow": "Ce que disent nos clientes",
     "rev.title": "4,9 sur 5, <em>515 fois.</em>",
-    "rev.sub": "Quelques avis vérifiés laissés par nos clientes sur Salonkee.",
+    "rev.sub": "Note de 4,9 sur Google (515 avis). Ci-dessous, des avis vérifiés laissés sur Salonkee.",
     "rev.1": "Un accueil chaleureux, on se sent tout de suite chez soi.",
     "rev.2": "Parmi les plus beaux brushings de Neuchâtel : des ondulations et une brillance incroyables.",
     "rev.3": "De vrais conseils pour choisir la coupe et la couleur qui vont à mon visage.",
@@ -113,11 +118,16 @@ window.I18N = {
     "exp.r2.t": "Tailored advice",
     "exp.r2.d": "Cut and colour chosen for your face, your style and your everyday life.",
     "exp.r3.t": "Since 1 December 2000",
-    "exp.r3.d": "Always on rue des Chavannes. The salon turns 26 in December 2026.",
+    "exp.r3.d": "Always on rue des Chavannes, with more than 25 years of loyal clients.",
     "exp.s1": "years in the heart of Neuchâtel",
     "exp.s2": "Google rating",
     "exp.s3": "client reviews",
     "exp.caption": "The salon, rue des Chavannes 13",
+    "rev.all": "See all reviews on Salonkee",
+    "bday.cta": "Book for my birthday",
+    "srv.popular": "Popular",
+    "info.door": "The entrance, at 13 rue des Chavannes",
+    "foot.legal": "Legal notice & privacy",
 
     "srv.eyebrow": "Service menu",
     "srv.title": "Services <em>&amp; prices</em>",
@@ -144,7 +154,7 @@ window.I18N = {
 
     "rev.eyebrow": "What our clients say",
     "rev.title": "4.9 out of 5, <em>515 times.</em>",
-    "rev.sub": "A few verified reviews from our clients on Salonkee (in French).",
+    "rev.sub": "Rated 4.9 on Google (515 reviews). Below, verified reviews left on Salonkee (in French).",
     "rev.1": "A warm welcome, you instantly feel at home.",
     "rev.2": "Some of the best blow-dries in Neuchâtel: incredible waves and shine.",
     "rev.3": "Real advice to find the cut and colour that suit my face.",
@@ -203,11 +213,16 @@ window.I18N = {
     "exp.r2.t": "Persönliche Beratung",
     "exp.r2.d": "Schnitt und Farbe passend zu Gesicht, Stil und Alltag.",
     "exp.r3.t": "Seit dem 1. Dezember 2000",
-    "exp.r3.d": "Immer an der Rue des Chavannes. Im Dezember 2026 feiert der Salon 26 Jahre.",
+    "exp.r3.d": "Immer an der Rue des Chavannes, seit über 25 Jahren mit treuen Kundinnen.",
     "exp.s1": "Jahre im Herzen von Neuenburg",
     "exp.s2": "Google-Bewertung",
     "exp.s3": "Kundenbewertungen",
     "exp.caption": "Der Salon, Rue des Chavannes 13",
+    "rev.all": "Alle Bewertungen auf Salonkee",
+    "bday.cta": "Für meinen Geburtstag buchen",
+    "srv.popular": "Beliebt",
+    "info.door": "Der Eingang, Rue des Chavannes 13",
+    "foot.legal": "Impressum & Datenschutz",
 
     "srv.eyebrow": "Leistungskarte",
     "srv.title": "Leistungen <em>&amp; Preise</em>",
@@ -234,7 +249,7 @@ window.I18N = {
 
     "rev.eyebrow": "Was unsere Kundinnen sagen",
     "rev.title": "4,9 von 5, <em>515 Mal.</em>",
-    "rev.sub": "Einige verifizierte Bewertungen unserer Kundinnen auf Salonkee (auf Französisch).",
+    "rev.sub": "4,9 auf Google (515 Bewertungen). Unten verifizierte Bewertungen von Salonkee (auf Französisch).",
     "rev.1": "Ein herzlicher Empfang, man fühlt sich sofort zu Hause.",
     "rev.2": "Eines der schönsten Brushings in Neuenburg: unglaubliche Wellen und Glanz.",
     "rev.3": "Echte Beratung für Schnitt und Farbe, die zu meinem Gesicht passen.",
@@ -274,7 +289,7 @@ window.I18N = {
 // Carte des prestations, relevée sur la page Salonkee du salon (noms tels qu'affichés par le salon)
 // [nom, prix (nombre, texte ou null = offert), « dès » ?]
 window.SERVICES = [
-  { id: "coupes", label: { fr: "Coupes femme", en: "Women's cuts", de: "Damenschnitte" }, img: "assets/img/work/ig-11.webp",
+  { id: "coupes", label: { fr: "Coupes femme", en: "Women's cuts", de: "Damenschnitte" }, img: "assets/img/portfolio/p-52.webp",
     items: [
       [["Butterfly Cut avec shampoing, sans séchage", "Butterfly cut with shampoo, no drying", "Butterfly Cut mit Haarwäsche, ohne Föhnen"], 69],
       [["Shag long", "Long shag", "Langer Shag"], 60],
@@ -365,12 +380,10 @@ window.HOURS = [null, ["09:30", "18:30"], null, ["10:00", "18:00"], ["10:00", "1
 
 // Avis vérifiés publiés sur Salonkee (extraits courts, en français pour toutes les langues)
 window.REVIEWS = [
-  ["Suzy est aux petits soins pour ses clientes et a un super coup de ciseaux.", "Joanna"],
-  ["Je suis sortie avec une superbe couleur, je ne regrette absolument pas !", "Selma"],
-  ["Suzy est à l'écoute et dégage beaucoup de bienveillance.", "Julie"],
-  ["La coupe est exactement ce que j'avais demandé. Ambiance chaleureuse.", "Cécile"],
-  ["Coiffeuse géniale et très à l'écoute !", "Karine"],
-  ["Très bon service.", "Jasmine"]
+  ["J'ai adoré cette prestation, il y a une bonne ambiance et le personnel est de qualité. Je suis sortie avec une superbe couleur, je ne regrette absolument pas ! C'était la première fois que je faisais un grand changement à mes cheveux et je n'ai absolument pas été déçue.", "Selma"],
+  ["Suzy est à l'écoute et dégage beaucoup de bienveillance. Très satisfaite de ma coupe et du moment relaxant que j'ai passé dans son salon, je recommande vivement ✨", "Julie"],
+  ["Absolument parfait ! La coupe est exactement ce que j'avais demandé, j'en suis ravie ! Ambiance chaleureuse, vraiment un service de qualité.", "Cécile"],
+  ["Bon rendez-vous avec Suzy, qui est aux petits soins pour ses clientes et qui a un super coup de ciseaux. Je recommande :)", "Joanna"]
 ];
 
 // Avant / après : photos des carrousels Instagram du salon

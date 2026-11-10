@@ -443,7 +443,7 @@ em { font-style: italic; }
   display: flex; flex-direction: column;
   background: #0f0a08; color: var(--porcelain);
 }
-.hero-media { position: absolute; inset: 0; z-index: 0; background: #0f0a08 url(assets/img/work/hero-blond.webp) center / cover no-repeat; overflow: hidden; }
+.hero-media { position: absolute; inset: 0; z-index: 0; background: #0f0a08 url(assets/img/work/hero-cliente.webp) center / cover no-repeat; overflow: hidden; }
 .hero.has-gl .hero-media { background-image: none; }
 .hero-canvas { display: block; width: 100%; height: 100%; }
 .hero-veil { position: absolute; inset: 0; pointer-events: none;
@@ -737,3 +737,133 @@ em { font-style: italic; }
     color: var(--espresso); font-size: .82rem; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; box-shadow: 0 10px 24px -10px rgba(0, 0, 0, .6); }
   .footer { padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)); }
 }
+
+/* =====================================================================
+   Refonte « comme à la maison » : base claire et chaude, sombre en accent
+   ===================================================================== */
+:root {
+  --porcelain: #faf6f1;
+  --milk: #fffbf6;
+  --blush: #f4e6dc;
+  --terracotta: #b5654a;
+  --cocoa: #3d2b23;
+  --ink: #33241d;
+  --ink-soft: #5b463d;
+  --line-light: rgba(61, 43, 35, .14);
+}
+body { background: var(--porcelain); color: var(--ink); }
+
+/* textes trop petits : minimum lisible */
+.eyebrow { font-size: .82rem; }
+.nav-links { font-size: .86rem; letter-spacing: .12em; }
+.nav-links a { opacity: 1; }
+.member-role, .rev-meta, .stat-l, .srv-tab, .map-cta, .slide-num, .hero-scroll, .ba-tag, .hours-note, .gal-item figcaption { font-size: .8rem; }
+.lead, .rituals p, .member-body p { color: var(--ink-soft); }
+
+/* en-tête : clair une fois la page défilée, un seul logo */
+.logo-one { display: flex; align-items: center; }
+.logo-one img { height: 62px; width: auto; display: block; transition: height .5s var(--ease); }
+.logo-one .logo-dark { display: none; }
+.nav-inner { min-height: 92px; }
+.nav.is-scrolled { background: rgba(250, 246, 241, .94); border-bottom-color: var(--line-light); color: var(--ink); }
+.nav.is-scrolled .logo-one img { height: 48px; }
+.nav.is-scrolled .logo-light { display: none; }
+.nav.is-scrolled .logo-dark { display: block; }
+.nav.is-scrolled .lang { border-color: var(--line-light); }
+.nav.is-scrolled .burger span { background: var(--ink); }
+@media (max-width: 1020px) { .mobile-menu { background: var(--porcelain); } .mobile-menu a { color: var(--ink); } }
+@media (max-width: 560px) { .logo-one img, .nav.is-scrolled .logo-one img { height: 44px; } .nav-inner { min-height: 72px; } }
+
+/* hero : voile chaud, titre plus discret, appel à réserver plus visible */
+.hero { background: #2e211b; }
+.hero-veil { background:
+    linear-gradient(180deg, rgba(46, 33, 27, .55) 0%, rgba(46, 33, 27, 0) 24%, rgba(46, 33, 27, 0) 46%, rgba(46, 33, 27, .6) 76%, rgba(46, 33, 27, .9) 100%),
+    linear-gradient(270deg, rgba(46, 33, 27, .62), rgba(46, 33, 27, 0) 50%); }
+.ht-1 { font-size: clamp(4.6rem, 15vw, 15rem); }
+.ht-2 { font-size: clamp(2.2rem, 6vw, 6.6rem); }
+.hero-aside { max-width: 30rem; gap: 1.8rem; }
+.hero-line { font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2.5rem); }
+.hero-actions .btn { min-height: 60px; padding: 0 2.2rem; font-size: .9rem; }
+.hero-rating { font-size: .9rem; }
+@media (max-width: 760px) { .ht-1 { font-size: 24vw; } .ht-2 { font-size: 11vw; } }
+
+/* bande défilante : une seule, en terracotta mat */
+.ribbon { background: var(--terracotta); color: var(--milk); }
+
+/* expérience : une grande photo d'intérieur */
+.exp { background: var(--porcelain); }
+.exp-media { min-height: 0; }
+.exp-img-one { position: relative; margin: 0; aspect-ratio: 4 / 5; border-radius: 4px; overflow: hidden; max-width: 100%; }
+.exp-img-one img { width: 100%; height: 100%; object-fit: cover; }
+.exp-caption { position: static; margin-top: .9rem; }
+
+/* prestations : bloc sombre d'accent (cacao), prix plus grands, badge « populaire » */
+.services { background: var(--cocoa); }
+.srv-price { font-size: 1.1rem; }
+.srv-price b { font-size: 1.9rem; }
+.srv-pop { display: inline-block; margin-left: .7rem; font-family: var(--f-body); font-style: normal; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--cocoa); background: #f1d9a8; padding: .25rem .6rem; border-radius: 999px; vertical-align: middle; }
+
+/* galerie : grille régulière, même traitement chaud pour toutes les photos */
+.gallery { background: var(--milk); color: var(--ink); padding-block: clamp(80px, 11vw, 160px); overflow: visible; }
+.gallery .h2 { color: var(--ink); }
+.gal-head { margin-bottom: 2.4rem; }
+.gal-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.gal-item, .gal-item.tall { width: auto; height: auto; aspect-ratio: 4 / 5; border-radius: 4px; }
+.gal-item img { transform: none; filter: sepia(.14) saturate(.9) contrast(1.03) brightness(1.02); }
+.gal-item:hover img { transform: scale(1.05); filter: sepia(.08) saturate(1) contrast(1.03); }
+.gal-item figcaption { font-size: 1.1rem; padding: 2.4rem 1rem .9rem; }
+@media (max-width: 900px) { .gal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.cta-row { display: flex; gap: .8rem; flex-wrap: wrap; justify-content: center; margin-top: 2.6rem; }
+
+/* équipe : photo de groupe adoucie pour s'accorder à la palette */
+.team { background: var(--porcelain); }
+.team-photo img { filter: sepia(.3) saturate(.55) hue-rotate(-6deg) brightness(1.04) contrast(.97); }
+
+/* avis : grille de cartes claires, sans doublons */
+.reviews { background: var(--blush); color: var(--ink); }
+.reviews .h2 { color: var(--ink); }
+.rev-sub { color: var(--ink-soft); }
+.rev-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; max-width: 1080px; margin: 0 auto; }
+.rev-grid .rev-card { width: auto; background: var(--milk); border-color: var(--line-light); color: var(--ink); }
+.rev-grid .rev-card p { font-size: 1.2rem; }
+.rev-grid .rev-meta { color: var(--ink-soft); }
+@media (max-width: 760px) { .rev-grid { grid-template-columns: 1fr; } }
+
+/* anniversaire : terracotta mat, avec bouton */
+.bday-sec { background: var(--porcelain); }
+.bday { background: var(--terracotta); color: var(--milk); box-shadow: 0 40px 80px -50px rgba(120, 60, 40, .7); }
+.bday .eyebrow, .bday .h2 { color: var(--milk); }
+.bday .h2 em { color: #f6dcc4; }
+.bday-text { display: grid; gap: 1.2rem; justify-items: start; }
+.btn-cream { background: var(--milk); color: var(--terracotta); }
+.btn-cream:hover { background: #fff; }
+
+/* contact : photo de l'entrée */
+.info { background: var(--porcelain); }
+.place-photo { margin: 0; position: relative; aspect-ratio: 16 / 9; overflow: hidden; max-width: 100%; }
+.place-photo img { width: 100%; height: 100%; object-fit: cover; }
+.place-photo figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 1.6rem 1rem .7rem; background: linear-gradient(transparent, rgba(46, 33, 27, .75)); color: var(--milk); font-size: .85rem; }
+.book-card { background: var(--cocoa); border-color: var(--cocoa); }
+
+/* pied de page : horaires, réseaux, mentions légales */
+.footer { background: var(--cocoa); text-align: left; color: rgba(250, 246, 241, .8); }
+.footer-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 2.4rem; }
+.footer-brand img { height: 74px; width: auto; margin-bottom: 1rem; }
+.footer h3 { margin: 0 0 .8rem; font-size: .8rem; letter-spacing: .2em; text-transform: uppercase; color: #e6c79a; font-weight: 500; }
+.footer p { margin: 0 0 .6rem; }
+.footer a { color: inherit; }
+.foot-hours { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; font-variant-numeric: tabular-nums; }
+.foot-hours li { display: flex; justify-content: space-between; gap: 1rem; max-width: 16rem; }
+.socials { display: flex; gap: .7rem; margin-top: 1rem; }
+.socials a { width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(250, 246, 241, .3); display: grid; place-items: center; transition: background .3s; }
+.socials a:hover { background: rgba(250, 246, 241, .12); }
+.socials svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.footer-bottom { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-top: 2.6rem; padding-top: 1.4rem; border-top: 1px solid rgba(250, 246, 241, .15); font-size: .85rem; color: rgba(250, 246, 241, .6); }
+.footer-bottom a { text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 760px) { .footer-grid { grid-template-columns: 1fr; } }
+
+/* pages intérieures : bandeaux clairs */
+.prices, .works { background: var(--porcelain); }
+.works-ba { background: var(--blush); }
+.cta-band { background: var(--cocoa); }

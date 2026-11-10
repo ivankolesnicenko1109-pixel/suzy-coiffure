@@ -63,6 +63,9 @@
 
   /* ---------- Prestations ---------- */
   let activeCat = SERVICES[0].id;
+  // prestations mises en avant (à valider avec le salon)
+  const POPULAR = ["Butterfly Cut avec shampoing, sans séchage", "Shampoing & brushing wave", "Balayage Air Touch", "Coloration hydratante, coupe & brushing",
+    "Soin botox / soin réparateur", "Coupe homme + shampoing / sourcils", "Pose vernis semi-permanent, par Valentina", "Coupe kids"];
   const fmtPrice = (p) => typeof p === "number" ? (Number.isInteger(p) ? String(p) : p.toFixed(2)) : p;
   const priceHtml = (price, from) => price === null
     ? `<b class="srv-free">${t("srv.free")}</b>`
@@ -84,9 +87,11 @@
     });
     const cat = SERVICES.find((c) => c.id === activeCat);
     const list = $("#srvList");
-    list.innerHTML = cat.items.map(([names, price, from]) => `
+    const isPop = (names) => POPULAR.includes(Array.isArray(names) ? names[0] : names);
+    const shown = cat.items.slice().sort((a, b) => isPop(b[0]) - isPop(a[0])).slice(0, 6);
+    list.innerHTML = shown.map(([names, price, from]) => `
       <li class="srv-item">
-        <span class="srv-name">${Array.isArray(names) ? names[LANG_INDEX[lang]] : names}</span>
+        <span class="srv-name">${Array.isArray(names) ? names[LANG_INDEX[lang]] : names}${isPop(names) ? `<em class="srv-pop">★ ${t("srv.popular")}</em>` : ""}</span>
         <span class="srv-dots" aria-hidden="true"></span>
         <span class="srv-price">${priceHtml(price, from)}</span>
       </li>`).join("");
@@ -103,8 +108,7 @@
   /* ---------- Avis ---------- */
   function renderReviews() {
     const card = ([text, who]) => `<article class="rev-card"><p>${text}</p><div class="rev-meta"><span class="stars">★★★★★</span><span>${who} · Salonkee</span></div></article>`;
-    const html = REVIEWS.map(card).join("");
-    $("#revTrack").innerHTML = html + html.replace(/<article /g, '<article aria-hidden="true" ');
+    $("#revTrack").innerHTML = REVIEWS.map(card).join("");
   }
 
   /* ---------- Avant / après : choix de la transformation ---------- */
@@ -132,6 +136,8 @@
       const val = h ? `${h[0]} – ${h[1]}` : `<span class="off">${t("info.closed")}</span>`;
       return `<li class="${d === today ? "is-today" : ""}"><span>${days[d]}</span><span>${val}</span></li>`;
     }).join("");
+    const foot = $("#footHours");
+    if (foot) foot.innerHTML = order.map((d) => `<li><span>${days[d]}</span><span>${HOURS[d] ? HOURS[d][0] + "–" + HOURS[d][1] : t("info.closed")}</span></li>`).join("");
     const h = HOURS[today];
     const mins = now.getHours() * 60 + now.getMinutes();
     const toMin = (s) => { const [a, b] = s.split(":").map(Number); return a * 60 + b; };
@@ -292,6 +298,7 @@
      transitions « or liquide » + distorsion fluide à la souris
      ========================================================= */
   const SLIDES = [
+    { img: "assets/img/work/hero-cliente.webp", name: { fr: "Résultat au salon", en: "Result at the salon", de: "Ergebnis im Salon" } },
     { img: "assets/img/work/hero-blond.webp", name: { fr: "Ondulations blondes", en: "Blonde waves", de: "Blonde Wellen" } },
     { img: "assets/img/work/hero-cuivre.webp", name: { fr: "Cuivré lumineux", en: "Luminous copper", de: "Leuchtendes Kupfer" } },
     { img: "assets/img/work/hero-boucles.webp", name: { fr: "Boucles définies", en: "Defined curls", de: "Definierte Locken" } },
@@ -306,7 +313,6 @@
     try {
       renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: "high-performance" });
     } catch (e) { return null; }
-    $("#hero").classList.add("has-gl");
     renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
     renderer.setClearColor(0x0f0a08, 1);
 
@@ -416,6 +422,7 @@
     }))).then(() => {
       uniforms.uTex1.value = texs[0]; uniforms.uImg1.value.copy(sizes[0]);
       uniforms.uTex2.value = texs[1] || texs[0]; uniforms.uImg2.value.copy(sizes[1] || sizes[0]);
+      requestAnimationFrame(() => $("#hero").classList.add("has-gl"));
     });
 
     // souris
@@ -513,49 +520,18 @@
   /* =========================================================
      Préloader + intro + animations au scroll (GSAP)
      ========================================================= */
-  const loader = $("#loader");
-  const countEl = $("#loaderCount");
-  document.body.classList.add("is-loading");
-
+  // pas de préloader : le hero s'affiche tout de suite (image préchargée), le texte entre en douceur
   function startSite() {
-    document.body.classList.remove("is-loading");
-    if (!hasGsap || reduced) {
-      loader.remove();
-      if (heroGL) heroGL.uniforms.uIntro.value = 1;
-      return;
-    }
-    const tl = gsap.timeline();
-    tl.to(".loader-inner", { opacity: 0, scale: .94, duration: .6, ease: "power2.in" })
-      .to(loader, { clipPath: "inset(50% 0 50% 0)", duration: 1.3, ease: "expo.inOut" }, "-=.1")
-      .add(() => loader.remove());
-    if (heroGL) tl.to(heroGL.uniforms.uIntro, { value: 1, duration: 2.8, ease: "power2.inOut" }, "-=.7");
-    tl.from(".ht-1 .ch", { yPercent: 105, duration: 1.8, stagger: .07, ease: "expo.out" }, "-=2.1")
-      .from(".ht-2 .ch", { yPercent: 110, opacity: 0, rotate: 8, duration: 1.6, stagger: .045, ease: "expo.out" }, "-=1.5")
-      .from(".hero-top > *, .hero-aside > *", { y: 30, opacity: 0, duration: 1.2, stagger: .1, ease: "expo.out" }, "-=1.3")
-      .from(".hero-bar > *", { y: 20, opacity: 0, duration: 1, stagger: .1, ease: "expo.out" }, "-=1")
-      .add(() => { if (heroGL) heroGL.start(); }, "-=.6");
+    if (heroGL) heroGL.uniforms.uIntro.value = 1;
+    if (!hasGsap || reduced) return;
+    gsap.timeline({ delay: .1 })
+      .from(".ht-1 .ch", { yPercent: 105, duration: 1.5, stagger: .06, ease: "expo.out" })
+      .from(".ht-2 .ch", { yPercent: 110, opacity: 0, duration: 1.3, stagger: .04, ease: "expo.out" }, "-=1.2")
+      .from(".hero-top > *, .hero-aside > *", { y: 24, opacity: 0, duration: 1, stagger: .08, ease: "expo.out" }, "-=1.1")
+      .from(".hero-bar > *", { y: 16, opacity: 0, duration: .9, stagger: .08, ease: "expo.out" }, "-=.8");
+    if (heroGL) heroGL.ready.then(() => heroGL.start());
   }
-
-  if (reduced) { startSite(); }
-  else {
-    const minTime = 1900;
-    const t0 = performance.now();
-    const fontsReady = (document.fonts && document.fonts.ready) || Promise.resolve();
-    const texReady = heroGL ? heroGL.ready : Promise.resolve();
-    const timeout = new Promise((r) => setTimeout(r, 5000));
-    let done = false, started = false;
-    const go = () => { if (!started) { started = true; startSite(); } };
-    (function tick() {
-      if (started) return;
-      const p = Math.min((performance.now() - t0) / minTime, done ? 1 : 0.96);
-      countEl.textContent = String(Math.round(p * 100)).padStart(2, "0");
-      if (p < 1) requestAnimationFrame(tick);
-      else go();
-    })();
-    // onglet en arrière-plan : requestAnimationFrame peut être suspendu
-    setTimeout(go, 6000);
-    Promise.race([Promise.all([fontsReady, texReady]), timeout]).then(() => { done = true; });
-  }
+  startSite();
 
   if (hasGsap && window.ScrollTrigger && !reduced) {
     // le hero se referme en carte et les lettres s'envolent au scroll
@@ -572,7 +548,7 @@
     });
 
     // rideau doré qui dévoile les images
-    $$(".exp-img, .srv-visual, .member-img, .ba-frame").forEach((box) => {
+    $$(".exp-img, .srv-visual, .ba-frame").forEach((box) => {
       const c = document.createElement("div");
       c.className = "curtain";
       box.appendChild(c);
@@ -583,13 +559,6 @@
         .from(box.classList.contains("member-logo") ? [] : img, { scale: 1.35, duration: 2.2, ease: "expo.out" }, .25);
     });
 
-    // bande typographique géante
-    gsap.fromTo(".bt-1", { xPercent: 0 }, { xPercent: -28, ease: "none", scrollTrigger: { trigger: ".bigtype", start: "top bottom", end: "bottom top", scrub: true } });
-    gsap.fromTo(".bt-2", { xPercent: -20 }, { xPercent: 8, ease: "none", scrollTrigger: { trigger: ".bigtype", start: "top bottom", end: "bottom top", scrub: true } });
-
-    // inclinaison de la galerie selon la vitesse du scroll
-    const skewTo = gsap.quickTo(".gal-item", "skewX", { duration: .7, ease: "power3" });
-    if (lenis) lenis.on("scroll", (e) => skewTo(gsap.utils.clamp(-7, 7, e.velocity * -0.35)));
     $$(".section .reveal-up").forEach((el) => {
       gsap.from(el, { y: 40, opacity: 0, duration: 1.2, ease: "expo.out", scrollTrigger: { trigger: el, start: "top 90%" } });
     });
@@ -620,17 +589,7 @@
     // prestations
     gsap.from("#srvList .srv-item", { y: 30, opacity: 0, duration: 1, stagger: .07, ease: "expo.out", scrollTrigger: { trigger: ".srv-body", start: "top 80%" } });
 
-    // galerie horizontale épinglée (desktop)
-    const mm = gsap.matchMedia();
-    mm.add("(min-width: 761px)", () => {
-      const track = $("#galTrack");
-      const dist = () => track.scrollWidth - innerWidth + 96;
-      gsap.to(track, {
-        x: () => -dist(), ease: "none",
-        scrollTrigger: { trigger: "#galerie", start: "top top", end: () => "+=" + dist(), pin: true, scrub: 1, invalidateOnRefresh: true, anticipatePin: 1 }
-      });
-    });
-    gsap.from(".gal-item", { y: 80, opacity: 0, duration: 1.4, stagger: .08, ease: "expo.out", scrollTrigger: { trigger: "#galerie", start: "top 75%" } });
+    gsap.from(".gal-item", { y: 40, opacity: 0, duration: 1.1, stagger: .06, ease: "expo.out", scrollTrigger: { trigger: ".gal-grid", start: "top 85%" } });
 
     // avant/après : petit balayage d'invitation
     const ba = { v: 50 };
@@ -642,7 +601,6 @@
     // équipe, anniversaire, infos
     gsap.from(".member", { y: 90, opacity: 0, rotateX: 10, duration: 1.6, stagger: .2, ease: "expo.out", scrollTrigger: { trigger: ".team-grid", start: "top 82%" } });
     gsap.from(".bday", { scale: .92, opacity: 0, duration: 1.6, ease: "expo.out", scrollTrigger: { trigger: ".bday", start: "top 85%" } });
-    gsap.from(".bday-minus", { yPercent: 60, opacity: 0, duration: 1.6, delay: .2, ease: "expo.out", scrollTrigger: { trigger: ".bday", start: "top 85%" } });
     gsap.from(".info-card", { y: 60, opacity: 0, duration: 1.3, stagger: .12, ease: "expo.out", scrollTrigger: { trigger: ".info-grid", start: "top 85%" } });
 
     addEventListener("load", () => ScrollTrigger.refresh());
