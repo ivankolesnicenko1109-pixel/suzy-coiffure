@@ -289,7 +289,7 @@ window.I18N = {
 // Carte des prestations, relevée sur la page Salonkee du salon (noms tels qu'affichés par le salon)
 // [nom, prix (nombre, texte ou null = offert), « dès » ?]
 window.SERVICES = [
-  { id: "coupes", label: { fr: "Coupes femme", en: "Women's cuts", de: "Damenschnitte" }, img: "assets/img/portfolio/p-52.webp",
+  { id: "coupes", label: { fr: "Coupes femme", en: "Women's cuts", de: "Damenschnitte" }, img: "assets/img/work/hero-boucles.webp",
     items: [
       [["Butterfly Cut avec shampoing, sans séchage", "Butterfly cut with shampoo, no drying", "Butterfly Cut mit Haarwäsche, ohne Föhnen"], 69],
       [["Shag long", "Long shag", "Langer Shag"], 60],

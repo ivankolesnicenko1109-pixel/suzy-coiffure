@@ -298,7 +298,6 @@
      transitions « or liquide » + distorsion fluide à la souris
      ========================================================= */
   const SLIDES = [
-    { img: "assets/img/work/hero-cliente.webp", name: { fr: "Résultat au salon", en: "Result at the salon", de: "Ergebnis im Salon" } },
     { img: "assets/img/work/hero-blond.webp", name: { fr: "Ondulations blondes", en: "Blonde waves", de: "Blonde Wellen" } },
     { img: "assets/img/work/hero-cuivre.webp", name: { fr: "Cuivré lumineux", en: "Luminous copper", de: "Leuchtendes Kupfer" } },
     { img: "assets/img/work/hero-boucles.webp", name: { fr: "Boucles définies", en: "Defined curls", de: "Definierte Locken" } },
