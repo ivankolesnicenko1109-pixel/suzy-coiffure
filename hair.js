@@ -70,6 +70,8 @@
     }`;
 
   const hex = (h) => new T.Color(h);
+  const COMB_SVG = '<svg viewBox="0 0 72 30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 7h60a3 3 0 0 1 0 6H6a3 3 0 0 1 0-6z"/>' +
+    Array.from({ length: 12 }, (_, i) => `<path d="M${10 + i * 4.8} 13v${i % 2 ? 11 : 14}"/>`).join("") + "</svg>";
   function tweenColor(target, to, dur) {
     const c = hex(to);
     if (!hasGsap || !dur) { target.copy(c); return; }
@@ -118,21 +120,23 @@
      1. HERO — cheveux vivants
      ========================================================= */
   const SHADES = {
-    blond:    { root: "#7d5a35", tip: "#f3d9a4", streak: 0.3 },
-    cuivre:   { root: "#5c200e", tip: "#d26c36", streak: 0.12 },
-    chatain:  { root: "#26180f", tip: "#74492f", streak: 0.1 },
-    balayage: { root: "#2c1c13", tip: "#e4c18a", streak: 0.45 }
+    blond:    { root: "#a47c4b", tip: "#f8e5bb", streak: 0.35 },
+    cuivre:   { root: "#5c200e", tip: "#d8723a", streak: 0.12 },
+    chatain:  { root: "#26180f", tip: "#7a4d31", streak: 0.1 },
+    balayage: { root: "#2c1c13", tip: "#e8c590", streak: 0.45 }
   };
 
   function hero({ canvas, title, reduced, mobile }) {
     const renderer = makeRenderer(canvas, { alpha: false });
     if (!renderer) return null;
+    // 1,5 au maximum : la différence ne se voit pas sur des fibres, le gain de fluidité oui
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
     renderer.setClearColor(0x1c1410, 1);
     const scene = new T.Scene();
     const camera = new T.PerspectiveCamera(35, 1, 0.1, 50);
     camera.position.z = 10;
 
-    const N = mobile ? 3600 : 10000, S = 24, TRAIL = 10;
+    const N = mobile ? 3000 : 7000, S = 20, TRAIL = 16;
     const g = strandGeometry(S);
     // les fibres du fond sont dessinées en premier
     const strands = [];
@@ -149,20 +153,23 @@
     g.setAttribute("aText", textAttr);
     g.instanceCount = N;
 
-    const trail = Array.from({ length: TRAIL }, () => new T.Vector4(99, 99, 0, 0));
+    const trail = Array.from({ length: TRAIL }, () => new T.Vector4(99, 99, 1, 0));
     const start = SHADES.blond;
     const u = {
       uTime: { value: 0 }, uForm: { value: reduced ? 0 : 1 }, uAlpha: { value: reduced ? 1 : 0 }, uScroll: { value: 0 },
       uView: { value: new T.Vector2(10, 6) }, uCamZ: { value: 10 },
       uRootCol: { value: hex(start.root) }, uTipCol: { value: hex(start.tip) }, uStreak: { value: start.streak },
+      uRootA: { value: hex(start.root) }, uTipA: { value: hex(start.tip) }, uStreakA: { value: start.streak },
+      uWave: { value: 1 }, uWaveO: { value: new T.Vector2(0, 0) },
+      uLight: { value: new T.Vector3(0, 0, 0) },
       uTrail: { value: trail }, uTrailS: { value: new Array(TRAIL).fill(0) }
     };
     const mat = new T.ShaderMaterial({
       uniforms: u, transparent: true, depthWrite: false, depthTest: false,
       vertexShader: `
-        uniform float uTime, uForm, uAlpha, uScroll, uCamZ, uStreak;
-        uniform vec2 uView;
-        uniform vec3 uRootCol, uTipCol;
+        uniform float uTime, uForm, uAlpha, uScroll, uCamZ, uStreak, uStreakA, uWave;
+        uniform vec2 uView, uWaveO;
+        uniform vec3 uRootCol, uTipCol, uRootA, uTipA, uLight;
         uniform vec4 uTrail[${TRAIL}];
         uniform float uTrailS[${TRAIL}];
         attribute vec3 aRoot, aText;
@@ -184,48 +191,68 @@
           p.x += snoise(q) * 1.05 * tt * wind;
           p.z += snoise(q + 11.3) * 0.7 * tt;
           p.y += snoise(q + 23.7) * 0.25 * tt;
-          vec3 q2 = vec3(t * 1.8 + aRand.x * 10.0, aRand.y * 30.0, uTime * 0.14);
-          p.x += snoise(q2) * 0.06 * tt;
-          p.y += snoise(q2 + 5.0) * 0.03 * tt;
+          p.x += snoise(vec3(t * 1.8 + aRand.x * 10.0, aRand.y * 30.0, uTime * 0.14)) * 0.06 * tt;
           return p;
         }
         vec3 formPos(float t) {
           float ang = 1.15 + (aRand.w - 0.5) * 1.1;
-          vec3 jitter = vec3(snoise(vec3(aText.xy * 3.0, uTime * 0.5)), snoise(vec3(aText.yx * 3.0, uTime * 0.5 + 4.0)), 0.0) * 0.012;
-          return aText + vec3(cos(ang), sin(ang), 0.0) * (t - 0.5) * 0.11 + jitter;
+          vec2 jitter = vec2(sin(uTime * 2.1 + aRand.x * 40.0), cos(uTime * 1.7 + aRand.y * 40.0)) * 0.008;
+          return aText + vec3(cos(ang), sin(ang), 0.0) * (t - 0.5) * 0.11 + vec3(jitter, 0.0);
         }
-        // la souris peigne : les fibres s'écartent puis reviennent doucement
+        vec3 hairPos(float t, float k) {
+          vec3 p = flowPos(t);
+          if (k > 0.0) p = mix(p, formPos(t), k);
+          return p;
+        }
+        // la souris peigne : un fin sillon s'ouvre de part et d'autre de son passage, puis se referme
         vec3 comb(vec3 p, float t) {
           float w = smoothstep(0.02, 0.3, t);
           vec2 pp = p.xy * (uCamZ / (uCamZ - p.z));
+          vec2 off = vec2(0.0);
           for (int i = 0; i < ${TRAIL}; i++) {
+            float s = uTrailS[i];
+            if (s < 0.01) continue;
+            vec2 dir = uTrail[i].zw;
+            vec2 nrm = vec2(-dir.y, dir.x);
             vec2 d = pp - uTrail[i].xy;
-            float f = uTrailS[i] * exp(-dot(d, d) / 0.3) * w;
-            p.xy += normalize(d + vec2(1e-4)) * f * 0.42 + uTrail[i].zw * f * 0.5;
+            float along = dot(d, dir), across = dot(d, nrm);
+            off += nrm * sign(across) * s * exp(-along * along / 0.03) * exp(-abs(across) / 0.25) * 0.14;
           }
+          p.xy += off * w;
           return p;
+        }
+        vec3 shade(vec3 root, vec3 tip, float streakAmt, float t) {
+          vec3 base = mix(root, tip, smoothstep(0.08, 0.95, t));
+          float streak = step(1.0 - streakAmt, fract(aRand.y * 7.13 + floor(aRoot.x * 40.0) * 0.17));
+          return mix(base, tip * 1.12, streak * smoothstep(0.12, 0.55, t));
         }
         void main() {
           float t = position.x;
-          float t2 = min(t + 0.04, 1.0), t1 = t2 - 0.04;
-          float k = smoothstep(aRand.x * 0.4 + (1.0 - t) * 0.12, aRand.x * 0.4 + (1.0 - t) * 0.12 + 0.5, uForm);
-          vec3 p = comb(mix(flowPos(t), formPos(t), k), t);
-          vec3 pa = comb(mix(flowPos(t1), formPos(t1), k), t1);
-          vec3 pb = comb(mix(flowPos(t2), formPos(t2), k), t2);
-          vec3 Tg = normalize(pb - pa + vec3(0.0, 1e-4, 0.0));
+          float t2 = t < 0.95 ? t + 0.05 : t - 0.05;
+          float k = uForm > 0.0 ? smoothstep(aRand.x * 0.4 + (1.0 - t) * 0.12, aRand.x * 0.4 + (1.0 - t) * 0.12 + 0.5, uForm) : 0.0;
+          vec3 p = comb(hairPos(t, k), t);
+          vec3 p2 = comb(hairPos(t2, k), t2);
+          vec3 Tg = normalize((p2 - p) * sign(t2 - t) + vec3(0.0, 1e-4, 0.0));
           gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+          vec2 pp = p.xy * (uCamZ / (uCamZ - p.z));
 
-          float g = smoothstep(0.08, 0.95, t);
-          vec3 base = mix(uRootCol, uTipCol, g);
-          float streak = step(1.0 - uStreak, fract(aRand.y * 7.13 + floor(aRoot.x * 40.0) * 0.17));
-          base = mix(base, uTipCol * 1.12, streak * smoothstep(0.12, 0.55, t));
+          // la nouvelle teinte se répand en vague depuis la pastille choisie, des racines vers les pointes
+          float wd = length(pp - uWaveO) / length(uView) + (aRand.w - 0.5) * 0.05 + t * 0.08;
+          float wm = smoothstep(wd, wd + 0.12, uWave * 1.3 - 0.12);
+          vec3 base = mix(shade(uRootA, uTipA, uStreakA, t), shade(uRootCol, uTipCol, uStreak, t), wm);
           base *= 0.72 + 0.5 * fract(aRand.x * 13.7);
-          vec3 L = normalize(vec3(sin(uTime * 0.18) * 0.7, 0.65, 0.55));
-          vec3 c = hairLight(Tg, vec3(0.0, 0.0, 1.0), L, base, 1.0);
+
+          vec3 V = vec3(0.0, 0.0, 1.0);
+          vec3 c = hairLight(Tg, V, normalize(vec3(sin(uTime * 0.18) * 0.7, 0.65, 0.55)), base, 1.0);
+          // le curseur est une petite lampe : le reflet suit la souris
+          vec2 ld = uLight.xy - pp;
+          float lf = uLight.z * exp(-dot(ld, ld) / 1.4);
+          c += hairLight(Tg, V, normalize(vec3(ld * 0.9, 0.8)), vec3(0.0), 1.0) * lf * 2.2 + base * lf * 0.25;
+          c += vec3(1.0, 0.86, 0.6) * wm * (1.0 - wm) * 1.2;
           c = mix(c, vec3(1.0, 0.85, 0.58) * 1.35, k * 0.75);
           float depth = smoothstep(-3.2, 1.2, p.z);
           vCol = c * mix(0.5, 1.15, depth) * (1.0 - uScroll * 0.6);
-          vA = uAlpha * mix(1.0, 1.0 - smoothstep(0.8, 1.0, t), 1.0 - k) * mix(0.38, 0.85, depth) * mix(1.0, 1.25, k);
+          vA = uAlpha * mix(1.0, 1.0 - smoothstep(0.8, 1.0, t), 1.0 - k) * mix(0.42, 0.9, depth) * mix(1.0, 1.25, k);
         }`,
       fragmentShader: `
         varying vec3 vCol;
@@ -249,6 +276,10 @@
     }
     resize();
     addEventListener("resize", resize);
+    const toWorld = (clientX, clientY) => {
+      const r = canvas.getBoundingClientRect();
+      return [((clientX - r.left) / r.width - 0.5) * view.w, -((clientY - r.top) / r.height - 0.5) * view.h];
+    };
 
     // le mot « Suzy » est dessiné exactement là où le titre HTML apparaîtra
     function sampleTitle() {
@@ -284,25 +315,32 @@
       return true;
     }
 
-    // souris / doigt
+    // souris / doigt : on mémorise le trajet par petits pas pour tracer un sillon continu
     let head = 0, lastX = null, lastY = null;
-    function pointer(clientX, clientY) {
-      const r = canvas.getBoundingClientRect();
-      const x = ((clientX - r.left) / r.width - 0.5) * view.w;
-      const y = -((clientY - r.top) / r.height - 0.5) * view.h;
-      if (lastX === null) { lastX = x; lastY = y; }
-      const dx = x - lastX, dy = y - lastY;
-      if (Math.hypot(dx, dy) < 0.08) { u.uTrailS.value[head] = Math.max(u.uTrailS.value[head], 0.9); return; }
+    const light = { x: 0, y: 0, on: 0, tx: 0, ty: 0, ton: 0 };
+    function addPoint(x, y, dx, dy) {
       head = (head + 1) % TRAIL;
-      const v = Math.min(Math.hypot(dx, dy), 0.5) / (Math.hypot(dx, dy) || 1);
-      trail[head].set(x, y, dx * v, dy * v);
+      const l = Math.hypot(dx, dy) || 1;
+      trail[head].set(x, y, dx / l, dy / l);
       u.uTrailS.value[head] = 1;
+    }
+    function combTo(x, y) {
+      if (lastX === null) { lastX = x; lastY = y; return; }
+      const dx = x - lastX, dy = y - lastY, dist = Math.hypot(dx, dy);
+      if (dist < 0.09) return;
+      const steps = Math.min(Math.ceil(dist / 0.09), 6);
+      for (let i = 1; i <= steps; i++) addPoint(lastX + dx * i / steps, lastY + dy * i / steps, dx, dy);
       lastX = x; lastY = y;
+    }
+    function pointer(clientX, clientY) {
+      const [x, y] = toWorld(clientX, clientY);
+      light.tx = x; light.ty = y; light.ton = 1;
+      combTo(x, y);
     }
     const host = canvas.closest("section") || canvas;
     host.addEventListener("pointermove", (e) => pointer(e.clientX, e.clientY), { passive: true });
     host.addEventListener("touchmove", (e) => { const tc = e.touches[0]; if (tc) pointer(tc.clientX, tc.clientY); }, { passive: true });
-    host.addEventListener("pointerleave", () => { lastX = null; });
+    host.addEventListener("pointerleave", () => { lastX = null; light.ton = 0; });
 
     let time = 0;
     function render() { renderer.render(scene, camera); }
@@ -310,11 +348,39 @@
       if (reduced) return;
       time += dt;
       u.uTime.value = time;
-      const s = u.uTrailS.value, fall = Math.pow(0.35, dt);
+      // le sillon se referme en un peu plus d'une seconde
+      const s = u.uTrailS.value, fall = Math.pow(0.12, dt);
       for (let i = 0; i < TRAIL; i++) s[i] *= fall;
+      const e = 1 - Math.pow(0.002, dt);
+      light.x += (light.tx - light.x) * e; light.y += (light.ty - light.y) * e; light.on += (light.ton - light.on) * e * 0.5;
+      u.uLight.value.set(light.x, light.y, light.on);
       render();
     });
-    ctl.onSlow = () => { g.instanceCount = Math.floor(N * 0.5); renderer.setPixelRatio(1); resize(); };
+    ctl.onSlow = () => { g.instanceCount = Math.floor(N * 0.55); renderer.setPixelRatio(1); resize(); };
+
+    // démonstration : une brosse invisible passe une fois dans les cheveux
+    function demoComb() {
+      const r = canvas.getBoundingClientRect();
+      if (!hasGsap || !r.width) return;
+      const ghost = document.createElement("div");
+      ghost.className = "comb-ghost";
+      ghost.setAttribute("aria-hidden", "true");
+      ghost.innerHTML = COMB_SVG;
+      host.appendChild(ghost);
+      const p = { k: 0 };
+      const a = [r.width * 0.18, r.height * 0.3], b = [r.width * 0.78, r.height * 0.52];
+      gsap.timeline({ onComplete: () => { ghost.remove(); lastX = null; light.ton = 0; } })
+        .fromTo(ghost, { opacity: 0 }, { opacity: 1, duration: .4 })
+        .to(p, {
+          k: 1, duration: 1.6, ease: "power2.inOut",
+          onUpdate() {
+            const x = a[0] + (b[0] - a[0]) * p.k, y = a[1] + (b[1] - a[1]) * p.k + Math.sin(p.k * Math.PI) * -r.height * 0.06;
+            ghost.style.transform = `translate(${x}px, ${y}px) rotate(${-8 + p.k * 16}deg)`;
+            pointer(r.left + x, r.top + y);
+          }
+        }, "<")
+        .to(ghost, { opacity: 0, duration: .5 }, "-=.4");
+    }
 
     const fontsReady = document.fonts ? Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 1500))]) : Promise.resolve();
     const ready = fontsReady.then(() => {
@@ -331,17 +397,22 @@
       start() {
         if (reduced || !hasGsap) { u.uAlpha.value = 1; u.uForm.value = 0; render(); return 0; }
         gsap.to(u.uAlpha, { value: 1, duration: 1.4, ease: "power2.out" });
-        gsap.to(u.uForm, { value: 0, duration: 3.4, delay: 1.5, ease: "power3.inOut" });
+        gsap.to(u.uForm, { value: 0, duration: 3.4, delay: 1.5, ease: "power3.inOut", onComplete: () => { if (!mobile) demoComb(); } });
         return 2.1;
       },
-      setShade(key) {
+      setShade(key, clientX, clientY) {
         const s = SHADES[key];
-        if (!s) return;
+        if (!s || key === this.shade) return;
         this.shade = key;
-        tweenColor(u.uRootCol.value, s.root, 1.4);
-        tweenColor(u.uTipCol.value, s.tip, 1.4);
-        tweenNum(u.uStreak, s.streak, 1.4);
-        if (reduced) render();
+        u.uRootA.value.copy(u.uRootCol.value);
+        u.uTipA.value.copy(u.uTipCol.value);
+        u.uStreakA.value = u.uStreak.value;
+        u.uRootCol.value.copy(hex(s.root));
+        u.uTipCol.value.copy(hex(s.tip));
+        u.uStreak.value = s.streak;
+        if (clientX !== undefined) u.uWaveO.value.set(...toWorld(clientX, clientY));
+        if (reduced || !hasGsap) { u.uWave.value = 1; render(); return; }
+        gsap.fromTo(u.uWave, { value: 0 }, { value: 1, duration: 1.6, ease: "power2.inOut", overwrite: true });
       },
       setScroll(p) { u.uScroll.value = p; },
       color(key) { return SHADES[key] && SHADES[key].tip; }
@@ -379,13 +450,16 @@
     const m0 = MODES.balayage;
     const u = {
       uTime: { value: 0 }, uRoot: { value: hex(m0.root) }, uTip: { value: hex(m0.tip) }, uStreakCol: { value: hex(m0.streakCol) },
-      uG0: { value: m0.g0 }, uG1: { value: m0.g1 }, uStreak: { value: m0.streak }, uSF: { value: m0.sf }, uGloss: { value: m0.gloss }
+      uG0: { value: m0.g0 }, uG1: { value: m0.g1 }, uStreak: { value: m0.streak }, uSF: { value: m0.sf }, uGloss: { value: m0.gloss },
+      uRootA: { value: hex(m0.root) }, uTipA: { value: hex(m0.tip) }, uStreakColA: { value: hex(m0.streakCol) },
+      uParA: { value: new T.Vector4(m0.g0, m0.g1, m0.streak, m0.sf) }, uFlow: { value: 1 }
     };
     const mat = new T.ShaderMaterial({
       uniforms: u, transparent: true, depthWrite: false,
       vertexShader: `
-        uniform float uTime, uG0, uG1, uStreak, uSF, uGloss;
-        uniform vec3 uRoot, uTip, uStreakCol;
+        uniform float uTime, uG0, uG1, uStreak, uSF, uGloss, uFlow;
+        uniform vec3 uRoot, uTip, uStreakCol, uRootA, uTipA, uStreakColA;
+        uniform vec4 uParA;
         attribute vec2 aOff;
         attribute vec4 aRand;
         varying vec3 vCol;
@@ -406,20 +480,25 @@
           p.x += sin(uTime * 0.9 + t * 2.4) * 0.05 * t * t;
           return p;
         }
+        vec3 colour(vec3 root, vec3 tip, vec3 sc, vec4 par, float t) {
+          vec3 base = mix(root, tip, smoothstep(par.x, par.y, t));
+          float s = step(1.0 - par.z, aRand.y);
+          return mix(base, sc, s * smoothstep(par.w, par.w + 0.25, t));
+        }
         void main() {
           float t = position.x;
           float t2 = min(t + 0.03, 1.0), t1 = t2 - 0.03;
           vec4 mv = modelViewMatrix * vec4(lockPos(t), 1.0);
           vec3 Tg = normalize((modelViewMatrix * vec4(lockPos(t2), 1.0)).xyz - (modelViewMatrix * vec4(lockPos(t1), 1.0)).xyz);
           gl_Position = projectionMatrix * mv;
-          vec3 base = mix(uRoot, uTip, smoothstep(uG0, uG1, t));
-          float s = step(1.0 - uStreak, aRand.y);
-          base = mix(base, uStreakCol, s * smoothstep(uSF, uSF + 0.25, t));
+          float wm = smoothstep(t, t + 0.15, uFlow * 1.3 - 0.15);
+          vec3 base = mix(colour(uRootA, uTipA, uStreakColA, uParA, t), colour(uRoot, uTip, uStreakCol, vec4(uG0, uG1, uStreak, uSF), t), wm);
           base *= 0.8 + 0.4 * aRand.x;
+          base += vec3(1.0, 0.88, 0.66) * wm * (1.0 - wm) * 0.9;
           vec3 V = normalize(-mv.xyz);
           vec3 c = hairLight(Tg, V, normalize(vec3(-0.5, 0.7, 0.6)), base, uGloss);
           c += hairLight(Tg, V, normalize(vec3(0.8, 0.1, -0.3)), base, uGloss * 0.5) * 0.25;
-          vCol = min(c, vec3(0.9)) * mix(1.0, 0.8, smoothstep(0.7, 1.0, t));
+          vCol = min(c, vec3(0.92)) * mix(1.0, 0.8, smoothstep(0.7, 1.0, t));
           vA = 0.85 * mix(1.0, 0.3, smoothstep(0.55, 1.0, t)) * (1.0 - smoothstep(0.9, 1.0, t)) * smoothstep(0.0, 0.14 + aRand.w * 0.1, t);
         }`,
       fragmentShader: `
@@ -439,7 +518,7 @@
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
       // la mèche entière reste dans le cadre, même en format étroit
-      camera.position.z = camera.aspect < 0.8 ? 8.2 / Math.max(camera.aspect / 0.8, 0.55) : 8.2;
+      camera.position.z = camera.aspect < 0.75 ? 7.3 / Math.max(camera.aspect / 0.75, 0.55) : 7.3;
       camera.updateProjectionMatrix();
     }
     resize();
@@ -461,6 +540,7 @@
     canvas.addEventListener("pointerleave", () => { tiltX = 0; });
 
     let time = 0;
+    const spin = { v: 0 };
     const render = () => renderer.render(scene, camera);
     const ctl = loop(canvas, (dt) => {
       if (reduced) return;
@@ -468,8 +548,8 @@
       u.uTime.value = time;
       idle += dt;
       if (!dragging) velY *= Math.pow(0.04, dt);
-      rotY += velY + (idle > 1.5 ? dt * 0.25 : 0);
-      pivot.rotation.y = rotY;
+      rotY += velY + (idle > 0.6 ? dt * 0.3 : 0);
+      pivot.rotation.y = rotY + spin.v;
       pivot.rotation.x += (tiltX - pivot.rotation.x) * 0.06;
       render();
     });
@@ -481,17 +561,20 @@
       setMode(key) {
         const m = MODES[key];
         if (!m) return;
-        const d = reduced ? 0 : 1.2;
-        tweenColor(u.uRoot.value, m.root, d);
-        tweenColor(u.uTip.value, m.tip, d);
-        tweenColor(u.uStreakCol.value, m.streakCol, d);
-        tweenNum(u.uG0, m.g0, d);
-        tweenNum(u.uG1, m.g1, d);
-        tweenNum(u.uStreak, m.streak, d);
-        tweenNum(u.uSF, m.sf, d);
-        tweenNum(u.uGloss, m.gloss, d);
-        // petite pirouette pour montrer la nouvelle couleur sous tous les angles
-        if (reduced) render(); else { velY += 0.06; idle = 0; }
+        // l'ancienne couleur reste, la nouvelle coule des racines vers les pointes
+        u.uRootA.value.copy(u.uRoot.value);
+        u.uTipA.value.copy(u.uTip.value);
+        u.uStreakColA.value.copy(u.uStreakCol.value);
+        u.uParA.value.set(u.uG0.value, u.uG1.value, u.uStreak.value, u.uSF.value);
+        u.uRoot.value.copy(hex(m.root));
+        u.uTip.value.copy(hex(m.tip));
+        u.uStreakCol.value.copy(hex(m.streakCol));
+        u.uG0.value = m.g0; u.uG1.value = m.g1; u.uStreak.value = m.streak; u.uSF.value = m.sf;
+        if (reduced || !hasGsap) { u.uFlow.value = 1; u.uGloss.value = m.gloss; render(); return; }
+        gsap.to(u.uGloss, { value: m.gloss, duration: 1.8, ease: "power3.inOut", overwrite: true });
+        gsap.fromTo(u.uFlow, { value: 0 }, { value: 1, duration: 1.9, ease: "power2.inOut", overwrite: true });
+        gsap.fromTo(spin, { v: 0 }, { v: Math.PI * 2, duration: 1.9, ease: "power3.inOut", overwrite: true });
+        idle = 0;
       },
       swatch(key) { return MODES[key] && [MODES[key].root, MODES[key].tip]; }
     };
@@ -512,6 +595,7 @@
     const V2 = T.Vector2;
     const u = {
       uA: { value: null }, uB: { value: null }, uImgA: { value: new V2(4, 5) }, uImgB: { value: new V2(4, 5) },
+      uA0: { value: null }, uB0: { value: null }, uImgA0: { value: new V2(4, 5) }, uImgB0: { value: new V2(4, 5) }, uSwap: { value: 1 },
       uRes: { value: new V2(4, 5) }, uPos: { value: 0.5 }, uTime: { value: 0 }, uVel: { value: 0 }
     };
     scene.add(new T.Mesh(new T.PlaneGeometry(2, 2), new T.ShaderMaterial({
@@ -519,9 +603,9 @@
       vertexShader: "varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }",
       fragmentShader: `
         precision highp float;
-        uniform sampler2D uA, uB;
-        uniform vec2 uImgA, uImgB, uRes;
-        uniform float uPos, uTime, uVel;
+        uniform sampler2D uA, uB, uA0, uB0;
+        uniform vec2 uImgA, uImgB, uImgA0, uImgB0, uRes;
+        uniform float uPos, uTime, uVel, uSwap;
         varying vec2 vUv;
         float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
         float noise(vec2 p) {
@@ -543,9 +627,17 @@
           float m = smoothstep(uPos - w, uPos + w, v);
           float band = 1.0 - abs(m * 2.0 - 1.0);
           vec2 disp = vec2((n - 0.5) * 0.14, sin(uv.y * 13.0 + uTime * 1.3 + n * 6.0) * 0.03) * band;
-          vec3 a = texture2D(uA, cover(uv + disp, uImgA)).rgb;
-          vec3 b = texture2D(uB, cover(uv - disp, uImgB)).rgb;
-          vec3 col = mix(a, b, m);
+          vec3 col = mix(texture2D(uA, cover(uv + disp, uImgA)).rgb, texture2D(uB, cover(uv - disp, uImgB)).rgb, m);
+          // changement de transformation : l'ancienne paire fond dans la nouvelle
+          if (uSwap < 1.0) {
+            float n2 = fbm(uv * 3.0 + 7.0);
+            float sw = smoothstep(n2 - 0.12, n2 + 0.12, uSwap * 1.3 - 0.15);
+            float sb = 1.0 - abs(sw * 2.0 - 1.0);
+            vec2 d2 = vec2(n2 - 0.5, sin(uv.y * 9.0 + uTime) * 0.5) * sb * 0.08;
+            vec3 old = mix(texture2D(uA0, cover(uv + disp + d2, uImgA0)).rgb, texture2D(uB0, cover(uv - disp + d2, uImgB0)).rgb, m);
+            col = mix(old, col, sw);
+            col += vec3(1.0, 0.88, 0.7) * pow(sb, 2.0) * 0.18;
+          }
           col += vec3(1.0, 0.9, 0.74) * pow(band, 3.0) * 0.2 * (0.6 + 0.4 * sin(uv.y * 28.0 + uTime * 2.0 + n * 10.0));
           gl_FragColor = vec4(col, 1.0);
         }`
@@ -565,6 +657,11 @@
     function setPair(before, after) {
       return Promise.all([load(before), load(after)]).then(([a, b]) => {
         if (!a || !b) return;
+        if (u.uA.value && !reduced && hasGsap) {
+          u.uA0.value = u.uA.value; u.uB0.value = u.uB.value;
+          u.uImgA0.value.copy(u.uImgA.value); u.uImgB0.value.copy(u.uImgB.value);
+          gsap.fromTo(u.uSwap, { value: 0 }, { value: 1, duration: 1.4, ease: "power2.inOut", overwrite: true });
+        }
         u.uA.value = a; u.uB.value = b;
         u.uImgA.value.set(a.image.width, a.image.height);
         u.uImgB.value.set(b.image.width, b.image.height);

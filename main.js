@@ -308,7 +308,11 @@
     const box = $("#hairDots");
     if (!box || !heroGL) return;
     box.innerHTML = SHADE_KEYS.map((k) => `<button type="button" class="hd" role="radio" aria-checked="${heroGL.shade === k}" data-k="${k}" style="--c:${heroGL.color(k)}"><i></i><span>${t("hair." + k)}</span></button>`).join("");
-    $$(".hd", box).forEach((b) => b.addEventListener("click", () => { heroGL.setShade(b.dataset.k); renderShades(); }));
+    $$(".hd", box).forEach((b) => b.addEventListener("click", () => {
+      const r = b.getBoundingClientRect();
+      heroGL.setShade(b.dataset.k, r.left + r.width / 2, r.top + r.height / 2);
+      renderShades();
+    }));
   }
   if (heroGL) heroGL.relabel = renderShades;
   renderShades();
@@ -386,9 +390,9 @@
     const heroST = { trigger: "#hero", start: "top top", end: "bottom top", scrub: true };
     ScrollTrigger.create({ ...heroST, onUpdate: (self) => { if (heroGL) heroGL.setScroll(self.progress); } });
     gsap.fromTo("#heroMedia", { clipPath: "inset(0% 0% 0% 0% round 0px)" }, { clipPath: "inset(7% 4% 0% 4% round 28px)", ease: "none", scrollTrigger: heroST });
-    gsap.to(".ht-1 .ch", { yPercent: (i) => -30 - i * 22, ease: "none", scrollTrigger: heroST });
+    gsap.fromTo(".ht-1 .ch", { yPercent: 0 }, { yPercent: (i) => -30 - i * 22, ease: "none", immediateRender: false, scrollTrigger: heroST });
     gsap.to(".ht-2", { xPercent: 12, ease: "none", scrollTrigger: heroST });
-    gsap.to(".hero-top, .hero-aside, .hero-bar", { y: -80, opacity: 0, ease: "none", scrollTrigger: { ...heroST, end: "60% top" } });
+    gsap.fromTo(".hero-top, .hero-aside, .hero-bar", { y: 0, opacity: 1 }, { y: -80, opacity: 0, ease: "none", immediateRender: false, scrollTrigger: { ...heroST, end: "60% top" } });
 
     // titres et textes
     $$(".section .reveal-lines").forEach((el) => {
