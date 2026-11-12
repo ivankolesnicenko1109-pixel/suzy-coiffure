@@ -7,8 +7,11 @@
   const finePointer = matchMedia("(hover: hover) and (pointer: fine)").matches;
   const hasGsap = typeof window.gsap !== "undefined";
   if (hasGsap && window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger);
+  // une seule courbe pour tout le site : cubic-bezier(0.22, 1, 0.36, 1)
+  if (hasGsap) gsap.defaults({ ease: "power4.out" });
 
   let heroGL = null;
+  let renderTryUI = null;
 
   /* ---------- i18n ---------- */
   const store = {
@@ -32,7 +35,8 @@
     renderHours();
     renderPairs();
     $$(".count").forEach((el) => { if (el.dataset.done) el.textContent = formatCount(+el.dataset.to, +el.dataset.dec || 0); });
-    if (heroGL) heroGL.relabel();
+    if (heroGL && heroGL.relabel) heroGL.relabel();
+    if (renderTryUI) renderTryUI();
     store.set("suzy-lang", lang);
     if (window.ScrollTrigger) ScrollTrigger.refresh();
   }
@@ -101,8 +105,8 @@
   }
   function animateServiceList() {
     if (!hasGsap || reduced) return;
-    gsap.from("#srvList .srv-item", { y: 24, opacity: 0, duration: .8, stagger: .06, ease: "expo.out" });
-    gsap.fromTo("#srvImg", { scale: 1.15, opacity: .4 }, { scale: 1, opacity: 1, duration: 1.2, ease: "expo.out" });
+    gsap.from("#srvList .srv-item", { y: 24, opacity: 0, duration: .8, stagger: .06, ease: "power4.out" });
+    gsap.fromTo("#srvImg", { scale: 1.15, opacity: .4 }, { scale: 1, opacity: 1, duration: 1.2, ease: "power4.out" });
   }
 
   /* ---------- Avis ---------- */
@@ -121,6 +125,7 @@
       $(".ba-before").src = BA_PAIRS[i].before;
       $(".ba-after").src = BA_PAIRS[i].after;
       $(".ba-after").alt = BA_PAIRS[i].label[lang];
+      document.dispatchEvent(new CustomEvent("ba:pair", { detail: { before: BA_PAIRS[i].before, after: BA_PAIRS[i].after } }));
       renderPairs();
     }));
   }
@@ -272,7 +277,7 @@
     $("#lbCap").textContent = img.alt;
     lb.hidden = false;
     if (lenis) lenis.stop();
-    if (hasGsap) gsap.fromTo("#lbImg", { scale: .92, opacity: 0 }, { scale: 1, opacity: 1, duration: .8, ease: "expo.out" });
+    if (hasGsap) gsap.fromTo("#lbImg", { scale: .92, opacity: 0 }, { scale: 1, opacity: 1, duration: .8, ease: "power4.out" });
   }));
   const closeLb = () => { lb.hidden = true; if (lenis) lenis.start(); };
   $("#lbClose").addEventListener("click", closeLb);
@@ -294,226 +299,69 @@
   });
 
   /* =========================================================
-     HERO — diaporama cinéma en WebGL
-     transitions « or liquide » + distorsion fluide à la souris
+     HERO — cheveux vivants (hair.js) + pastilles de teinte
      ========================================================= */
-  const SLIDES = [
-    { img: "assets/img/work/hero-blond.webp", name: { fr: "Ondulations blondes", en: "Blonde waves", de: "Blonde Wellen" } },
-    { img: "assets/img/work/hero-cuivre.webp", name: { fr: "Cuivré lumineux", en: "Luminous copper", de: "Leuchtendes Kupfer" } },
-    { img: "assets/img/work/hero-boucles.webp", name: { fr: "Boucles définies", en: "Defined curls", de: "Definierte Locken" } },
-    { img: "assets/img/work/hero-wave.webp", name: { fr: "Brushing wave", en: "Wave blow-dry", de: "Wave-Brushing" } }
+  const mobileGL = matchMedia("(max-width: 760px)").matches || !finePointer;
+  heroGL = window.SuzyGL ? SuzyGL.hero({ canvas: $("#heroCanvas"), title: $(".ht-1"), reduced, mobile: mobileGL }) : null;
+  const SHADE_KEYS = ["blond", "cuivre", "chatain", "balayage"];
+  function renderShades() {
+    const box = $("#hairDots");
+    if (!box || !heroGL) return;
+    box.innerHTML = SHADE_KEYS.map((k) => `<button type="button" class="hd" role="radio" aria-checked="${heroGL.shade === k}" data-k="${k}" style="--c:${heroGL.color(k)}"><i></i><span>${t("hair." + k)}</span></button>`).join("");
+    $$(".hd", box).forEach((b) => b.addEventListener("click", () => { heroGL.setShade(b.dataset.k); renderShades(); }));
+  }
+  if (heroGL) heroGL.relabel = renderShades;
+  renderShades();
+
+  /* =========================================================
+     ESSAYEZ VOTRE COULEUR — mèche 3D (chargée à l'approche)
+     ========================================================= */
+  const TRY = [
+    { k: "balayage", price: 100 },
+    { k: "airtouch", price: 120 },
+    { k: "gloss", price: 49 },
+    { k: "cuivre", price: 79 }
   ];
-  heroGL = initHeroGL();
+  let tryKey = "balayage", tryGL = null;
+  function renderTry() {
+    const box = $("#trySwatches");
+    if (!box) return;
+    box.innerHTML = TRY.map(({ k }) => {
+      const m = window.SuzyGL ? SuzyGL.MODES[k] : null;
+      const bg = m ? `linear-gradient(160deg, ${m.root}, ${m.tip})` : "var(--gold)";
+      return `<button type="button" class="try-sw" role="radio" aria-checked="${k === tryKey}" data-k="${k}"><i style="background:${bg}"></i><span>${t("try." + k)}</span></button>`;
+    }).join("");
+    $$(".try-sw", box).forEach((b) => b.addEventListener("click", () => {
+      tryKey = b.dataset.k;
+      if (tryGL) tryGL.setMode(tryKey);
+      renderTry();
+      if (hasGsap && !reduced) gsap.from(".try-card > *", { y: 14, opacity: 0, duration: .8, stagger: .05 });
+    }));
+    const cur = TRY.find((x) => x.k === tryKey);
+    $("#tryName").textContent = t("try." + tryKey);
+    $("#tryDesc").textContent = t("try." + tryKey + ".d");
+    $("#tryPrice").innerHTML = `<b>${cur.price}</b> CHF`;
+  }
+  renderTry();
+  renderTryUI = renderTry;
+  const tryCanvas = $("#tryCanvas");
+  if (tryCanvas && window.SuzyGL) {
+    new IntersectionObserver(([e], obs) => {
+      if (!e.isIntersecting) return;
+      obs.disconnect();
+      tryGL = SuzyGL.lock({ canvas: tryCanvas, reduced, mobile: mobileGL });
+      if (tryGL) { tryGL.setMode(tryKey); $("#essayez").classList.add("has-gl"); }
+    }, { rootMargin: "400px" }).observe(tryCanvas);
+  }
 
-  function initHeroGL() {
-    const canvas = $("#heroCanvas");
-    if (!window.THREE || !canvas) return null;
-    let renderer;
-    try {
-      renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: "high-performance" });
-    } catch (e) { return null; }
-    renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
-    renderer.setClearColor(0x0f0a08, 1);
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-    const V2 = THREE.Vector2;
-    const uniforms = {
-      uTex1: { value: null }, uTex2: { value: null },
-      uImg1: { value: new V2(16, 9) }, uImg2: { value: new V2(16, 9) },
-      uRes: { value: new V2(1, 1) },
-      uMouse: { value: new V2(0.5, 0.5) }, uVel: { value: new V2() }, uShift: { value: new V2() },
-      uHover: { value: 0 }, uProgress: { value: 0 }, uTime: { value: 0 },
-      uIntro: { value: reduced ? 1 : 0 }, uZoom1: { value: 1 }, uZoom2: { value: 1 }, uScroll: { value: 0 }
-    };
-    const material = new THREE.ShaderMaterial({
-      uniforms,
-      vertexShader: "varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }",
-      fragmentShader: `
-        precision highp float;
-        uniform sampler2D uTex1, uTex2;
-        uniform vec2 uImg1, uImg2, uRes, uMouse, uVel, uShift;
-        uniform float uHover, uProgress, uTime, uIntro, uZoom1, uZoom2, uScroll;
-        varying vec2 vUv;
-
-        float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-        float noise(vec2 p) {
-          vec2 i = floor(p), f = fract(p);
-          vec2 u = f * f * (3.0 - 2.0 * f);
-          return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
-        }
-        float fbm(vec2 p) {
-          float v = 0.0, a = 0.5;
-          for (int i = 0; i < 5; i++) { v += a * noise(p); p *= 2.03; a *= 0.5; }
-          return v;
-        }
-        vec2 cover(vec2 uv, vec2 img, float zoom) {
-          float ra = uRes.x / uRes.y, ia = img.x / img.y;
-          vec2 s = ra > ia ? vec2(1.0, ia / ra) : vec2(ra / ia, 1.0);
-          return (uv - 0.5) * s / zoom + 0.5 + uShift;
-        }
-        vec3 sampleRGB(sampler2D t, vec2 uv, float ca) {
-          return vec3(texture2D(t, uv + vec2(ca, 0.0)).r, texture2D(t, uv).g, texture2D(t, uv - vec2(ca, 0.0)).b);
-        }
-        void main() {
-          vec2 uv = vUv;
-          vec2 asp = vec2(uRes.x / uRes.y, 1.0);
-          vec2 d = (uv - uMouse) * asp;
-          float dist = length(d);
-          float fall = smoothstep(0.42, 0.0, dist) * uHover;
-
-          // la souris pousse l'image comme un liquide
-          vec2 duv = uv - uVel * fall * 1.4;
-          duv += normalize(d + 1e-5) / asp * sin(dist * 36.0 - uTime * 3.0) * 0.0022 * fall;
-
-          // transition : brûlure dorée dans un bruit organique
-          float w = 0.09;
-          float n = clamp((fbm(uv * vec2(2.4, 1.7) + vec2(uTime * 0.02, 0.0)) - 0.18) / 0.64, 0.0, 1.0);
-          n = n * 0.82 + (1.0 - uv.x) * 0.1 + uv.y * 0.08;
-          float tp = uProgress * (1.0 + 2.0 * w) - w;
-          float mixv = 1.0 - smoothstep(tp - w, tp + w, n);
-          float glow = (1.0 - smoothstep(0.0, w * 0.5, abs(n - tp))) * sin(uProgress * 3.14159);
-
-          float zs = 1.0 + uScroll * 0.15;
-          vec2 uv1 = cover(duv + (n - 0.5) * 0.07 * uProgress, uImg1, uZoom1 * zs);
-          vec2 uv2 = cover(duv - (n - 0.5) * 0.07 * (1.0 - uProgress), uImg2, uZoom2 * zs);
-          float ca = fall * clamp(length(uVel) * 1.2, 0.0, 0.012) + glow * 0.004;
-          vec3 col = mix(sampleRGB(uTex1, uv1, ca), sampleRGB(uTex2, uv2, ca), mixv);
-
-          vec3 gold = vec3(1.0, 0.78, 0.46);
-          col += gold * glow * 1.25;
-
-          // étalonnage chaud, contraste doux
-          col = pow(col, vec3(1.06)) * vec3(1.04, 0.99, 0.93);
-
-          // apparition : l'image se révèle depuis le noir par une flamme d'or
-          float n2 = clamp((fbm(uv * 3.0 + 7.0) - 0.18) / 0.64, 0.0, 1.0) * 0.85 + uv.x * 0.15;
-          float ti = uIntro * (1.0 + 2.0 * w) - w;
-          float show = 1.0 - smoothstep(ti - w, ti + w, n2);
-          float gI = (1.0 - smoothstep(0.0, w * 0.45, abs(n2 - ti))) * sin(uIntro * 3.14159);
-          col = col * show + gold * gI * 0.95;
-
-          col *= 1.0 - uScroll * 0.55;
-          float vig = smoothstep(1.25, 0.35, length((uv - 0.5) * vec2(1.15, 1.0)));
-          col *= mix(0.62, 1.0, vig);
-          gl_FragColor = vec4(col, 1.0);
-        }`
-    });
-    scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
-
-    function resize() {
-      const w = canvas.clientWidth, h = canvas.clientHeight;
-      if (!w || !h) return;
-      renderer.setSize(w, h, false);
-      uniforms.uRes.value.set(w, h);
-    }
-    resize();
-    addEventListener("resize", resize);
-
-    // textures
-    const texs = [], sizes = [];
-    const tl = new THREE.TextureLoader();
-    const ready = Promise.all(SLIDES.map((s, i) => new Promise((res) => {
-      tl.load(s.img, (t) => {
-        t.minFilter = THREE.LinearFilter; t.generateMipmaps = false;
-        texs[i] = t; sizes[i] = new V2(t.image.width, t.image.height); res();
-      }, undefined, () => res());
-    }))).then(() => {
-      uniforms.uTex1.value = texs[0]; uniforms.uImg1.value.copy(sizes[0]);
-      uniforms.uTex2.value = texs[1] || texs[0]; uniforms.uImg2.value.copy(sizes[1] || sizes[0]);
-      requestAnimationFrame(() => $("#hero").classList.add("has-gl"));
-    });
-
-    // souris
-    const heroEl = $("#hero");
-    const target = new V2(0.5, 0.5), prev = new V2(0.5, 0.5);
-    let hoverT = 0;
-    heroEl.addEventListener("pointermove", (e) => {
-      const r = canvas.getBoundingClientRect();
-      target.set((e.clientX - r.left) / r.width, 1 - (e.clientY - r.top) / r.height);
-      hoverT = 1;
-    });
-    heroEl.addEventListener("pointerleave", () => { hoverT = 0; });
-
-    // zoom lent par image (effet Ken Burns)
-    const zooms = SLIDES.map(() => ({ v: 1.0 }));
-    let cur = 0, next = 1;
-    const kenBurns = (i) => { if (hasGsap) gsap.fromTo(zooms[i], { v: 1.16 }, { v: 1.0, duration: 10, ease: "power2.out" }); };
-
-    let visible = true, running = true;
-    new IntersectionObserver(([en]) => { visible = en.isIntersecting; }).observe(heroEl);
-    const clock = new THREE.Clock();
-    let time = 0;
-    const vel = new V2();
-    function frame() {
-      if (!running) return;
-      requestAnimationFrame(frame);
-      const dt = Math.min(clock.getDelta(), 0.05);
-      if (!visible) return;
-      time += dt;
-      uniforms.uTime.value = time;
-      const m = uniforms.uMouse.value;
-      prev.copy(m);
-      m.lerp(target, 0.12);
-      vel.set(m.x - prev.x, m.y - prev.y).multiplyScalar(5);
-      if (vel.length() > 0.09) vel.setLength(0.09);
-      uniforms.uVel.value.lerp(vel, 0.12);
-      uniforms.uHover.value += (hoverT - uniforms.uHover.value) * 0.05;
-      uniforms.uShift.value.set((m.x - 0.5) * -0.012, (m.y - 0.5) * -0.008);
-      uniforms.uZoom1.value = zooms[cur].v;
-      uniforms.uZoom2.value = zooms[next].v;
-      renderer.render(scene, camera);
-    }
-    if (reduced) ready.then(() => renderer.render(scene, camera));
-    else frame();
-
-    // diaporama
-    const nav = $("#slidesNav");
-    nav.innerHTML = SLIDES.map((s, i) => `<button type="button" class="sn" role="tab" aria-label="${String(i + 1).padStart(2, "0")}"><span class="sn-fill"></span></button>`).join("");
-    const btns = $$(".sn", nav);
-    let busy = false, auto = null;
-    function label(i, animate) {
-      $("#slideNum").textContent = String(i + 1).padStart(2, "0");
-      $("#slideLabel").textContent = SLIDES[i].name[lang];
-      btns.forEach((b, k) => b.setAttribute("aria-selected", String(k === i)));
-      if (animate && hasGsap) gsap.from("#slideLabel, #slideNum", { yPercent: 110, opacity: 0, duration: 1, stagger: .06, ease: "expo.out" });
-    }
-    function play(i) {
-      if (!hasGsap || reduced) return;
-      if (auto) auto.kill();
-      btns.forEach((b, k) => gsap.set($(".sn-fill", b), { scaleX: k < i ? 1 : 0 }));
-      auto = gsap.fromTo($(".sn-fill", btns[i]), { scaleX: 0 }, { scaleX: 1, duration: 6.5, ease: "none", onComplete: () => goTo((i + 1) % SLIDES.length) });
-      if (!visible) auto.pause();
-    }
-    function goTo(i) {
-      if (busy || i === cur || !texs[i]) return;
-      busy = true;
-      next = i;
-      uniforms.uTex2.value = texs[i];
-      uniforms.uImg2.value.copy(sizes[i]);
-      kenBurns(i);
-      label(i, true);
-      play(i);
-      gsap.fromTo(uniforms.uProgress, { value: 0 }, {
-        value: 1, duration: 2.1, ease: "power2.inOut",
-        onComplete: () => {
-          uniforms.uTex1.value = texs[i];
-          uniforms.uImg1.value.copy(sizes[i]);
-          cur = i;
-          uniforms.uProgress.value = 0;
-          busy = false;
-        }
-      });
-    }
-    btns.forEach((b, i) => b.addEventListener("click", () => goTo(i)));
-    new IntersectionObserver(([en]) => { if (auto) en.isIntersecting ? auto.resume() : auto.pause(); }).observe(heroEl);
-    label(0, false);
-
-    return {
-      uniforms, ready,
-      start() { kenBurns(0); play(0); },
-      relabel() { $("#slideLabel").textContent = SLIDES[cur].name[lang]; }
-    };
+  /* ---------- Avant / après liquide (ordinateur seulement) ---------- */
+  const baLiquid = !!window.SuzyGL && finePointer && !matchMedia("(max-width: 760px)").matches;
+  if (baLiquid) {
+    new IntersectionObserver(([e], obs) => {
+      if (!e.isIntersecting) return;
+      obs.disconnect();
+      SuzyGL.liquidBA({ frame: baFrame, range: baRange, reduced });
+    }, { rootMargin: "500px" }).observe(baFrame);
   }
 
   /* =========================================================
@@ -521,21 +369,22 @@
      ========================================================= */
   // pas de préloader : le hero s'affiche tout de suite (image préchargée), le texte entre en douceur
   function startSite() {
-    if (heroGL) heroGL.uniforms.uIntro.value = 1;
-    if (!hasGsap || reduced) return;
-    gsap.timeline({ delay: .1 })
-      .from(".ht-1 .ch", { yPercent: 105, duration: 1.5, stagger: .06, ease: "expo.out" })
-      .from(".ht-2 .ch", { yPercent: 110, opacity: 0, duration: 1.3, stagger: .04, ease: "expo.out" }, "-=1.2")
-      .from(".hero-top > *, .hero-aside > *", { y: 24, opacity: 0, duration: 1, stagger: .08, ease: "expo.out" }, "-=1.1")
-      .from(".hero-bar > *", { y: 16, opacity: 0, duration: .9, stagger: .08, ease: "expo.out" }, "-=.8");
-    if (heroGL) heroGL.ready.then(() => heroGL.start());
+    if (!hasGsap || reduced) { if (heroGL) heroGL.ready.then(() => heroGL.start()); return; }
+    // avec les cheveux : les fibres écrivent « Suzy », puis le vrai titre prend le relais
+    const intro = gsap.timeline({ delay: .1, paused: !!heroGL });
+    if (heroGL) heroGL.ready.then(() => { intro.delay(heroGL.start()); intro.restart(true); });
+    intro
+      .from(".ht-1 .ch", { yPercent: 105, duration: 1.5, stagger: .06, ease: "power4.out" })
+      .from(".ht-2 .ch", { yPercent: 110, opacity: 0, duration: 1.3, stagger: .04, ease: "power4.out" }, "-=1.2")
+      .from(".hero-top > *, .hero-aside > *", { y: 24, opacity: 0, duration: 1, stagger: .08, ease: "power4.out" }, "-=1.1")
+      .from(".hero-bar > *", { y: 16, opacity: 0, duration: .9, stagger: .08, ease: "power4.out" }, "-=.8");
   }
   startSite();
 
   if (hasGsap && window.ScrollTrigger && !reduced) {
     // le hero se referme en carte et les lettres s'envolent au scroll
     const heroST = { trigger: "#hero", start: "top top", end: "bottom top", scrub: true };
-    ScrollTrigger.create({ ...heroST, onUpdate: (self) => { if (heroGL) heroGL.uniforms.uScroll.value = self.progress; } });
+    ScrollTrigger.create({ ...heroST, onUpdate: (self) => { if (heroGL) heroGL.setScroll(self.progress); } });
     gsap.fromTo("#heroMedia", { clipPath: "inset(0% 0% 0% 0% round 0px)" }, { clipPath: "inset(7% 4% 0% 4% round 28px)", ease: "none", scrollTrigger: heroST });
     gsap.to(".ht-1 .ch", { yPercent: (i) => -30 - i * 22, ease: "none", scrollTrigger: heroST });
     gsap.to(".ht-2", { xPercent: 12, ease: "none", scrollTrigger: heroST });
@@ -543,7 +392,7 @@
 
     // titres et textes
     $$(".section .reveal-lines").forEach((el) => {
-      gsap.from($$(".wi", el), { yPercent: 115, rotate: 4, duration: 1.4, stagger: .045, ease: "expo.out", scrollTrigger: { trigger: el, start: "top 88%" } });
+      gsap.from($$(".wi", el), { yPercent: 115, rotate: 4, duration: 1.4, stagger: .045, ease: "power4.out", scrollTrigger: { trigger: el, start: "top 88%" } });
     });
 
     // rideau doré qui dévoile les images
@@ -554,16 +403,16 @@
       gsap.set(c, { scaleY: 1, transformOrigin: "top" });
       const img = $("img", box);
       gsap.timeline({ scrollTrigger: { trigger: box, start: "top 82%" } })
-        .to(c, { scaleY: 0, duration: 1.5, ease: "expo.inOut" })
-        .from(box.classList.contains("member-logo") ? [] : img, { scale: 1.35, duration: 2.2, ease: "expo.out" }, .25);
+        .to(c, { scaleY: 0, duration: 1.5, ease: "power4.inOut" })
+        .from(box.classList.contains("member-logo") ? [] : img, { scale: 1.35, duration: 2.2, ease: "power4.out" }, .25);
     });
 
     $$(".section .reveal-up").forEach((el) => {
-      gsap.from(el, { y: 40, opacity: 0, duration: 1.2, ease: "expo.out", scrollTrigger: { trigger: el, start: "top 90%" } });
+      gsap.from(el, { y: 40, opacity: 0, duration: 1.2, ease: "power4.out", scrollTrigger: { trigger: el, start: "top 90%" } });
     });
     $$(".eyebrow").forEach((el) => {
       if (el.closest(".hero")) return;
-      gsap.from(el, { x: -20, opacity: 0, duration: 1, ease: "expo.out", scrollTrigger: { trigger: el, start: "top 92%" } });
+      gsap.from(el, { x: -20, opacity: 0, duration: 1, ease: "power4.out", scrollTrigger: { trigger: el, start: "top 92%" } });
     });
 
     // parallaxe des images
@@ -586,21 +435,21 @@
     });
 
     // prestations
-    gsap.from("#srvList .srv-item", { y: 30, opacity: 0, duration: 1, stagger: .07, ease: "expo.out", scrollTrigger: { trigger: ".srv-body", start: "top 80%" } });
+    gsap.from("#srvList .srv-item", { y: 30, opacity: 0, duration: 1, stagger: .07, ease: "power4.out", scrollTrigger: { trigger: ".srv-body", start: "top 80%" } });
 
-    gsap.from(".gal-item", { y: 40, opacity: 0, duration: 1.1, stagger: .06, ease: "expo.out", scrollTrigger: { trigger: ".gal-grid", start: "top 85%" } });
+    gsap.from(".gal-item", { y: 40, opacity: 0, duration: 1.1, stagger: .06, ease: "power4.out", scrollTrigger: { trigger: ".gal-grid", start: "top 85%" } });
 
     // avant/après : petit balayage d'invitation
     const ba = { v: 50 };
-    gsap.timeline({ scrollTrigger: { trigger: "#baFrame", start: "top 70%" } })
+    if (!baLiquid) gsap.timeline({ scrollTrigger: { trigger: "#baFrame", start: "top 70%" } })
       .to(ba, { v: 78, duration: 1, ease: "power2.inOut", onUpdate: () => { baFrame.style.setProperty("--pos", ba.v + "%"); baRange.value = ba.v; } })
       .to(ba, { v: 26, duration: 1.2, ease: "power2.inOut", onUpdate: () => { baFrame.style.setProperty("--pos", ba.v + "%"); baRange.value = ba.v; } })
       .to(ba, { v: 50, duration: .9, ease: "power2.inOut", onUpdate: () => { baFrame.style.setProperty("--pos", ba.v + "%"); baRange.value = ba.v; } });
 
     // équipe, anniversaire, infos
-    gsap.from(".member", { y: 90, opacity: 0, rotateX: 10, duration: 1.6, stagger: .2, ease: "expo.out", scrollTrigger: { trigger: ".team-grid", start: "top 82%" } });
-    gsap.from(".bday", { scale: .92, opacity: 0, duration: 1.6, ease: "expo.out", scrollTrigger: { trigger: ".bday", start: "top 85%" } });
-    gsap.from(".info-card", { y: 60, opacity: 0, duration: 1.3, stagger: .12, ease: "expo.out", scrollTrigger: { trigger: ".info-grid", start: "top 85%" } });
+    gsap.from(".member", { y: 90, opacity: 0, rotateX: 10, duration: 1.6, stagger: .2, ease: "power4.out", scrollTrigger: { trigger: ".team-grid", start: "top 82%" } });
+    gsap.from(".bday", { scale: .92, opacity: 0, duration: 1.6, ease: "power4.out", scrollTrigger: { trigger: ".bday", start: "top 85%" } });
+    gsap.from(".info-card", { y: 60, opacity: 0, duration: 1.3, stagger: .12, ease: "power4.out", scrollTrigger: { trigger: ".info-grid", start: "top 85%" } });
 
     addEventListener("load", () => ScrollTrigger.refresh());
   }

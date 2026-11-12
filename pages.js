@@ -134,7 +134,7 @@
         </button>`).join("");
       $("#worksCount").textContent = list.length + " " + t("works.count");
       $$(".work", grid).forEach((b) => b.addEventListener("click", () => openLb(+b.dataset.k)));
-      if (animate && hasGsap && !reduced) gsap.from(".work", { y: 40, opacity: 0, duration: .9, stagger: .025, ease: "expo.out" });
+      if (animate && hasGsap && !reduced) gsap.from(".work", { y: 40, opacity: 0, duration: .9, stagger: .025, ease: "power4.out" });
     }
 
     // visionneuse
@@ -146,7 +146,7 @@
       $("#lbImg").alt = t(label[tags.split(" ")[0]]);
       $("#lbCap").textContent = `${t(label[tags.split(" ")[0]])} · ${cur + 1} / ${list.length}`;
     }
-    function openLb(k) { cur = k; showLb(); lb.hidden = false; if (hasGsap) gsap.fromTo("#lbImg", { scale: .94, opacity: 0 }, { scale: 1, opacity: 1, duration: .7, ease: "expo.out" }); }
+    function openLb(k) { cur = k; showLb(); lb.hidden = false; if (hasGsap) gsap.fromTo("#lbImg", { scale: .94, opacity: 0 }, { scale: 1, opacity: 1, duration: .7, ease: "power4.out" }); }
     const step = (d) => { const n = visible().length; cur = (cur + d + n) % n; showLb(); };
     $("#lbClose").addEventListener("click", () => { lb.hidden = true; });
     $("#lbPrev").addEventListener("click", () => step(-1));
@@ -208,12 +208,12 @@
 
   /* ---------- animations d'entrée ---------- */
   if (hasGsap && !reduced) {
-    gsap.from(".page-hero .wi", { yPercent: 115, rotate: 4, duration: 1.4, stagger: .05, ease: "expo.out", delay: .1 });
-    gsap.from(".page-hero .reveal-up", { y: 30, opacity: 0, duration: 1.2, stagger: .1, ease: "expo.out", delay: .3 });
-    gsap.from(".page-hero-bg", { scale: 1.15, duration: 2.4, ease: "expo.out" });
+    gsap.from(".page-hero .wi", { yPercent: 115, rotate: 4, duration: 1.4, stagger: .05, ease: "power4.out", delay: .1 });
+    gsap.from(".page-hero .reveal-up", { y: 30, opacity: 0, duration: 1.2, stagger: .1, ease: "power4.out", delay: .3 });
+    gsap.from(".page-hero-bg", { scale: 1.15, duration: 2.4, ease: "power4.out" });
     if (window.ScrollTrigger) {
-      $$(".section .reveal-up").forEach((el) => gsap.from(el, { y: 40, opacity: 0, duration: 1.1, ease: "expo.out", scrollTrigger: { trigger: el, start: "top 90%" } }));
-      $$(".price-cat").forEach((el) => gsap.from(el, { y: 60, opacity: 0, duration: 1.2, ease: "expo.out", scrollTrigger: { trigger: el, start: "top 85%" } }));
+      $$(".section .reveal-up").forEach((el) => gsap.from(el, { y: 40, opacity: 0, duration: 1.1, ease: "power4.out", scrollTrigger: { trigger: el, start: "top 90%" } }));
+      $$(".price-cat").forEach((el) => gsap.from(el, { y: 60, opacity: 0, duration: 1.2, ease: "power4.out", scrollTrigger: { trigger: el, start: "top 85%" } }));
     }
   }
 })();

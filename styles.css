@@ -872,3 +872,82 @@ body { background: var(--porcelain); color: var(--ink); }
   .bday .btn { white-space: normal; text-align: center; max-width: 100%; }
   .ht-2 { margin-top: .5em; }
 }
+
+/* =====================================================================
+   Refonte 3D : palette ivoire / sable / bronze, cheveux vivants, mèche, avant/après liquide
+   ===================================================================== */
+:root {
+  --porcelain: #f6f1ea;
+  --milk: #fbf8f3;
+  --blush: #ede4d8;
+  --sand: #ede4d8;
+  --ink: #1f1a17;
+  --ink-soft: #5e5149;
+  --taupe: #8a7d72;
+  --bronze: #a9805a;
+  --gold: #a9805a;
+  --terracotta: #a9805a;
+  --cocoa: #2a221d;
+  --espresso: #1f1a17;
+  --line-light: rgba(31, 26, 23, .13);
+  --ease: cubic-bezier(.22, 1, .36, 1);
+}
+.services .srv-tab[aria-selected="true"], .lang button.is-active { color: #fff; }
+
+/* hero : fond sombre immédiat si WebGL, la photo reste pour les autres */
+.webgl .hero-media { background: radial-gradient(120% 90% at 70% 20%, #2b1f18, #140e0b 70%); }
+.hero.has-gl .hero-veil { background:
+    linear-gradient(180deg, rgba(20, 14, 11, .5) 0%, rgba(20, 14, 11, 0) 26%, rgba(20, 14, 11, 0) 50%, rgba(20, 14, 11, .55) 78%, rgba(20, 14, 11, .85) 100%),
+    linear-gradient(270deg, rgba(20, 14, 11, .55), rgba(20, 14, 11, 0) 46%); }
+.hero-canvas { touch-action: pan-y; }
+.hair-shades { display: none; align-items: center; gap: 1.1rem; min-width: 0; }
+.hero.has-gl .hair-shades { display: flex; }
+.hs-label { font-size: .72rem; letter-spacing: .26em; text-transform: uppercase; color: rgba(234, 210, 164, .75); }
+.hair-dots { display: flex; gap: .4rem; flex-wrap: wrap; }
+.hd { display: inline-flex; align-items: center; gap: .5rem; padding: .4rem .8rem .4rem .45rem; border-radius: 999px; border: 1px solid rgba(246, 241, 234, .16); color: rgba(246, 241, 234, .8); font-size: .8rem; letter-spacing: .06em; transition: border-color .5s var(--ease), background .5s var(--ease), color .5s var(--ease); }
+.hd i { width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff8 0 12%, transparent 40%), var(--c); box-shadow: 0 0 0 2px rgba(0, 0, 0, .25); transition: transform .6s var(--ease); }
+.hd:hover { border-color: rgba(246, 241, 234, .45); color: #fff; }
+.hd[aria-checked="true"] { background: rgba(246, 241, 234, .1); border-color: var(--gold-light); color: #fff; }
+.hd[aria-checked="true"] i { transform: scale(1.2); box-shadow: 0 0 0 2px var(--gold-light); }
+.hair-hint { display: none; margin: 0; font-family: var(--f-display); font-style: italic; font-size: 1rem; color: rgba(246, 241, 234, .6); }
+@media (hover: hover) and (pointer: fine) { .hero.has-gl .hair-hint { display: block; } }
+@media (max-width: 760px) {
+  .hs-label { display: none; }
+  .hd { padding: .35rem .6rem .35rem .35rem; font-size: .74rem; }
+  .hd span { display: none; }
+  .hd[aria-checked="true"] span { display: inline; }
+}
+
+/* ESSAYEZ VOTRE COULEUR */
+.try { background: var(--sand); }
+.try-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 5.5rem); align-items: center; }
+.try-stage { position: relative; aspect-ratio: 4 / 5; max-width: 100%; border-radius: 6px; overflow: hidden;
+  background: radial-gradient(70% 60% at 50% 35%, #3a2c23, #1a1310 75%); box-shadow: 0 40px 80px -45px rgba(31, 26, 23, .7); }
+.try-stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: pan-y; }
+.try-stage canvas:active { cursor: grabbing; }
+.try-fallback { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.try.has-gl .try-fallback { display: none; }
+.try-hint { position: absolute; left: 0; right: 0; bottom: 1.2rem; margin: 0; text-align: center; font-size: .72rem; letter-spacing: .24em; text-transform: uppercase; color: rgba(246, 241, 234, .6); pointer-events: none; }
+.try:not(.has-gl) .try-hint { display: none; }
+.try-text .lead { max-width: 40ch; }
+.try-swatches { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; margin-bottom: 1.6rem; }
+.try-sw { display: flex; align-items: center; gap: .8rem; padding: .7rem .9rem; border-radius: 6px; border: 1px solid var(--line-light); background: rgba(255, 255, 255, .4); text-align: left; font-size: .95rem; color: var(--ink); transition: border-color .5s var(--ease), background .5s var(--ease), transform .5s var(--ease); }
+.try-sw i { width: 30px; height: 30px; border-radius: 50%; flex: none; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .25); }
+.try-sw:hover { transform: translateY(-2px); border-color: var(--taupe); }
+.try-sw[aria-checked="true"] { background: var(--milk); border-color: var(--bronze); box-shadow: 0 14px 30px -20px rgba(31, 26, 23, .5); }
+.try-card { background: var(--milk); border-radius: 6px; padding: clamp(1.2rem, 2.5vw, 1.8rem); border: 1px solid var(--line-light); }
+.try-card h3 { margin: 0 0 .4rem; font-family: var(--f-display); font-weight: 400; font-size: clamp(1.6rem, 1.2rem + 1.2vw, 2.2rem); }
+.try-card p { margin: 0; color: var(--ink-soft); }
+.try-foot { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin: 1.2rem 0 .9rem; }
+.try-price { font-size: .9rem; letter-spacing: .1em; color: var(--ink) !important; }
+.try-price b { font-family: var(--f-display); font-weight: 400; font-size: 2.4rem; letter-spacing: 0; }
+.try-note { font-size: .8rem; color: var(--taupe) !important; }
+@media (max-width: 860px) { .try-grid { grid-template-columns: minmax(0, 1fr); } .try-stage { aspect-ratio: 1 / 1; } }
+
+/* AVANT / APRÈS liquide */
+.ba-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity .8s var(--ease); pointer-events: none; }
+.ba-gl .ba-canvas { opacity: 1; }
+.ba-gl .ba-before-wrap, .ba-gl .ba-after { opacity: 0; }
+.ba-gl .ba-handle { background: transparent; }
+.ba-gl .ba-handle span { width: 46px; height: 46px; background: rgba(246, 241, 234, .9); }
+@media (max-width: 760px) { .hero.has-gl .hero-bar { padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px)); } }

@@ -549,3 +549,41 @@ window.PORTFOLIO = [
   ["51", "copper waves"], ["53", "waves copper"], ["54", "updo"], ["59", "waves"], ["60-reel", "blond waves"], ["61", "blond waves"],
   ["63", "updo"], ["69", "updo blond"], ["70", "blond waves"], ["79", "blond"], ["80", "blond"], ["85", "blond"], ["89", "bob copper"]
 ];
+
+// Refonte 3D : teintes du hero et « Essayez votre couleur »
+Object.assign(I18N.fr, {
+  "hair.label": "Teinte", "hair.hint": "Passez la souris dans les cheveux",
+  "hair.blond": "Blond", "hair.cuivre": "Cuivré", "hair.chatain": "Châtain", "hair.balayage": "Balayage",
+  "try.eyebrow": "Essayez votre couleur", "try.title": "Trouvez <em>votre</em> nuance",
+  "try.text": "Faites tourner la mèche et choisissez une prestation : la couleur se pose sous vos yeux. La teinte finale se décide toujours avec Suzy ou Valentina, selon vos cheveux.",
+  "try.hint": "Glissez pour faire tourner la mèche", "try.book": "Réserver ce soin",
+  "try.note": "Prix Salonkee. Durée et tarif final confirmés au salon selon la longueur.",
+  "try.balayage": "Balayage", "try.balayage.d": "Un fondu naturel posé à la main, plus clair vers les pointes, sans démarcation.",
+  "try.airtouch": "Air Touch", "try.airtouch.d": "Des reflets très fins et lumineux dès les racines, pour une repousse tout en douceur.",
+  "try.gloss": "Gloss", "try.gloss.d": "Un gloss aux protéines ou hydratant : la couleur reste la vôtre, la brillance double.",
+  "try.cuivre": "Cuivré lumineux", "try.cuivre.d": "Une coloration hydratante aux huiles végétales, chaude et éclatante."
+});
+Object.assign(I18N.en, {
+  "hair.label": "Shade", "hair.hint": "Run your cursor through the hair",
+  "hair.blond": "Blonde", "hair.cuivre": "Copper", "hair.chatain": "Chestnut", "hair.balayage": "Balayage",
+  "try.eyebrow": "Try your colour", "try.title": "Find <em>your</em> shade",
+  "try.text": "Turn the lock and pick a service: the colour appears before your eyes. The final shade is always chosen with Suzy or Valentina, to suit your hair.",
+  "try.hint": "Drag to turn the lock", "try.book": "Book this service",
+  "try.note": "Salonkee prices. Duration and final price confirmed at the salon depending on length.",
+  "try.balayage": "Balayage", "try.balayage.d": "A natural hand-painted blend, lighter towards the ends, with no hard line.",
+  "try.airtouch": "Air Touch", "try.airtouch.d": "Very fine, luminous highlights from the roots, for soft regrowth.",
+  "try.gloss": "Gloss", "try.gloss.d": "A protein or moisturising gloss: your colour stays yours, the shine doubles.",
+  "try.cuivre": "Luminous copper", "try.cuivre.d": "A moisturising colour with plant oils, warm and radiant."
+});
+Object.assign(I18N.de, {
+  "hair.label": "Farbton", "hair.hint": "Fahren Sie mit der Maus durchs Haar",
+  "hair.blond": "Blond", "hair.cuivre": "Kupfer", "hair.chatain": "Kastanie", "hair.balayage": "Balayage",
+  "try.eyebrow": "Probieren Sie Ihre Farbe", "try.title": "Finden Sie <em>Ihren</em> Ton",
+  "try.text": "Drehen Sie die Strähne und wählen Sie eine Leistung: Die Farbe erscheint vor Ihren Augen. Der endgültige Ton wird immer mit Suzy oder Valentina passend zu Ihrem Haar gewählt.",
+  "try.hint": "Ziehen, um die Strähne zu drehen", "try.book": "Diese Leistung buchen",
+  "try.note": "Salonkee-Preise. Dauer und Endpreis werden im Salon je nach Länge bestätigt.",
+  "try.balayage": "Balayage", "try.balayage.d": "Ein natürlicher, von Hand gemalter Verlauf, zu den Spitzen heller, ohne harte Kante.",
+  "try.airtouch": "Air Touch", "try.airtouch.d": "Sehr feine, leuchtende Strähnen ab dem Ansatz für ein sanftes Nachwachsen.",
+  "try.gloss": "Gloss", "try.gloss.d": "Ein Protein- oder Feuchtigkeitsglossing: Ihre Farbe bleibt, der Glanz verdoppelt sich.",
+  "try.cuivre": "Leuchtendes Kupfer", "try.cuivre.d": "Eine pflegende Farbe mit Pflanzenölen, warm und strahlend."
+});

@@ -19,9 +19,9 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="image" href="assets/img/work/hero-blond.webp" fetchpriority="high">
+<script>try{var c=document.createElement("canvas");if(c.getContext("webgl")||c.getContext("experimental-webgl"))document.documentElement.classList.add("webgl")}catch(e){}</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400;1,6..96,500&family=Jost:wght@300;400;500&display=swap">
-<link rel="stylesheet" href="styles.css?v=1794339607">
+<link rel="stylesheet" href="styles.css?v=1794494782">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"HairSalon","name":"Suzy Coiffure","image":"https://suzy-coiffure.vercel.app/assets/img/og.jpg",
 "url":"https://suzy-coiffure.vercel.app/","telephone":"+41763213239","priceRange":"CHF",
@@ -106,8 +106,11 @@
     </div>
 
     <div class="hero-bar wrap">
-      <div class="slides-nav" id="slidesNav" role="tablist" aria-label="Réalisations"></div>
-      <div class="slide-name" aria-live="polite"><span class="slide-num" id="slideNum">01</span><span class="slide-label" id="slideLabel"></span></div>
+      <div class="hair-shades">
+        <span class="hs-label" data-i18n="hair.label"></span>
+        <div class="hair-dots" id="hairDots" role="radiogroup" aria-label="Teinte"></div>
+      </div>
+      <p class="hair-hint" data-i18n="hair.hint"></p>
       <div class="hero-scroll" aria-hidden="true"><span data-i18n="hero.scroll"></span><i></i></div>
     </div>
   </section>
@@ -167,6 +170,32 @@
         <div class="more-actions">
           <a class="btn btn-ghost magnetic" href="tarifs.html"><span data-i18n="more.prices"></span></a>
           <a class="btn btn-gold magnetic" href="https://salonkee.ch/salon/suzy-coiffure?lang=fr" target="_blank" rel="noopener"><span data-i18n="nav.book"></span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ESSAYEZ VOTRE COULEUR -->
+  <section class="section try" id="essayez">
+    <div class="wrap try-grid">
+      <div class="try-stage">
+        <canvas id="tryCanvas" aria-label="Mèche de cheveux en 3D" role="img"></canvas>
+        <img class="try-fallback" src="assets/img/work/hero-cuivre.webp" alt="" loading="lazy">
+        <p class="try-hint" data-i18n="try.hint"></p>
+      </div>
+      <div class="try-text">
+        <p class="eyebrow" data-i18n="try.eyebrow"></p>
+        <h2 class="h2 reveal-lines" data-i18n-html="try.title"></h2>
+        <p class="lead reveal-up" data-i18n="try.text"></p>
+        <div class="try-swatches" id="trySwatches" role="radiogroup"></div>
+        <div class="try-card" aria-live="polite">
+          <h3 id="tryName"></h3>
+          <p id="tryDesc"></p>
+          <div class="try-foot">
+            <p class="try-price" id="tryPrice"></p>
+            <a class="btn btn-gold magnetic" href="https://salonkee.ch/salon/suzy-coiffure?lang=fr" target="_blank" rel="noopener"><span data-i18n="try.book"></span></a>
+          </div>
+          <p class="try-note" data-i18n="try.note"></p>
         </div>
       </div>
     </div>
@@ -379,7 +408,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
-<script src="i18n.js?v=1794339607"></script>
-<script src="main.js?v=1794339607"></script>
+<script src="hair.js?v=1794494782"></script>
+<script src="i18n.js?v=1794494782"></script>
+<script src="main.js?v=1794494782"></script>
 </body>
 </html>
