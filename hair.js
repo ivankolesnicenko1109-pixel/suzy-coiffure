@@ -126,17 +126,18 @@
     balayage: { root: "#2c1c13", tip: "#e8c590", streak: 0.45 }
   };
 
-  function hero({ canvas, title, reduced, mobile }) {
-    const renderer = makeRenderer(canvas, { alpha: false });
+  // maskEl : les cheveux ne se dessinent qu'à l'intérieur des lettres de cet élément (le « SUZY » du pied de page)
+  function hero({ canvas, title, reduced, mobile, maskEl }) {
+    const renderer = makeRenderer(canvas, { alpha: !!maskEl });
     if (!renderer) return null;
     // 1,5 au maximum : la différence ne se voit pas sur des fibres, le gain de fluidité oui
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
-    renderer.setClearColor(0x1c1410, 1);
+    if (maskEl) renderer.setClearColor(0x000000, 0); else renderer.setClearColor(0x1c1410, 1);
     const scene = new T.Scene();
     const camera = new T.PerspectiveCamera(35, 1, 0.1, 50);
     camera.position.z = 10;
 
-    const N = mobile ? 3000 : 7000, S = 20, TRAIL = 16;
+    const N = maskEl ? (mobile ? 1600 : 3200) : (mobile ? 2600 : 5500), S = 20, TRAIL = 16;
     const g = strandGeometry(S);
     // les fibres du fond sont dessinées en premier
     const strands = [];
@@ -156,7 +157,8 @@
     const trail = Array.from({ length: TRAIL }, () => new T.Vector4(99, 99, 1, 0));
     const start = SHADES.blond;
     const u = {
-      uTime: { value: 0 }, uForm: { value: reduced ? 0 : 1 }, uAlpha: { value: reduced ? 1 : 0 }, uScroll: { value: 0 },
+      uTime: { value: 0 }, uForm: { value: reduced || maskEl ? 0 : 1 }, uAlpha: { value: reduced || maskEl ? 1 : 0 }, uScroll: { value: 0 },
+      uComb: { value: 0 }, uTilt: { value: 0 }, uMask: { value: null }, uUseMask: { value: maskEl ? 1 : 0 }, uRes: { value: new T.Vector2(1, 1) },
       uView: { value: new T.Vector2(10, 6) }, uCamZ: { value: 10 },
       uRootCol: { value: hex(start.root) }, uTipCol: { value: hex(start.tip) }, uStreak: { value: start.streak },
       uRootA: { value: hex(start.root) }, uTipA: { value: hex(start.tip) }, uStreakA: { value: start.streak },
@@ -167,7 +169,7 @@
     const mat = new T.ShaderMaterial({
       uniforms: u, transparent: true, depthWrite: false, depthTest: false,
       vertexShader: `
-        uniform float uTime, uForm, uAlpha, uScroll, uCamZ, uStreak, uStreakA, uWave;
+        uniform float uTime, uForm, uAlpha, uScroll, uCamZ, uStreak, uStreakA, uWave, uComb, uTilt;
         uniform vec2 uView, uWaveO;
         uniform vec3 uRootCol, uTipCol, uRootA, uTipA, uLight;
         uniform vec4 uTrail[${TRAIL}];
@@ -186,7 +188,7 @@
           p.y -= t * L;
           // la chevelure ondule comme sous un sèche-cheveux, par mèches
           float clump = floor(aRoot.x * 16.0 + aRoot.z * 2.0);
-          p.x += sin(t * 1.9 - uTime * 0.38 + aRoot.x * 1.7 + clump * 0.22) * 0.95 * t * wind + t * t * 1.3;
+          p.x += sin(t * 1.9 - uTime * 0.38 + aRoot.x * 1.7 + clump * 0.22) * 0.95 * t * wind + t * t * (1.3 + uTilt * 2.2);
           vec3 q = vec3(clump * 0.29 + t * 0.85, aRoot.z * 0.45, uTime * 0.09);
           p.x += snoise(q) * 1.05 * tt * wind;
           p.z += snoise(q + 11.3) * 0.7 * tt;
@@ -206,6 +208,7 @@
         }
         // la souris peigne : un fin sillon s'ouvre de part et d'autre de son passage, puis se referme
         vec3 comb(vec3 p, float t) {
+          if (uComb < 0.01) return p;
           float w = smoothstep(0.02, 0.3, t);
           vec2 pp = p.xy * (uCamZ / (uCamZ - p.z));
           vec2 off = vec2(0.0);
@@ -245,9 +248,11 @@
           vec3 V = vec3(0.0, 0.0, 1.0);
           vec3 c = hairLight(Tg, V, normalize(vec3(sin(uTime * 0.18) * 0.7, 0.65, 0.55)), base, 1.0);
           // le curseur est une petite lampe : le reflet suit la souris
-          vec2 ld = uLight.xy - pp;
-          float lf = uLight.z * exp(-dot(ld, ld) / 1.4);
-          c += hairLight(Tg, V, normalize(vec3(ld * 0.9, 0.8)), vec3(0.0), 1.0) * lf * 2.2 + base * lf * 0.25;
+          if (uLight.z > 0.01) {
+            vec2 ld = uLight.xy - pp;
+            float lf = uLight.z * exp(-dot(ld, ld) / 1.4);
+            c += hairLight(Tg, V, normalize(vec3(ld * 0.9, 0.8)), vec3(0.0), 1.0) * lf * 2.2 + base * lf * 0.25;
+          }
           c += vec3(1.0, 0.86, 0.6) * wm * (1.0 - wm) * 1.2;
           c = mix(c, vec3(1.0, 0.85, 0.58) * 1.35, k * 0.75);
           float depth = smoothstep(-3.2, 1.2, p.z);
@@ -255,15 +260,46 @@
           vA = uAlpha * mix(1.0, 1.0 - smoothstep(0.8, 1.0, t), 1.0 - k) * mix(0.42, 0.9, depth) * mix(1.0, 1.25, k);
         }`,
       fragmentShader: `
+        uniform sampler2D uMask;
+        uniform float uUseMask;
+        uniform vec2 uRes;
         varying vec3 vCol;
         varying float vA;
-        void main() { gl_FragColor = vec4(vCol, vA); }`
+        void main() {
+          float m = 1.0;
+          if (uUseMask > 0.5) { m = texture2D(uMask, gl_FragCoord.xy / uRes).a; if (m < 0.02) discard; }
+          gl_FragColor = vec4(vCol, vA * m);
+        }`
     });
     const mesh = new T.LineSegments(g, mat);
     mesh.frustumCulled = false;
     scene.add(mesh);
 
     const view = { w: 10, h: 6 };
+    // masque : le mot dessiné à la taille exacte du canvas
+    function drawMask() {
+      if (!maskEl) return;
+      const cr = canvas.getBoundingClientRect(), r = maskEl.getBoundingClientRect();
+      const size = renderer.getDrawingBufferSize(new T.Vector2());
+      if (!cr.width || !size.x) return;
+      const sc = size.x / cr.width;
+      const c = document.createElement("canvas");
+      c.width = size.x; c.height = size.y;
+      const x = c.getContext("2d");
+      const cs = getComputedStyle(maskEl);
+      x.font = `${cs.fontStyle} ${cs.fontWeight} ${parseFloat(cs.fontSize) * sc}px ${cs.fontFamily}`;
+      try { x.letterSpacing = (parseFloat(cs.letterSpacing) || 0) * sc + "px"; } catch (e) { /* ancien navigateur */ }
+      x.textAlign = "center";
+      x.fillStyle = "#fff";
+      const m = x.measureText(maskEl.textContent);
+      // le centre optique des capitales, pas celui de la boîte de ligne
+      x.textBaseline = "alphabetic";
+      const cy = (r.top - cr.top + r.height / 2) * sc + (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2;
+      x.fillText(maskEl.textContent, (r.left - cr.left + r.width / 2) * sc, cy);
+      if (u.uMask.value) u.uMask.value.dispose();
+      u.uMask.value = new T.CanvasTexture(c);
+      u.uRes.value.set(size.x, size.y);
+    }
     function resize() {
       const w = canvas.clientWidth, h = canvas.clientHeight;
       if (!w || !h) return;
@@ -273,6 +309,7 @@
       view.h = 2 * camera.position.z * Math.tan((camera.fov / 2) * Math.PI / 180);
       view.w = view.h * camera.aspect;
       u.uView.value.set(view.w, view.h);
+      drawMask();
     }
     resize();
     addEventListener("resize", resize);
@@ -337,7 +374,7 @@
       light.tx = x; light.ty = y; light.ton = 1;
       combTo(x, y);
     }
-    const host = canvas.closest("section") || canvas;
+    const host = maskEl ? canvas.parentElement : (canvas.closest("section") || canvas);
     host.addEventListener("pointermove", (e) => pointer(e.clientX, e.clientY), { passive: true });
     host.addEventListener("touchmove", (e) => { const tc = e.touches[0]; if (tc) pointer(tc.clientX, tc.clientY); }, { passive: true });
     host.addEventListener("pointerleave", () => { lastX = null; light.ton = 0; });
@@ -350,13 +387,32 @@
       u.uTime.value = time;
       // le sillon se referme en un peu plus d'une seconde
       const s = u.uTrailS.value, fall = Math.pow(0.12, dt);
-      for (let i = 0; i < TRAIL; i++) s[i] *= fall;
+      let mx = 0;
+      for (let i = 0; i < TRAIL; i++) { s[i] *= fall; if (s[i] > mx) mx = s[i]; }
+      u.uComb.value = mx;
+      tilt.v += (tilt.t - tilt.v) * (1 - Math.pow(0.05, dt));
+      u.uTilt.value = tilt.v;
       const e = 1 - Math.pow(0.002, dt);
       light.x += (light.tx - light.x) * e; light.y += (light.ty - light.y) * e; light.on += (light.ton - light.on) * e * 0.5;
       u.uLight.value.set(light.x, light.y, light.on);
       render();
     });
     ctl.onSlow = () => { g.instanceCount = Math.floor(N * 0.55); renderer.setPixelRatio(1); resize(); };
+
+    // téléphone : la chevelure suit l'inclinaison (sur iPhone, autorisation demandée au premier toucher)
+    const tilt = { v: 0, t: 0 };
+    if (mobile && !reduced && window.DeviceOrientationEvent) {
+      const onTilt = (e) => { if (e.gamma !== null) tilt.t = Math.max(-1, Math.min(1, e.gamma / 35)); };
+      const listen = () => addEventListener("deviceorientation", onTilt);
+      if (typeof DeviceOrientationEvent.requestPermission === "function") {
+        const ask = (e) => {
+          if (e.target.closest("a, button")) return;
+          host.removeEventListener("touchend", ask);
+          DeviceOrientationEvent.requestPermission().then((r) => { if (r === "granted") listen(); }).catch(() => {});
+        };
+        host.addEventListener("touchend", ask);
+      } else listen();
+    }
 
     // démonstration : une brosse invisible passe une fois dans les cheveux
     function demoComb() {
@@ -384,7 +440,8 @@
 
     const fontsReady = document.fonts ? Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 1500))]) : Promise.resolve();
     const ready = fontsReady.then(() => {
-      if (!reduced && !sampleTitle()) u.uForm.value = 0;
+      if (maskEl) drawMask();
+      else if (!reduced && !sampleTitle()) u.uForm.value = 0;
       render();
       host.classList.add("has-gl");
     });

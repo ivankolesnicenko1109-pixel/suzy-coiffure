@@ -12,6 +12,7 @@
 
   let heroGL = null;
   let renderTryUI = null;
+  let studioUI = null;
 
   /* ---------- i18n ---------- */
   const store = {
@@ -37,6 +38,7 @@
     $$(".count").forEach((el) => { if (el.dataset.done) el.textContent = formatCount(+el.dataset.to, +el.dataset.dec || 0); });
     if (heroGL && heroGL.relabel) heroGL.relabel();
     if (renderTryUI) renderTryUI();
+    if (studioUI) studioUI();
     store.set("suzy-lang", lang);
     if (window.ScrollTrigger) ScrollTrigger.refresh();
   }
@@ -149,7 +151,17 @@
     const open = !!h && mins >= toMin(h[0]) && mins < toMin(h[1]);
     const st = $("#openStatus");
     st.className = "status " + (open ? "open" : "closed");
-    st.textContent = open ? t("info.openNow") : t("info.closedNow");
+    if (open) {
+      const left = toMin(h[1]) - mins;
+      st.textContent = t("info.closesIn").replace("{t}", `${Math.floor(left / 60)}h${String(left % 60).padStart(2, "0")}`);
+    } else {
+      // prochaine ouverture : plus tard aujourd'hui, demain, ou tel jour
+      let k = h && mins < toMin(h[0]) ? 0 : 1;
+      while (k < 8 && !HOURS[(today + k) % 7]) k++;
+      const d = (today + k) % 7;
+      const when = k === 0 ? t("info.today") : k === 1 ? t("info.tomorrow") : (lang === "de" ? days[d] : days[d].toLowerCase());
+      st.textContent = t("info.opensAt").replace("{d}", when).replace("{h}", HOURS[d][0]);
+    }
   }
 
   /* ---------- Compteurs ---------- */
@@ -220,12 +232,15 @@
       cur.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
       requestAnimationFrame(loop);
     })();
+    cur.insertAdjacentHTML("beforeend", `<span class="cursor-comb">${$(".hh-ico") ? $(".hh-ico").innerHTML : ""}</span>`);
     document.addEventListener("mouseover", (e) => {
       const lab = e.target.closest("[data-cursor]");
       const hov = e.target.closest("a, button, input, .tilt");
+      const hair = !lab && !hov && e.target.closest(".hero.has-gl, .foot-giant.has-gl");
       cur.classList.toggle("is-label", !!lab);
       label.textContent = lab ? lab.dataset.cursor : "";
       cur.classList.toggle("is-hover", !lab && !!hov);
+      cur.classList.toggle("is-comb", !!hair);
     });
 
     $$(".magnetic").forEach((el) => {
@@ -233,10 +248,12 @@
         const r = el.getBoundingClientRect();
         const x = e.clientX - r.left - r.width / 2;
         const y = e.clientY - r.top - r.height / 2;
-        el.style.transform = `translate(${x * 0.25}px, ${y * 0.35}px)`;
+        // attirance de 10 px au plus, puis retour en ressort
+        const k = Math.min(1, 10 / Math.max(Math.abs(x * 0.25), Math.abs(y * 0.35), 1));
+        el.style.transform = `translate(${x * 0.25 * k}px, ${y * 0.35 * k}px)`;
       });
       el.addEventListener("mouseleave", () => { el.style.transform = ""; });
-      el.style.transition = "transform .5s cubic-bezier(.16,1,.3,1), background .5s, box-shadow .5s, color .5s, border-color .5s";
+      el.style.transition = "transform .7s cubic-bezier(.34, 1.56, .64, 1), background .5s, box-shadow .5s, color .5s, border-color .5s";
     });
 
     $$(".tilt").forEach((el) => {
@@ -311,6 +328,12 @@
     $$(".hd", box).forEach((b) => b.addEventListener("click", () => {
       const r = b.getBoundingClientRect();
       heroGL.setShade(b.dataset.k, r.left + r.width / 2, r.top + r.height / 2);
+      if (footGL) footGL.setShade(b.dataset.k);
+      if (!tryChosen) {
+        tryKey = { blond: "airtouch", cuivre: "cuivre", chatain: "gloss", balayage: "balayage" }[b.dataset.k];
+        if (tryGL) tryGL.setMode(tryKey);
+        renderTry();
+      }
       renderShades();
     }));
   }
@@ -326,7 +349,7 @@
     { k: "gloss", price: 49 },
     { k: "cuivre", price: 79 }
   ];
-  let tryKey = "balayage", tryGL = null;
+  let tryKey = "balayage", tryGL = null, tryChosen = false, footGL = null;
   function renderTry() {
     const box = $("#trySwatches");
     if (!box) return;
@@ -337,6 +360,7 @@
     }).join("");
     $$(".try-sw", box).forEach((b) => b.addEventListener("click", () => {
       tryKey = b.dataset.k;
+      tryChosen = true;
       if (tryGL) tryGL.setMode(tryKey);
       renderTry();
       if (hasGsap && !reduced) gsap.from(".try-card > *", { y: 14, opacity: 0, duration: .8, stagger: .05 });
@@ -457,4 +481,145 @@
 
     addEventListener("load", () => ScrollTrigger.refresh());
   }
+
+  /* =========================================================
+     Détails « studio » : index des sections, fil d'or, lecture,
+     citation, « SUZY » en cheveux, titre d'onglet
+     ========================================================= */
+  const pad2 = (n) => String(n).padStart(2, "0");
+  const SECS = ["experience", "services", "essayez", "galerie", "avant-apres", "equipe", "avis", "contact"].map((id) => $("#" + id)).filter(Boolean);
+  const secIndex = $("#secIndex");
+  function renderIndex() {
+    SECS.forEach((sec, i) => {
+      const eb = $(".eyebrow", sec);
+      if (!eb) return;
+      let num = $(".sec-num", eb);
+      if (!num) { num = document.createElement("span"); num.className = "sec-num"; eb.prepend(num); }
+      num.textContent = pad2(i + 1) + " — ";
+    });
+    secIndex.innerHTML = SECS.map((sec, i) => {
+      const eb = $(".eyebrow", sec);
+      const name = eb ? t(eb.dataset.i18n) : "";
+      return `<a href="#${sec.id}"><span>${pad2(i + 1)}</span><em>${name}</em></a>`;
+    }).join("");
+    $$("a", secIndex).forEach((a, i) => a.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (lenis) lenis.scrollTo(SECS[i], { offset: -80 }); else SECS[i].scrollIntoView({ behavior: "smooth" });
+    }));
+  }
+  function markIndex() {
+    const y = innerHeight * 0.45;
+    let cur = -1;
+    SECS.forEach((sec, i) => { if (sec.getBoundingClientRect().top < y) cur = i; });
+    $$("a", secIndex).forEach((a, i) => a.classList.toggle("is-active", i === cur));
+    secIndex.classList.toggle("is-on", cur >= 0 && $("#contact").getBoundingClientRect().bottom > 0);
+  }
+  addEventListener("scroll", markIndex, { passive: true });
+
+  // lecture : les mots du texte « L'expérience » foncent un à un au fil du défilement
+  let readTween = null;
+  function readReveal() {
+    const el = $(".read-reveal");
+    if (!el || !hasGsap || !window.ScrollTrigger || reduced) return;
+    el.innerHTML = el.textContent.split(/(\s+)/).map((w) => /^\s+$/.test(w) ? w : `<span class="rw">${w}</span>`).join("");
+    if (readTween) { readTween.scrollTrigger.kill(); readTween.kill(); }
+    readTween = gsap.fromTo($$(".rw", el), { opacity: .18 }, { opacity: 1, stagger: .1, ease: "none", scrollTrigger: { trigger: el, start: "top 82%", end: "bottom 42%", scrub: .4 } });
+  }
+
+  // avis : une grande citation, qui change toute seule toutes les 6 secondes
+  let qi = 0, qTimer = null;
+  function showQuote(i, animate) {
+    qi = (i + REVIEWS.length) % REVIEWS.length;
+    const [text, who] = REVIEWS[qi];
+    const put = () => {
+      $("#qText").innerHTML = text.split(/(\s+)/).map((w) => /^\s+$/.test(w) ? w : `<span class="qw">${w}</span>`).join("");
+      $("#qWho").textContent = who + " · Salonkee";
+      $("#qCount").textContent = `${pad2(qi + 1)} / ${pad2(REVIEWS.length)}`;
+      if (animate && hasGsap && !reduced) gsap.from("#qText .qw", { opacity: 0, y: 10, filter: "blur(6px)", duration: .9, stagger: .012 });
+    };
+    if (animate && hasGsap && !reduced && $("#qText .qw")) {
+      gsap.to("#qText .qw", { opacity: 0, y: -8, filter: "blur(6px)", duration: .45, stagger: .006, ease: "power2.in", onComplete: put });
+    } else put();
+  }
+  function autoQuote() {
+    clearInterval(qTimer);
+    if (!reduced) qTimer = setInterval(() => showQuote(qi + 1, true), 6000);
+  }
+  if ($("#quote")) {
+    $("#qPrev").addEventListener("click", () => { showQuote(qi - 1, true); autoQuote(); });
+    $("#qNext").addEventListener("click", () => { showQuote(qi + 1, true); autoQuote(); });
+    $("#quote").addEventListener("mouseenter", () => clearInterval(qTimer));
+    $("#quote").addEventListener("mouseleave", autoQuote);
+    autoQuote();
+  }
+
+  // fil d'or : une mèche qui part du hero, coud les sections entre elles et finit dans le « SUZY » du pied de page
+  const thread = $("#goldThread"), tpath = $("#goldPath");
+  let tLen = 0, tTable = [], tShown = 0;
+  function buildThread() {
+    if (!thread) return;
+    const W = document.documentElement.clientWidth;
+    const abs = (el) => el.getBoundingClientRect().top + scrollY;
+    const giant = $(".foot-giant");
+    const end = abs(giant) + giant.offsetHeight * 0.55;
+    const L = W < 760 ? 7 : Math.max(18, W * 0.028), R = W - L;
+    let x = W * 0.06, y = abs($("#hero")) + $("#hero").offsetHeight * 0.9;
+    let d = `M ${x} ${y}`;
+    SECS.forEach((sec, i) => {
+      const top = abs(sec), h = sec.offsetHeight;
+      const nx = i % 2 ? L : R;
+      // la mèche traverse la page à la couture entre deux sections, en S
+      d += ` C ${x} ${top + 10}, ${nx} ${top - 10}, ${nx} ${top + 90}`;
+      x = nx; y = top + 90;
+      // puis elle descend le long de la marge en ondulant doucement
+      const amp = (i % 2 ? 1 : -1) * Math.min(L * 0.8, 22);
+      const y2 = top + h - 60;
+      if (y2 > y + 100) { d += ` C ${x + amp} ${y + (y2 - y) * 0.33}, ${x - amp} ${y + (y2 - y) * 0.66}, ${x} ${y2}`; y = y2; }
+    });
+    // arrivée : une boucle qui se pose au centre du mot géant
+    const cx = W * 0.5;
+    d += ` C ${x} ${end - 120}, ${cx - W * 0.2} ${end - 160}, ${cx} ${end - 40} S ${cx + W * 0.08} ${end + 40}, ${cx} ${end}`;
+    thread.setAttribute("viewBox", `0 0 ${W} ${end + 60}`);
+    thread.style.height = end + 60 + "px";
+    tpath.setAttribute("d", d);
+    tLen = tpath.getTotalLength();
+    tTable = [];
+    for (let k = 0; k <= 400; k++) { const l = (tLen * k) / 400; tTable.push([l, tpath.getPointAtLength(l).y]); }
+    tpath.style.strokeDasharray = tLen;
+    drawThread(true);
+  }
+  function drawThread(jump) {
+    if (!tLen) return;
+    const target = scrollY + innerHeight * 0.62;
+    let l = 0;
+    for (const [len, py] of tTable) { if (py <= target) l = Math.max(l, len); }
+    if (reduced) l = tLen;
+    tShown = jump ? l : tShown + (l - tShown) * 0.12;
+    tpath.style.strokeDashoffset = tLen - tShown;
+  }
+  (function threadLoop() { drawThread(false); requestAnimationFrame(threadLoop); })();
+  let tRes = null;
+  const rebuild = () => { clearTimeout(tRes); tRes = setTimeout(buildThread, 200); };
+  addEventListener("resize", rebuild);
+  addEventListener("load", rebuild);
+  if (window.ScrollTrigger) ScrollTrigger.addEventListener("refresh", rebuild);
+
+  // « SUZY » géant du pied de page, rempli des mêmes cheveux que le hero
+  const footCanvas = $("#footHair");
+  if (footCanvas && window.SuzyGL) {
+    new IntersectionObserver(([e], obs) => {
+      if (!e.isIntersecting) return;
+      obs.disconnect();
+      footGL = SuzyGL.hero({ canvas: footCanvas, maskEl: $(".fg-word"), reduced, mobile: mobileGL });
+      if (footGL && heroGL && heroGL.shade !== "blond") footGL.setShade(heroGL.shade);
+    }, { rootMargin: "300px" }).observe(footCanvas);
+  }
+
+  // onglet inactif : le salon vous attend
+  const baseTitle = document.title;
+  document.addEventListener("visibilitychange", () => { document.title = document.hidden ? t("tab.away") : baseTitle; });
+
+  studioUI = () => { renderIndex(); readReveal(); showQuote(qi, false); markIndex(); };
+  studioUI();
+  rebuild();
 })();

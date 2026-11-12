@@ -587,3 +587,20 @@ Object.assign(I18N.de, {
   "try.gloss": "Gloss", "try.gloss.d": "Ein Protein- oder Feuchtigkeitsglossing: Ihre Farbe bleibt, der Glanz verdoppelt sich.",
   "try.cuivre": "Leuchtendes Kupfer", "try.cuivre.d": "Eine pflegende Farbe mit Pflanzenölen, warm und strahlend."
 });
+
+// Détails « studio » : équipe, avis Google, itinéraire, statut vivant, onglet
+Object.assign(I18N.fr, {
+  "team.book": "Réserver avec", "rev.google": "Lire les 515 avis sur Google", "info.route": "Itinéraire",
+  "info.closesIn": "Ouvert · ferme dans {t}", "info.opensAt": "Fermé · ouvre {d} à {h}",
+  "info.today": "aujourd'hui", "info.tomorrow": "demain", "tab.away": "Suzy vous attend ✂️"
+});
+Object.assign(I18N.en, {
+  "team.book": "Book with", "rev.google": "Read the 515 reviews on Google", "info.route": "Directions",
+  "info.closesIn": "Open · closes in {t}", "info.opensAt": "Closed · opens {d} at {h}",
+  "info.today": "today", "info.tomorrow": "tomorrow", "tab.away": "Suzy is waiting for you ✂️"
+});
+Object.assign(I18N.de, {
+  "team.book": "Termin bei", "rev.google": "Die 515 Google-Bewertungen lesen", "info.route": "Route",
+  "info.closesIn": "Geöffnet · schliesst in {t}", "info.opensAt": "Geschlossen · öffnet {d} um {h}",
+  "info.today": "heute", "info.tomorrow": "morgen", "tab.away": "Suzy wartet auf Sie ✂️"
+});

@@ -200,6 +200,31 @@
         </section>`).join("");
     }
     renderers.push(render);
+
+    // aperçu : une petite photo de la catégorie suit la souris sur la ligne survolée
+    if (!finePointer || reduced) return;
+    const pv = document.createElement("div");
+    pv.className = "price-preview";
+    pv.setAttribute("aria-hidden", "true");
+    pv.innerHTML = "<img alt=\"\">";
+    document.body.appendChild(pv);
+    let px = 0, py = 0, x = 0, y = 0, on = false;
+    box.addEventListener("mousemove", (e) => {
+      px = e.clientX; py = e.clientY;
+      const row = e.target.closest(".srv-item");
+      const cat = row && row.closest(".price-cat");
+      if (row && cat) {
+        const src = $(".price-cat-img img", cat).getAttribute("src");
+        if ($("img", pv).getAttribute("src") !== src) $("img", pv).setAttribute("src", src);
+      }
+      if (!!row !== on) { on = !!row; pv.classList.toggle("is-on", on); }
+    });
+    box.addEventListener("mouseleave", () => { on = false; pv.classList.remove("is-on"); });
+    (function follow() {
+      x += (px - x) * 0.14; y += (py - y) * 0.14;
+      pv.style.transform = `translate(${x + 28}px, ${y - 130}px) rotate(${(px - x) * 0.04}deg)`;
+      requestAnimationFrame(follow);
+    })();
   }
 
   initWorks();
