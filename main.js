@@ -455,7 +455,8 @@
         v.appendChild(src);
         v.load();
       });
-      const T0 = 1200, SHINE = 8.7;
+      // les vidéos durent 10 s : jouées 2,3 fois plus vite, tout le vestibule tient en 4 à 5 s
+      const T0 = 500, SHINE = 8.7, RATE = 2.3;
       let exited = false, playing = false, resolved = false;
       const finish = () => { if (!resolved) { resolved = true; resolve(); } };
       box.classList.add("is-active");
@@ -492,7 +493,7 @@
       function fallback() {
         if (exited) return;
         showPng();
-        setTimeout(exit, 2500);
+        setTimeout(exit, 1400);
       }
       function exit() {
         if (exited) return;
@@ -512,13 +513,13 @@
           const a = $(from, box);
           const ra = a.getBoundingClientRect(), rb = $(to).getBoundingClientRect();
           gsap.set(a, { transformOrigin: "0 0" });
-          tl.to(a, { x: rb.left - ra.left, y: rb.top - ra.top, scale: rb.width / ra.width, duration: 1.1, ease: "power3.inOut" }, 0);
+          tl.to(a, { x: rb.left - ra.left, y: rb.top - ra.top, scale: rb.width / ra.width, duration: .9, ease: "power3.inOut" }, 0);
         });
         tl.to($(".li-line", box), { opacity: 0, duration: .45 }, 0)
           .to($(".li-veil", box), { opacity: 0, duration: 1 }, 0)
           .to($(".li-skip", box), { opacity: 0, duration: .3 }, 0)
           // le contenu commence à arriver une demi-seconde après le départ des logos
-          .call(finish, null, .5);
+          .call(finish, null, .4);
       }
       $("#introSkip").addEventListener("click", exit);
 
@@ -529,7 +530,7 @@
           if (exited) return;
           // départ des deux vidéos dans la même image
           requestAnimationFrame(() => {
-            vids.forEach((v) => { v.currentTime = 0; });
+            vids.forEach((v) => { v.currentTime = 0; v.defaultPlaybackRate = RATE; v.playbackRate = RATE; });
             Promise.all(vids.map((v) => v.play())).then(() => {
               playing = true;
               // contrôles : transparence présente, et lecture qui avance vraiment
@@ -547,7 +548,7 @@
                 else requestAnimationFrame(watch);
               };
               watch();
-              setTimeout(exit, (SHINE + 2) * 1000);
+              setTimeout(exit, (SHINE / RATE + 1.5) * 1000);
             }, fallback);
           });
         }, fallback);
