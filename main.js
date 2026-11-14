@@ -397,15 +397,136 @@
      ========================================================= */
   // pas de préloader : le hero s'affiche tout de suite (image préchargée), le texte entre en douceur
   function startSite() {
-    if (!hasGsap || reduced) { if (heroGL) heroGL.ready.then(() => heroGL.start()); return; }
-    // avec les cheveux : les fibres écrivent « Suzy », puis le vrai titre prend le relais
-    const intro = gsap.timeline({ delay: .1, paused: !!heroGL });
-    if (heroGL) heroGL.ready.then(() => { intro.delay(heroGL.start()); intro.restart(true); });
-    intro
-      .from(".ht-1 .ch", { yPercent: 105, duration: 1.5, stagger: .06, ease: "power4.out" })
-      .from(".ht-2 .ch", { yPercent: 110, opacity: 0, duration: 1.3, stagger: .04, ease: "power4.out" }, "-=1.2")
-      .from(".hero-top > *, .hero-aside > *", { y: 24, opacity: 0, duration: 1, stagger: .08, ease: "power4.out" }, "-=1.1")
-      .from(".hero-bar > *", { y: 16, opacity: 0, duration: .9, stagger: .08, ease: "power4.out" }, "-=.8");
+    const root = document.documentElement;
+    const box = $("#logoIntro");
+    const playIntro = root.classList.contains("intro-on") && hasGsap && !reduced;
+    // les cheveux ne disparaissent jamais : ils apparaissent une fois, en fondu, et continuent de vivre
+    if (heroGL) heroGL.ready.then(() => heroGL.reveal());
+    if (!playIntro) {
+      if (box) box.remove();
+      root.classList.remove("logos-hidden");
+      try { sessionStorage.setItem("introSeen", "1"); } catch (e) { /* stockage indisponible */ }
+      revealContent(root.classList.contains("intro-quick") ? .8 : 1);
+      return;
+    }
+    if (lenis) lenis.stop();
+    runIntro(box).then(() => {
+      try { sessionStorage.setItem("introSeen", "1"); } catch (e) { /* stockage indisponible */ }
+      revealContent(1);
+    });
+  }
+
+  // le contenu du hero arrive en cascade : navigation, titre, sous-titre, boutons, indice
+  function revealContent(dur) {
+    const root = document.documentElement;
+    const done = () => { if (lenis) lenis.start(); if (heroGL) setTimeout(() => heroGL.demo(), 900); };
+    if (!hasGsap || reduced) { root.classList.remove("intro-on", "intro-quick"); done(); return; }
+    const k = dur < 1 ? .65 : 1;
+    const tl = gsap.timeline({ onComplete: done, defaults: { ease: "power3.out" } });
+    tl.from(".nav-inner > *:not(.logo-pair)", { y: 24, opacity: 0, duration: dur, stagger: .12 * k })
+      .from(".hero-top > *", { y: 24, opacity: 0, duration: dur, stagger: .12 * k }, `<+${.12 * k}`)
+      .from(".ht-1 .ch", { yPercent: 105, duration: 1.4 * k, stagger: .06 * k, ease: "power4.out" }, `<+${.12 * k}`)
+      .from(".ht-2 .ch", { yPercent: 110, opacity: 0, duration: 1.2 * k, stagger: .04 * k, ease: "power4.out" }, `<+${.12 * k}`)
+      .from(".hero-line", { y: 24, opacity: 0, duration: dur }, `<+${.12 * k}`)
+      .from(".hero-actions > *", { y: 24, opacity: 0, duration: dur, stagger: .12 * k }, `<+${.12 * k}`)
+      .from(".hero-bar > *", { y: 24, opacity: 0, duration: dur, stagger: .12 * k }, `<+${.12 * k}`);
+    // les styles « from » sont posés : on peut lever le masque CSS sans flash
+    root.classList.remove("intro-on", "intro-quick");
+    if (window.ScrollTrigger) ScrollTrigger.refresh();
+  }
+
+  // vestibule : les deux logos se dessinent ensemble sur les cheveux, puis s'envolent dans l'en-tête
+  function runIntro(box) {
+    return new Promise((resolve) => {
+      const vids = $$("video", box);
+      // HEVC à transparence pour Safari (macOS, iOS) ; WebM VP9 à transparence pour tous les autres.
+      // Chrome sait lire le HEVC mais sans la transparence : il ne doit jamais le choisir.
+      const ua = navigator.userAgent;
+      const webkitOnly = /iP(hone|ad|od)/.test(ua) || (/Safari/.test(ua) && !/Chrome|Chromium|CriOS|FxiOS|Edg|OPR|Android/.test(ua));
+      vids.forEach((v) => {
+        const src = document.createElement("source");
+        src.src = webkitOnly ? v.dataset.hevc : v.dataset.webm;
+        src.type = webkitOnly ? 'video/mp4; codecs="hvc1"' : "video/webm";
+        v.appendChild(src);
+        v.load();
+      });
+      const T0 = 1200, SHINE = 8.7;
+      let exited = false, playing = false, resolved = false;
+      const finish = () => { if (!resolved) { resolved = true; resolve(); } };
+      box.classList.add("is-active");
+
+      const loaded = (v) => new Promise((res, rej) => {
+        if (v.readyState >= 4) return res();
+        v.addEventListener("canplaythrough", res, { once: true });
+        const last = $$("source", v).pop();
+        if (last) last.addEventListener("error", rej, { once: true });
+        v.addEventListener("error", rej, { once: true });
+      });
+      const ready = Promise.race([
+        Promise.all(vids.map(loaded)),
+        new Promise((_, rej) => setTimeout(rej, 4000))
+      ]);
+      ready.catch(() => { /* traité plus bas : on passe aux PNG */ });
+
+      function showPng() {
+        box.classList.add("is-png");
+        gsap.fromTo($$(".li-png", box), { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 1.5, ease: "power2.out" });
+      }
+      function fallback() {
+        if (exited) return;
+        showPng();
+        setTimeout(exit, 2500);
+      }
+      function exit() {
+        if (exited) return;
+        exited = true;
+        box.classList.add("is-on");
+        if (!playing && !box.classList.contains("is-png")) { box.classList.add("is-png"); gsap.set($$(".li-png", box), { opacity: 1 }); }
+        const tl = gsap.timeline({
+          onComplete: () => {
+            document.documentElement.classList.remove("logos-hidden");
+            // on libère la mémoire des vidéos
+            vids.forEach((v) => { v.pause(); $$("source", v).forEach((s) => s.remove()); v.removeAttribute("src"); v.load(); });
+            box.remove();
+            finish();
+          }
+        });
+        [[".li-suzy", ".lp-suzy"], [".li-val", ".lp-val"]].forEach(([from, to]) => {
+          const a = $(from, box);
+          const ra = a.getBoundingClientRect(), rb = $(to).getBoundingClientRect();
+          gsap.set(a, { transformOrigin: "0 0" });
+          tl.to(a, { x: rb.left - ra.left, y: rb.top - ra.top, scale: rb.width / ra.width, duration: 1.1, ease: "power3.inOut" }, 0);
+        });
+        tl.to($(".li-line", box), { opacity: 0, duration: .45 }, 0)
+          .to($(".li-veil", box), { opacity: 0, duration: 1 }, 0)
+          .to($(".li-skip", box), { opacity: 0, duration: .3 }, 0)
+          // le contenu commence à arriver une demi-seconde après le départ des logos
+          .call(finish, null, .5);
+      }
+      $("#introSkip").addEventListener("click", exit);
+
+      setTimeout(() => {
+        if (exited) return;
+        box.classList.add("is-on");
+        ready.then(() => {
+          if (exited) return;
+          // départ des deux vidéos dans la même image
+          requestAnimationFrame(() => {
+            vids.forEach((v) => { v.currentTime = 0; });
+            Promise.all(vids.map((v) => v.play())).then(() => {
+              playing = true;
+              const watch = () => {
+                if (exited) return;
+                if (vids[0].currentTime >= SHINE || vids[0].ended) exit();
+                else requestAnimationFrame(watch);
+              };
+              watch();
+              setTimeout(exit, (SHINE + 2) * 1000);
+            }, fallback);
+          });
+        }, fallback);
+      }, T0);
+    });
   }
   startSite();
 

@@ -604,3 +604,8 @@ Object.assign(I18N.de, {
   "info.closesIn": "Geöffnet · schliesst in {t}", "info.opensAt": "Geschlossen · öffnet {d} um {h}",
   "info.today": "heute", "info.tomorrow": "morgen", "tab.away": "Suzy wartet auf Sie ✂️"
 });
+
+// Vestibule
+I18N.fr["intro.skip"] = "Passer l'intro";
+I18N.en["intro.skip"] = "Skip intro";
+I18N.de["intro.skip"] = "Intro überspringen";

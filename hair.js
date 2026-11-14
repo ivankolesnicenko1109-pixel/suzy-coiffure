@@ -457,6 +457,14 @@
         gsap.to(u.uForm, { value: 0, duration: 3.4, delay: 1.5, ease: "power3.inOut", onComplete: () => { if (!mobile) demoComb(); } });
         return 2.1;
       },
+      // apparition simple pour le vestibule : fondu et léger recul de la caméra, sans écrire « Suzy »
+      reveal() {
+        u.uForm.value = 0;
+        if (reduced || !hasGsap) { u.uAlpha.value = 1; render(); return; }
+        gsap.fromTo(u.uAlpha, { value: 0 }, { value: 1, duration: 1.2, ease: "power2.out" });
+        gsap.fromTo(camera.position, { z: 10 / 1.08 }, { z: 10, duration: 1.2, ease: "power2.out", onUpdate: () => { u.uCamZ.value = camera.position.z; } });
+      },
+      demo() { if (!mobile && !reduced) demoComb(); },
       setShade(key, clientX, clientY) {
         const s = SHADES[key];
         if (!s || key === this.shade) return;

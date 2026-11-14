@@ -1097,3 +1097,47 @@ h1, h2, h3, .quote p { font-variant-ligatures: common-ligatures discretionary-li
 .sec-index a em { position: absolute; right: calc(100% + .4rem); white-space: nowrap; }
 .nav.is-scrolled .lang button { color: var(--ink); } .nav.is-scrolled .lang button.is-active { color: #fff; }
 .gold-thread path { stroke-width: 1.8; }
+
+/* =====================================================================
+   Vestibule : les deux logos animés se dessinent sur les cheveux, puis volent dans l'en-tête
+   ===================================================================== */
+/* en-tête : les deux logos côte à côte, séparés par un filet d'or */
+.logo-pair { display: flex; align-items: center; gap: .85rem; }
+.logo-pair .lp { display: block; position: relative; }
+.logo-pair img { height: 44px; width: auto; display: block; transition: height .5s var(--ease); }
+.logo-pair .logo-dark { display: none; }
+.lp-sep { width: 1px; height: 30px; background: linear-gradient(transparent, #c9a36a, transparent); }
+.nav.is-scrolled .logo-pair .logo-light { display: none; }
+.nav.is-scrolled .logo-pair .logo-dark { display: block; }
+.nav.is-scrolled .logo-pair img { height: 40px; }
+@media (max-width: 767px) { .logo-pair { gap: .55rem; } .logo-pair img, .nav.is-scrolled .logo-pair img { height: 32px; } .lp-sep { height: 22px; } }
+html.logos-hidden .logo-pair .lp, html.logos-hidden .logo-pair .lp-sep { opacity: 0; }
+
+/* pendant l'intro : seul les cheveux sont visibles, rien n'est cliquable */
+html.intro-on, html.intro-on body { overflow: hidden; }
+html.intro-on .nav-inner > *:not(.logo-pair), html.intro-quick .nav-inner > *:not(.logo-pair),
+html.intro-on .hero-top, html.intro-on .hero-main, html.intro-on .hero-bar,
+html.intro-quick .hero-top, html.intro-quick .hero-main, html.intro-quick .hero-bar,
+html.intro-on .m-cta, html.intro-on .sec-index, html.intro-on .gold-thread { opacity: 0; pointer-events: none; }
+
+.logo-intro { display: none; position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.logo-intro.is-active { display: block; }
+.li-veil { position: absolute; inset: 0; opacity: 0; transition: opacity .8s var(--ease);
+  background: radial-gradient(ellipse at center, rgba(46, 33, 27, .75) 0%, rgba(46, 33, 27, .35) 45%, transparent 75%); }
+.logo-intro.is-on .li-veil { opacity: 1; }
+.li-row { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 4vw; }
+.li-logo { position: relative; width: min(34vw, 460px); flex: none; }
+.li-logo video, .li-logo .li-png { display: block; width: 100%; height: auto; }
+.li-logo .li-png { position: absolute; inset: 0; opacity: 0; }
+.logo-intro.is-png .li-logo video { opacity: 0; }
+.li-line { width: 1px; height: 40%; flex: none; background: linear-gradient(transparent, #c9a36a, transparent); transform: scaleY(0); transition: transform 1.2s var(--ease); }
+.logo-intro.is-on .li-line { transform: scaleY(1); }
+.li-skip { position: absolute; right: max(24px, env(safe-area-inset-right, 0px)); bottom: calc(24px + env(safe-area-inset-bottom, 0px)); pointer-events: auto;
+  font-size: .72rem; letter-spacing: .2em; text-transform: uppercase; color: var(--porcelain); opacity: .6; padding: .6rem .9rem; transition: opacity .3s; }
+.li-skip:hover, .li-skip:focus-visible { opacity: 1; }
+@media (max-width: 767px) {
+  .li-row { flex-direction: column; gap: 6vw; }
+  .li-logo { width: 62vw; }
+  .li-line { width: 40%; height: 1px; background: linear-gradient(90deg, transparent, #c9a36a, transparent); transform: scaleX(0); }
+  .logo-intro.is-on .li-line { transform: scaleX(1); }
+}
