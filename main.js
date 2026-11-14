@@ -462,11 +462,23 @@
         if (last) last.addEventListener("error", rej, { once: true });
         v.addEventListener("error", rej, { once: true });
       });
+      // au bout de 4 s on tente quand même la lecture : sur iPhone, la vidéo ne se charge souvent qu'au premier play()
       const ready = Promise.race([
         Promise.all(vids.map(loaded)),
-        new Promise((_, rej) => setTimeout(rej, 4000))
+        new Promise((res) => setTimeout(res, 4000))
       ]);
       ready.catch(() => { /* traité plus bas : on passe aux PNG */ });
+
+      // la vidéo doit vraiment être transparente : un coin opaque veut dire que le navigateur a perdu l'alpha
+      function alphaOk(v) {
+        try {
+          const c = document.createElement("canvas");
+          c.width = 32; c.height = 32;
+          const x = c.getContext("2d", { willReadFrequently: true });
+          x.drawImage(v, 0, 0, 32, 32);
+          return x.getImageData(1, 1, 1, 1).data[3] < 128;
+        } catch (e) { return true; }
+      }
 
       function showPng() {
         box.classList.add("is-png");
@@ -515,6 +527,15 @@
             vids.forEach((v) => { v.currentTime = 0; });
             Promise.all(vids.map((v) => v.play())).then(() => {
               playing = true;
+              // contrôles : transparence présente, et lecture qui avance vraiment
+              setTimeout(() => {
+                if (exited) return;
+                if (!vids.every(alphaOk)) { vids.forEach((v) => v.pause()); playing = false; fallback(); }
+              }, 500);
+              setTimeout(() => {
+                if (exited || !playing) return;
+                if (vids.some((v) => v.currentTime < 0.3)) { vids.forEach((v) => v.pause()); playing = false; fallback(); }
+              }, 3000);
               const watch = () => {
                 if (exited) return;
                 if (vids[0].currentTime >= SHINE || vids[0].ended) exit();
