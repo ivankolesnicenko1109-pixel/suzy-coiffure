@@ -410,7 +410,12 @@
       return;
     }
     if (lenis) lenis.stop();
-    runIntro(box).then(() => {
+    // onglet ouvert en arrière-plan : l'intro attend qu'on le regarde, sinon elle se jouerait sans témoin
+    const whenVisible = () => document.hidden ? new Promise((r) => {
+      const f = () => { if (!document.hidden) { document.removeEventListener("visibilitychange", f); r(); } };
+      document.addEventListener("visibilitychange", f);
+    }) : Promise.resolve();
+    whenVisible().then(() => runIntro(box)).then(() => {
       try { sessionStorage.setItem("introSeen", "1"); } catch (e) { /* stockage indisponible */ }
       revealContent(1);
     });
